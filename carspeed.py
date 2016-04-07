@@ -55,7 +55,7 @@ IMAGEWIDTH = 640
 IMAGEHEIGHT = 480
 RESOLUTION = [IMAGEWIDTH,IMAGEHEIGHT]
 FOV = 53.5
-FPS = 30
+FPS = 90
 
 # the following enumerated values are used to make the program more readable
 WAITING = 0
@@ -109,8 +109,8 @@ prompt = ''
 camera = PiCamera()
 camera.resolution = RESOLUTION
 camera.framerate = FPS
-camera.vflip = True
-camera.hflip = True
+camera.vflip = False
+camera.hflip = False
 
 rawCapture = PiRGBArray(camera, size=camera.resolution)
 # allow the camera to warm up
