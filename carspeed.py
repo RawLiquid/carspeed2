@@ -5,7 +5,11 @@ import time
 import math
 import datetime
 import cv2
-import sqlalchemy
+import numpy
+
+from sqlalchemy import create_engine, MetaData, Table
+from sqlalchemy.orm import sessionmaker
+from db import speeders
 
 # place a prompt on the displayed image
 def prompt_on_image(txt):
@@ -179,6 +183,11 @@ print(" monitored_area {}".format(monitored_width * monitored_height))
 # capture frames from the camera (using capture_continuous.
 #   This keeps the picamera in capture mode - it doesn't need
 #   to prep for each frame's capture.
+#   First, open up the PostgreSQL database.
+
+engine = create_engine('postgresql://speedcam:Rward0232@localhost/speedcamdb')
+DBSession = sessionmaker(bind=engine)
+session = DBSession()
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
     #initialize the timestamp
@@ -229,6 +238,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             motion_found = True
 
     if motion_found:
+        mph_list=[]
         if state == WAITING:
             # intialize tracking
             state = TRACKING
@@ -249,8 +259,10 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                     abs_chg = initial_x - x
                 secs = secs_diff(timestamp,initial_time)
                 mph = get_speed(abs_chg,ftperpixel,secs)
+                mph_list.append(mph)
 
-                if mph > SPEED_THRESHOLD:
+                if mph > SPEED_THRESHOLD:  # Don't want all drivers, and want a reasonable
+                    # number of frames captured
                     print("--> chg={}  secs={}  mph={} this_x={} w={} ".format(abs_chg,secs,"%.0f" % mph,x,w))
                     real_y = upper_left_y + y
                     real_x = upper_left_x + x
@@ -258,7 +270,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                     # and save it
                     if ((x <= 2) and (direction == RIGHT_TO_LEFT)) \
                             or ((x+w >= monitored_width - 2) \
-                            and (direction == LEFT_TO_RIGHT)):
+                            and (direction == LEFT_TO_RIGHT))\
+                            and len(mph_list) >= 3:
                         # timestamp the image
                         cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
                             (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 1)
