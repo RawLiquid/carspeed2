@@ -5,6 +5,7 @@ import time
 import math
 import datetime
 import cv2
+import sqlalchemy
 
 # place a prompt on the displayed image
 def prompt_on_image(txt):
@@ -46,15 +47,16 @@ def draw_rectangle(event,x,y,flags,param):
         cv2.rectangle(image,(ix,iy),(fx,fy),(0,255,0),2)
         
 # define some constants
-DISTANCE = 76  #<---- enter your distance-to-road value here
+DISTANCE = 70  #<---- enter your distance-to-road value here
 THRESHOLD = 15
+SPEED_THRESHOLD = 40
 MIN_AREA = 175
 BLURSIZE = (15,15)
 IMAGEWIDTH = 640
 IMAGEHEIGHT = 480
 RESOLUTION = [IMAGEWIDTH,IMAGEHEIGHT]
 FOV = 53.5
-FPS = 30
+FPS = 90
 
 # the following enumerated values are used to make the program more readable
 WAITING = 0
@@ -108,8 +110,8 @@ prompt = ''
 camera = PiCamera()
 camera.resolution = RESOLUTION
 camera.framerate = FPS
-camera.vflip = True
-camera.hflip = True
+camera.vflip = False
+camera.hflip = False
 
 rawCapture = PiRGBArray(camera, size=camera.resolution)
 # allow the camera to warm up
@@ -247,31 +249,33 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                     abs_chg = initial_x - x
                 secs = secs_diff(timestamp,initial_time)
                 mph = get_speed(abs_chg,ftperpixel,secs)
-                print("--> chg={}  secs={}  mph={} this_x={} w={} ".format(abs_chg,secs,"%.0f" % mph,x,w))
-                real_y = upper_left_y + y
-                real_x = upper_left_x + x
-                # is front of object outside the monitired boundary? Then write date, time and speed on image
-                # and save it 
-                if ((x <= 2) and (direction == RIGHT_TO_LEFT)) \
-                        or ((x+w >= monitored_width - 2) \
-                        and (direction == LEFT_TO_RIGHT)):
-                    # timestamp the image
-                    cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
-                        (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 1)
-                    # write the speed: first get the size of the text
-                    size, base = cv2.getTextSize( "%.0f mph" % last_mph, cv2.FONT_HERSHEY_SIMPLEX, 2, 3)
-                    # then center it horizontally on the image
-                    cntr_x = int((IMAGEWIDTH - size[0]) / 2) 
-                    cv2.putText(image, "%.0f mph" % last_mph,
-                        (cntr_x , int(IMAGEHEIGHT * 0.2)), cv2.FONT_HERSHEY_SIMPLEX, 2.00, (0, 255, 0), 3)
-                    # and save the image to disk
-                    cv2.imwrite("car_at_"+datetime.datetime.now().strftime("%Y%m%d_%H%M%S")+".jpg",
-                        image)
-                    state = SAVING
-                # if the object hasn't reached the end of the monitored area, just remember the speed 
-                # and its last position
-                last_mph = mph
-                last_x = x
+
+                if mph > SPEED_THRESHOLD:
+                    print("--> chg={}  secs={}  mph={} this_x={} w={} ".format(abs_chg,secs,"%.0f" % mph,x,w))
+                    real_y = upper_left_y + y
+                    real_x = upper_left_x + x
+                    # is front of object outside the monitored boundary? Then write date, time and speed on image
+                    # and save it
+                    if ((x <= 2) and (direction == RIGHT_TO_LEFT)) \
+                            or ((x+w >= monitored_width - 2) \
+                            and (direction == LEFT_TO_RIGHT)):
+                        # timestamp the image
+                        cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
+                            (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 1)
+                        # write the speed: first get the size of the text
+                        size, base = cv2.getTextSize( "%.0f mph" % last_mph, cv2.FONT_HERSHEY_SIMPLEX, 2, 3)
+                        # then center it horizontally on the image
+                        cntr_x = int((IMAGEWIDTH - size[0]) / 2)
+                        cv2.putText(image, "%.0f mph" % last_mph,
+                            (cntr_x , int(IMAGEHEIGHT * 0.2)), cv2.FONT_HERSHEY_SIMPLEX, 2.00, (0, 255, 0), 3)
+                        # and save the image to disk
+                        cv2.imwrite("speed_tracking_images/car_at_"+datetime.datetime.now().strftime("%Y%m%d_%H%M%S")+".jpg",
+                            image)
+                        state = SAVING
+                    # if the object hasn't reached the end of the monitored area, just remember the speed
+                    # and its last position
+                    last_mph = mph
+                    last_x = x
     else:
         if state != WAITING:
             state = WAITING
