@@ -350,7 +350,6 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                 last_x = x
     else:
         if state != WAITING:
-            clear_screen()
             state = WAITING
             direction = UNKNOWN
             text_on_image = 'No Car Detected'
