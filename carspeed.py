@@ -250,8 +250,6 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             motion_found = True
 
     if motion_found:
-        print(found_area)
-        print(biggest_area)
         if state == WAITING:
             id = uuid()  # give same ID to all detections. This will help find errors
             clear_screen()
@@ -306,7 +304,6 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                             mph_list = []
 
                             if id:
-
                                 median_speed = median(mph_list)
 
                                 new_speeder = Speeders(
