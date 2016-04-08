@@ -194,6 +194,8 @@ session = DBSession()
 
 
 mph_list = []
+commited = False
+
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
     #initialize the timestamp
     timestamp = datetime.datetime.now()
@@ -293,24 +295,26 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                             state = SAVING
                             mph_list = []
 
-                            new_speeder = Speeders(
-                                uniqueID = uuid(),
-                                datetime = datetime.datetime.now(),
-                                speed = last_mph,
-                                rating = None  # Not yet utilized
-                            )
+                            if commited == False:
+                                new_speeder = Speeders(
+                                    uniqueID = uuid(),
+                                    datetime = datetime.datetime.now(),
+                                    speed = last_mph,
+                                    rating = None  # Not yet utilized
+                                )
 
-                            session.add(new_speeder)
-                            session.commit
+                                session.add(new_speeder)
+                                session.commit()
+                                commited = True
 
-                            print("Added new speeder to database")
+                                print("Added new speeder to database")
 
                         # if the object hasn't reached the end of the monitored area, just remember the speed
                         # and its last position
                         last_mph = mph
 
                     elif ((x <= 2) and (direction == RIGHT_TO_LEFT))\
-                            or ((x + w >= monitored_width - 2) and (direction == LEFT_TO_RIGHT)):
+                            or ((x + w >= monitored_width - 2) and (direction == LEFT_TO_RIGHT)) and commited == False:
                         new_vehicle = Vehicles(  # Table for statistics calculations
                             uniqueID = uuid(),
                             datetime = datetime.datetime.now(),
@@ -318,7 +322,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                             rating = None
                         )
                         session.add(new_vehicle)
-                        session.commit
+                        session.commit()
+                        commited = True
 
                         print("Added new vehicle to database")
 
@@ -333,6 +338,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             text_on_image = 'No Car Detected'
             print(text_on_image)
             mph_list = []
+            commited = False
     # only update image and wait for a keypress when waiting for a car
     # or if 50 frames have been processed in the WAITING state.
     # This is required since waitkey slows processing.
