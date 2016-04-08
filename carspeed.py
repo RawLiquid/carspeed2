@@ -315,9 +315,6 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
                                 session.add(new_speeder)
                                 session.commit()
-                                id = None
-
-                                mph_list = []
 
                                 clear_screen()
                                 print("Added new speeder to database")
