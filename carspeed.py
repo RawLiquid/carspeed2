@@ -285,7 +285,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                         real_x = upper_left_x + x
                         # is front of object outside the monitored boundary? Then write date, time and speed on image
                         # and save it
-                        if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and last_mph > SPEED_THRESHOLD:\
+                        if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and last_mph > SPEED_THRESHOLD\
                                 or ((x+w >= monitored_width - 2) \
                                 and (direction == LEFT_TO_RIGHT))\
                                 and last_mph > SPEED_THRESHOLD:  # Prevent writing of speeds less than realistic min.
