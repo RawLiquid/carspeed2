@@ -7,10 +7,15 @@ import datetime
 import cv2
 from statistics import median
 from uuid import uuid4 as uuid
+import os
 
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.orm import sessionmaker
 from db import Speeders, Vehicles
+
+
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 # place a prompt on the displayed image
 def prompt_on_image(txt):
@@ -246,6 +251,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
     if motion_found:
         if state == WAITING:
+            clear_screen()
             # intialize tracking
             state = TRACKING
             initial_x = x
@@ -256,7 +262,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             print(text_on_image)
         else:
 
-            if state == TRACKING:       
+            if state == TRACKING:
+                clear_screen()
                 if x >= last_x:
                     direction = LEFT_TO_RIGHT
                     abs_chg = x + w - initial_x
@@ -310,6 +317,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                                 session.commit()
                                 commited = True
 
+                                clear_screen()
                                 print("Added new speeder to database")
 
                         # if the object hasn't reached the end of the monitored area, just remember the speed
@@ -331,14 +339,17 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                         session.commit()
                         commited = True
 
+                        clear_screen()
                         print("Added new vehicle to database")
 
                 else:
+                    clear_screen()
                     print("Not enough frames captured")
 
                 last_x = x
     else:
         if state != WAITING:
+            clear_screen()
             state = WAITING
             direction = UNKNOWN
             text_on_image = 'No Car Detected'
