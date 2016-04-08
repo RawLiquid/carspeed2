@@ -6,6 +6,7 @@ import math
 import datetime
 import cv2
 import numpy
+from uuid import uuid4 as uuid
 
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.orm import sessionmaker
@@ -289,6 +290,17 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                             image)
                         state = SAVING
                         mph_list = []
+
+                        new_speeder = Speeders(
+                            uniqueID = uuid(),
+                            datetime = timestamp,
+                            speed = last_mph,
+                            rating = None  # Not yet utilized
+                        )
+
+                        session.add(new_speeder)
+                        session.commit
+
                     # if the object hasn't reached the end of the monitored area, just remember the speed
                     # and its last position
                     last_mph = mph
