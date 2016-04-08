@@ -326,7 +326,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                         # and its last position
                         last_mph = mph
 
-                    elif ((x <= 2) and (direction == RIGHT_TO_LEFT)) and id\
+                    if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and id\
                             or ((x + w >= monitored_width - 2) and (direction == LEFT_TO_RIGHT)) and id:
 
                         median_speed = median(mph_list)
