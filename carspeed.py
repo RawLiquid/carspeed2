@@ -301,7 +301,6 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                             cv2.imwrite("speed_tracking_images/car_at_"+datetime.datetime.now().strftime("%Y%m%d_%H%M%S")+".jpg",
                                 image)
                             state = SAVING
-                            mph_list = []
 
                             if id:
                                 median_speed = median(mph_list)
@@ -316,6 +315,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                                 session.add(new_speeder)
                                 session.commit()
                                 id = None
+
+                                mph_list = []
 
                                 clear_screen()
                                 print("Added new speeder to database")
