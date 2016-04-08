@@ -261,7 +261,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                 mph = get_speed(abs_chg,ftperpixel,secs)
                 mph_list.append(mph)
 
-                if mph > SPEED_THRESHOLD and len(mph_list) > 3:  # Don't want all drivers, and want a reasonable
+                if mph > SPEED_THRESHOLD and len(mph_list) >= 3:  # Don't want all drivers, and want a reasonable
                     # number of frames captured
                     print("--> chg={}  secs={}  mph={} this_x={} w={} ".format(abs_chg,secs,"%.0f" % mph,x,w))
                     real_y = upper_left_y + y
@@ -270,7 +270,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                     # and save it
                     if ((x <= 2) and (direction == RIGHT_TO_LEFT)) \
                             or ((x+w >= monitored_width - 2) \
-                            and (direction == LEFT_TO_RIGHT))
+                            and (direction == LEFT_TO_RIGHT)):
                         # timestamp the image
                         cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
                             (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 1)
