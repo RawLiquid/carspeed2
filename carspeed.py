@@ -62,7 +62,7 @@ IMAGEWIDTH = 640
 IMAGEHEIGHT = 480
 RESOLUTION = [IMAGEWIDTH,IMAGEHEIGHT]
 FOV = 53.5
-FPS = 90
+FPS = 30
 
 # the following enumerated values are used to make the program more readable
 WAITING = 0
