@@ -55,8 +55,8 @@ def draw_rectangle(event,x,y,flags,param):
 DISTANCE = 55  #<---- enter your distance-to-road value here
 THRESHOLD = 15
 SPEED_THRESHOLD = 40
-MINIMUM_SPEED = 20
-MAXIMUM_SPEED = 70
+MINIMUM_SPEED = 20  # Don't detect cars in parking lots, walkers, and slow drivers
+MAXIMUM_SPEED = 70  # Anything higher than this is likely to be noise.
 MIN_AREA = 175  # TODO: Experiment with this - it may reduce the sensitivity
 BLURSIZE = (15,15)
 IMAGEWIDTH = 640
@@ -311,7 +311,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                             and (direction == LEFT_TO_RIGHT)) \
                                 and mph > MINIMUM_SPEED:
                     new_vehicle = Vehicles(  # Table for statistics calculations
-                        unique_ID = uuid(),
+                        uniqueID = uuid(),
                         datetime = datetime.datetime.now(),
                         speed = mph,
                         rating = None
