@@ -265,59 +265,64 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                 mph = get_speed(abs_chg,ftperpixel,secs)
                 if mph > MINIMUM_SPEED and mph <= MAXIMUM_SPEED:  # Filter out cars in parking lot behind road and crazy-high readings
                    mph_list.append(mph)
-                if mph > SPEED_THRESHOLD and mph <= MAXIMUM_SPEED and len(mph_list) >= 3:  # Don't want all drivers, and want a reasonable
-                    # number of frames captured
-                    print("--> chg={}  secs={}  mph={} this_x={} w={} ".format(abs_chg,secs,"%.0f" % mph,x,w))
-                    real_y = upper_left_y + y
-                    real_x = upper_left_x + x
-                    # is front of object outside the monitored boundary? Then write date, time and speed on image
-                    # and save it
-                    if ((x <= 2) and (direction == RIGHT_TO_LEFT)) \
-                            or ((x+w >= monitored_width - 2) \
-                            and (direction == LEFT_TO_RIGHT))\
-                            and last_mph > SPEED_THRESHOLD:  # Prevent writing of speeds less than realistic min.
-                        # timestamp the image
-                        cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
-                            (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 1)
-                        # write the speed: first get the size of the text
-                        size, base = cv2.getTextSize( "%.0f mph" % last_mph, cv2.FONT_HERSHEY_SIMPLEX, 2, 3)
-                        # then center it horizontally on the image
-                        cntr_x = int((IMAGEWIDTH - size[0]) / 2)
-                        cv2.putText(image, "%.0f mph" % last_mph,
-                            (cntr_x , int(IMAGEHEIGHT * 0.2)), cv2.FONT_HERSHEY_SIMPLEX, 2.00, (0, 255, 0), 3)
-                        # and save the image to disk
-                        cv2.imwrite("speed_tracking_images/car_at_"+datetime.datetime.now().strftime("%Y%m%d_%H%M%S")+".jpg",
-                            image)
-                        state = SAVING
-                        mph_list = []
 
-                        new_speeder = Speeders(
+                if len(mph_list) >= 3:
+                    if mph > SPEED_THRESHOLD and mph <= MAXIMUM_SPEED:  # Don't want all drivers, and want a reasonable
+                        # number of frames captured
+                        print("--> chg={}  secs={}  mph={} this_x={} w={} ".format(abs_chg,secs,"%.0f" % mph,x,w))
+                        real_y = upper_left_y + y
+                        real_x = upper_left_x + x
+                        # is front of object outside the monitored boundary? Then write date, time and speed on image
+                        # and save it
+                        if ((x <= 2) and (direction == RIGHT_TO_LEFT)) \
+                                or ((x+w >= monitored_width - 2) \
+                                and (direction == LEFT_TO_RIGHT))\
+                                and last_mph > SPEED_THRESHOLD:  # Prevent writing of speeds less than realistic min.
+                            # timestamp the image
+                            cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
+                                (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 1)
+                            # write the speed: first get the size of the text
+                            size, base = cv2.getTextSize( "%.0f mph" % last_mph, cv2.FONT_HERSHEY_SIMPLEX, 2, 3)
+                            # then center it horizontally on the image
+                            cntr_x = int((IMAGEWIDTH - size[0]) / 2)
+                            cv2.putText(image, "%.0f mph" % last_mph,
+                                (cntr_x , int(IMAGEHEIGHT * 0.2)), cv2.FONT_HERSHEY_SIMPLEX, 2.00, (0, 255, 0), 3)
+                            # and save the image to disk
+                            cv2.imwrite("speed_tracking_images/car_at_"+datetime.datetime.now().strftime("%Y%m%d_%H%M%S")+".jpg",
+                                image)
+                            state = SAVING
+                            mph_list = []
+
+                            new_speeder = Speeders(
+                                uniqueID = uuid(),
+                                datetime = datetime.datetime.now(),
+                                speed = last_mph,
+                                rating = None  # Not yet utilized
+                            )
+
+                            session.add(new_speeder)
+                            session.commit
+
+                        # if the object hasn't reached the end of the monitored area, just remember the speed
+                        # and its last position
+                        last_mph = mph
+                        last_x = x
+
+                    elif ((x <= 2) and (direction == RIGHT_TO_LEFT))\
+                            or ((x + w >= monitored_width - 2)
+                                and (direction == LEFT_TO_RIGHT)) \
+                                    and mph > MINIMUM_SPEED:
+                        new_vehicle = Vehicles(  # Table for statistics calculations
                             uniqueID = uuid(),
                             datetime = datetime.datetime.now(),
-                            speed = last_mph,
-                            rating = None  # Not yet utilized
+                            speed = mph,
+                            rating = None
                         )
-
-                        session.add(new_speeder)
+                        session.add(new_vehicle)
                         session.commit
 
-                    # if the object hasn't reached the end of the monitored area, just remember the speed
-                    # and its last position
-                    last_mph = mph
-                    last_x = x
-
-                elif ((x <= 2) and (direction == RIGHT_TO_LEFT))\
-                        or ((x + w >= monitored_width - 2)
-                            and (direction == LEFT_TO_RIGHT)) \
-                                and mph > MINIMUM_SPEED:
-                    new_vehicle = Vehicles(  # Table for statistics calculations
-                        uniqueID = uuid(),
-                        datetime = datetime.datetime.now(),
-                        speed = mph,
-                        rating = None
-                    )
-                    session.add(new_vehicle)
-                    session.commit
+                else:
+                    print("Not enough frames captured")
     else:
         if state != WAITING:
             state = WAITING
