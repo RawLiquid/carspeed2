@@ -345,7 +345,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
                 else:
                     clear_screen()
-                    print("Not enough frames captured")
+                    print("Not enough frames captured ({})".format(len(mph_list)))
 
                 last_x = x
     else:
