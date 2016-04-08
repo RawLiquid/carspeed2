@@ -1,0 +1,6 @@
+﻿DELETE FROM vehicles
+WHERE id IN (SELECT id
+              FROM (SELECT id,
+                             ROW_NUMBER() OVER (partition BY speed ORDER BY id) AS rnum
+                     FROM vehicles) t
+              WHERE t.rnum > 1);
