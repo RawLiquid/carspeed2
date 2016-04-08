@@ -316,7 +316,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                         speed = mph,
                         rating = None
                     )
-                    session.add(new_speeder)
+                    session.add(new_vehicle)
                     session.commit
     else:
         if state != WAITING:
