@@ -267,7 +267,6 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                    mph_list.append(mph)
 
                 if len(mph_list) >= 3:
-                    print("Entered loop")
                     if mph > SPEED_THRESHOLD and mph <= MAXIMUM_SPEED:  # Don't want all drivers, and want a reasonable
                         # number of frames captured
                         print("--> chg={}  secs={}  mph={} this_x={} w={} ".format(abs_chg,secs,"%.0f" % mph,x,w))
@@ -304,14 +303,14 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                             session.add(new_speeder)
                             session.commit
 
+                            print("Added new speeder to database")
+
                         # if the object hasn't reached the end of the monitored area, just remember the speed
                         # and its last position
                         last_mph = mph
 
                     elif ((x <= 2) and (direction == RIGHT_TO_LEFT))\
-                            or ((x + w >= monitored_width - 2)
-                                and (direction == LEFT_TO_RIGHT)) \
-                                    and mph > MINIMUM_SPEED:
+                            or ((x + w >= monitored_width - 2) and (direction == LEFT_TO_RIGHT)):
                         new_vehicle = Vehicles(  # Table for statistics calculations
                             uniqueID = uuid(),
                             datetime = datetime.datetime.now(),
@@ -320,6 +319,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                         )
                         session.add(new_vehicle)
                         session.commit
+
+                        print("Added new vehicle to database")
 
                 else:
                     print("Not enough frames captured")
