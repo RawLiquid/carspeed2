@@ -9,7 +9,7 @@ import numpy
 
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.orm import sessionmaker
-from db import speeders
+from db import Speeders
 
 # place a prompt on the displayed image
 def prompt_on_image(txt):
