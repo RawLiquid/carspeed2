@@ -56,7 +56,7 @@ THRESHOLD = 15
 SPEED_THRESHOLD = 40
 MINIMUM_SPEED = 20
 MAXIMUM_SPEED = 75
-MIN_AREA = 175
+MIN_AREA = 175  # TODO: Experiment with this - it may reduce the sensitivity
 BLURSIZE = (15,15)
 IMAGEWIDTH = 640
 IMAGEHEIGHT = 480
@@ -243,7 +243,6 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
     if motion_found:
         if state == WAITING:
-            mph_list = []
             # intialize tracking
             state = TRACKING
             initial_x = x
@@ -274,7 +273,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                     # and save it
                     if ((x <= 2) and (direction == RIGHT_TO_LEFT)) \
                             or ((x+w >= monitored_width - 2) \
-                            and (direction == LEFT_TO_RIGHT)):
+                            and (direction == LEFT_TO_RIGHT))\
+                            and last_mph > SPEED_THRESHOLD:
                         # timestamp the image
                         cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
                             (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 1)
