@@ -33,6 +33,6 @@ class Vehicles(Base):
     uniqueID = Column(String, index=True)
     datetime = Column(DateTime, index=True)
     speed = Column(Float, index=True)
-    rating = Column(Integer)
+    rating = Column(Float)
 
 Base.metadata.create_all(engine, checkfirst=True)

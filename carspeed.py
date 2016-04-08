@@ -68,7 +68,7 @@ IMAGEWIDTH = 640
 IMAGEHEIGHT = 480
 RESOLUTION = [IMAGEWIDTH,IMAGEHEIGHT]
 FOV = 53.5
-FPS = 30
+FPS = 90
 
 # the following enumerated values are used to make the program more readable
 WAITING = 0
@@ -309,7 +309,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                                     uniqueID = uuid(),
                                     datetime = datetime.datetime.now(),
                                     speed = median_speed,
-                                    rating = len(mph_list)  # Not yet utilized
+                                    rating = median_speed / len(mph_list)  # Not yet utilized
                                 )
 
                                 session.add(new_speeder)
@@ -334,7 +334,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                             uniqueID = uuid(),
                             datetime = datetime.datetime.now(),
                             speed = median_speed,
-                            rating = len(mph_list)
+                            rating = median_speed / len(mph_list)
                         )
                         session.add(new_vehicle)
                         session.commit()
