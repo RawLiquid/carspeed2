@@ -7,9 +7,9 @@ import datetime
 import cv2
 import numpy
 
-#from sqlalchemy import create_engine, MetaData, Table
-#from sqlalchemy.orm import sessionmaker
-#from db import Speeders
+from sqlalchemy import create_engine, MetaData, Table
+from sqlalchemy.orm import sessionmaker
+from db import Speeders
 
 # place a prompt on the displayed image
 def prompt_on_image(txt):
@@ -55,7 +55,7 @@ DISTANCE = 55  #<---- enter your distance-to-road value here
 THRESHOLD = 15
 SPEED_THRESHOLD = 40
 MINIMUM_SPEED = 20
-MAXIMUM_SPEED = 75
+MAXIMUM_SPEED = 70
 MIN_AREA = 175  # TODO: Experiment with this - it may reduce the sensitivity
 BLURSIZE = (15,15)
 IMAGEWIDTH = 640
@@ -187,9 +187,9 @@ print(" monitored_area {}".format(monitored_width * monitored_height))
 #   to prep for each frame's capture.
 #   First, open up the PostgreSQL database.
 
-#engine = create_engine('postgresql://speedcam:Rward0232@localhost/speedcamdb')
-#DBSession = sessionmaker(bind=engine)
-#session = DBSession()
+engine = create_engine('postgresql://speedcam:Rward0232@localhost/speedcamdb')
+DBSession = sessionmaker(bind=engine)
+session = DBSession()
 
 
 mph_list = []
