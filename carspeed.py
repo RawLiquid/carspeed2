@@ -8,7 +8,6 @@ import cv2
 from statistics import median
 from uuid import uuid4 as uuid
 import os
-from math import log10
 
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.orm import sessionmaker
@@ -311,7 +310,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                                     uniqueID = uuid(),
                                     datetime = datetime.datetime.now(),
                                     speed = median_speed,
-                                    rating = log10(median_speed / len(mph_list) / monitored_width)
+                                    rating = (median_speed / len(mph_list) / monitored_width)
                                 )
 
                                 session.add(new_speeder)
@@ -333,7 +332,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                             uniqueID = uuid(),
                             datetime = datetime.datetime.now(),
                             speed = median_speed,
-                            rating = log10(median_speed / len(mph_list) / monitored_width)
+                            rating = (median_speed / len(mph_list) / monitored_width)
                         )
                         session.add(new_vehicle)
                         session.commit()
