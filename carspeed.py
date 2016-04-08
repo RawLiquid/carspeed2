@@ -199,7 +199,7 @@ session = DBSession()
 
 
 mph_list = []
-commited = False
+id = None
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
     #initialize the timestamp
@@ -251,6 +251,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
     if motion_found:
         if state == WAITING:
+            id = uuid()  # give same ID to all detections. This will help find errors
             clear_screen()
             # intialize tracking
             state = TRACKING
@@ -302,7 +303,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                             state = SAVING
                             mph_list = []
 
-                            if commited == False:
+                            if id:
 
                                 median_speed = median(mph_list)
 
@@ -315,7 +316,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
                                 session.add(new_speeder)
                                 session.commit()
-                                commited = True
+                                id = None
 
                                 clear_screen()
                                 print("Added new speeder to database")
@@ -324,8 +325,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                         # and its last position
                         last_mph = mph
 
-                    elif ((x <= 2) and (direction == RIGHT_TO_LEFT)) and commited == False\
-                            or ((x + w >= monitored_width - 2) and (direction == LEFT_TO_RIGHT)) and commited == False:
+                    elif ((x <= 2) and (direction == RIGHT_TO_LEFT)) and id\
+                            or ((x + w >= monitored_width - 2) and (direction == LEFT_TO_RIGHT)) and id:
 
                         median_speed = median(mph_list)
 
@@ -337,7 +338,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                         )
                         session.add(new_vehicle)
                         session.commit()
-                        commited = True
+                        id = None
 
                         clear_screen()
                         print("Added new vehicle to database")
@@ -355,7 +356,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             text_on_image = 'No Car Detected'
             print(text_on_image)
             mph_list = []
-            commited = False
+            id = None
     # only update image and wait for a keypress when waiting for a car
     # or if 50 frames have been processed in the WAITING state.
     # This is required since waitkey slows processing.
