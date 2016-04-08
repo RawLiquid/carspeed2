@@ -243,13 +243,15 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     for c in cnts:
         (x, y, w, h) = cv2.boundingRect(c)
         # get an approximate area of the contour
-        found_area = w*h 
+        found_area = w*h
         # find the largest bounding rectangle
         if (found_area > MIN_AREA) and (found_area > biggest_area):  
             biggest_area = found_area
             motion_found = True
 
     if motion_found:
+        print(found_area)
+        print(biggest_area)
         if state == WAITING:
             id = uuid()  # give same ID to all detections. This will help find errors
             clear_screen()
