@@ -56,7 +56,7 @@ def draw_rectangle(event,x,y,flags,param):
         prompt_on_image(prompt)
         cv2.rectangle(image,(ix,iy),(fx,fy),(0,255,0),2)
         
-# define some constants
+# define somec constants
 DISTANCE = 70  #<---- enter your distance-to-road value here
 THRESHOLD = 15
 SPEED_THRESHOLD = 40
@@ -310,7 +310,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                                     uniqueID = uuid(),
                                     datetime = datetime.datetime.now(),
                                     speed = median_speed,
-                                    rating = (median_speed / len(mph_list) / monitored_width)
+                                    rating = log(median_speed / len(mph_list) / monitored_width)
                                 )
 
                                 session.add(new_speeder)
@@ -332,7 +332,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                             uniqueID = uuid(),
                             datetime = datetime.datetime.now(),
                             speed = median_speed,
-                            rating = (median_speed / len(mph_list) / monitored_width)
+                            rating = log(median_speed / len(mph_list) / monitored_width)
                         )
                         session.add(new_vehicle)
                         session.commit()
