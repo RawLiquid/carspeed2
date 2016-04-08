@@ -264,7 +264,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                 mph = get_speed(abs_chg,ftperpixel,secs)
                 if mph > MINIMUM_SPEED and mph <= MAXIMUM_SPEED:  # Filter out cars in parking lot behind road and crazy-high readings
                    mph_list.append(mph)
-                if mph > SPEED_THRESHOLD and len(mph_list) >= 3:  # Don't want all drivers, and want a reasonable
+                if mph > SPEED_THRESHOLD and mph <= MAXIMUM_SPEED and len(mph_list) >= 3:  # Don't want all drivers, and want a reasonable
                     # number of frames captured
                     print("--> chg={}  secs={}  mph={} this_x={} w={} ".format(abs_chg,secs,"%.0f" % mph,x,w))
                     real_y = upper_left_y + y
