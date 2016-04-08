@@ -349,7 +349,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                     print("Not enough frames captured ({})".format(len(mph_list)))
 
                 last_x = x
-        motion_loop_count += 1
+                motion_loop_count += 1
     else:
         if state != WAITING:
             state = WAITING
