@@ -10,7 +10,7 @@ from uuid import uuid4 as uuid
 
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.orm import sessionmaker
-from db import Speeders
+from db import Speeders, Vehicles
 
 # place a prompt on the displayed image
 def prompt_on_image(txt):
@@ -275,7 +275,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                     if ((x <= 2) and (direction == RIGHT_TO_LEFT)) \
                             or ((x+w >= monitored_width - 2) \
                             and (direction == LEFT_TO_RIGHT))\
-                            and last_mph > SPEED_THRESHOLD:
+                            and last_mph > SPEED_THRESHOLD:  # Prevent writing of speeds less than realistic min.
                         # timestamp the image
                         cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
                             (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 1)
@@ -293,7 +293,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
                         new_speeder = Speeders(
                             uniqueID = uuid(),
-                            datetime = timestamp,
+                            datetime = datetime.datetime.now(),
                             speed = last_mph,
                             rating = None  # Not yet utilized
                         )
@@ -305,6 +305,19 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                     # and its last position
                     last_mph = mph
                     last_x = x
+
+                elif ((x <= 2) and (direction == RIGHT_TO_LEFT))\
+                        or ((x + w >= monitored_width - 2)
+                            and (direction == LEFT_TO_RIGHT)) \
+                                and mph > MINIMUM_SPEED:
+                    new_vehicle = Vehicles(  # Table for statistics calculations
+                        unique_ID = uuid(),
+                        datetime = datetime.datetime.now(),
+                        speed = mph,
+                        rating = None
+                    )
+                    session.add(new_speeder)
+                    session.commit
     else:
         if state != WAITING:
             state = WAITING
