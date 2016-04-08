@@ -310,7 +310,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                                     uniqueID = uuid(),
                                     datetime = datetime.datetime.now(),
                                     speed = median_speed,
-                                    rating = None  # Not yet utilized
+                                    rating = len(mph_list)  # Not yet utilized
                                 )
 
                                 session.add(new_speeder)
@@ -333,7 +333,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                             uniqueID = uuid(),
                             datetime = datetime.datetime.now(),
                             speed = median_speed,
-                            rating = None
+                            rating = len(mph_list)
                         )
                         session.add(new_vehicle)
                         session.commit()
