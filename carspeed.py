@@ -57,7 +57,7 @@ def draw_rectangle(event,x,y,flags,param):
         cv2.rectangle(image,(ix,iy),(fx,fy),(0,255,0),2)
         
 # define some constants
-DISTANCE = 55  #<---- enter your distance-to-road value here
+DISTANCE = 70  #<---- enter your distance-to-road value here
 THRESHOLD = 15
 SPEED_THRESHOLD = 40
 MINIMUM_SPEED = 20  # Don't detect cars in parking lots, walkers, and slow drivers
