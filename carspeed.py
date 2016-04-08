@@ -8,7 +8,7 @@ import cv2
 from statistics import median
 from uuid import uuid4 as uuid
 import os
-from math import log
+from math import log10
 
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.orm import sessionmaker
