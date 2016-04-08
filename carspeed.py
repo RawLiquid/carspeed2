@@ -7,9 +7,9 @@ import datetime
 import cv2
 import numpy
 
-from sqlalchemy import create_engine, MetaData, Table
-from sqlalchemy.orm import sessionmaker
-from db import Speeders
+#from sqlalchemy import create_engine, MetaData, Table
+#from sqlalchemy.orm import sessionmaker
+#from db import Speeders
 
 # place a prompt on the displayed image
 def prompt_on_image(txt):
@@ -54,6 +54,8 @@ def draw_rectangle(event,x,y,flags,param):
 DISTANCE = 70  #<---- enter your distance-to-road value here
 THRESHOLD = 15
 SPEED_THRESHOLD = 40
+MINIMUM_SPEED = 20
+MAXIMUM_SPEED = 75
 MIN_AREA = 175
 BLURSIZE = (15,15)
 IMAGEWIDTH = 640
@@ -185,10 +187,12 @@ print(" monitored_area {}".format(monitored_width * monitored_height))
 #   to prep for each frame's capture.
 #   First, open up the PostgreSQL database.
 
-engine = create_engine('postgresql://speedcam:Rward0232@localhost/speedcamdb')
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
+#engine = create_engine('postgresql://speedcam:Rward0232@localhost/speedcamdb')
+#DBSession = sessionmaker(bind=engine)
+#session = DBSession()
 
+
+mph_list = []
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
     #initialize the timestamp
     timestamp = datetime.datetime.now()
@@ -238,8 +242,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             motion_found = True
 
     if motion_found:
-        mph_list=[]
         if state == WAITING:
+            mph_list = []
             # intialize tracking
             state = TRACKING
             initial_x = x
@@ -259,8 +263,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                     abs_chg = initial_x - x
                 secs = secs_diff(timestamp,initial_time)
                 mph = get_speed(abs_chg,ftperpixel,secs)
-                mph_list.append(mph)
-
+                if mph > MINIMUM_SPEED and mph <= MAXIMUM_SPEED:  # Filter out cars in parking lot behind road and crazy-high readings
+                   mph_list.append(mph)
                 if mph > SPEED_THRESHOLD and len(mph_list) >= 3:  # Don't want all drivers, and want a reasonable
                     # number of frames captured
                     print("--> chg={}  secs={}  mph={} this_x={} w={} ".format(abs_chg,secs,"%.0f" % mph,x,w))
@@ -284,6 +288,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                         cv2.imwrite("speed_tracking_images/car_at_"+datetime.datetime.now().strftime("%Y%m%d_%H%M%S")+".jpg",
                             image)
                         state = SAVING
+                        mph_list = []
                     # if the object hasn't reached the end of the monitored area, just remember the speed
                     # and its last position
                     last_mph = mph
@@ -294,7 +299,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             direction = UNKNOWN
             text_on_image = 'No Car Detected'
             print(text_on_image)
-            
+            mph_list = []
     # only update image and wait for a keypress when waiting for a car
     # or if 50 frames have been processed in the WAITING state.
     # This is required since waitkey slows processing.
