@@ -200,6 +200,7 @@ session = DBSession()
 
 mph_list = []
 id = None
+motion_loop_count = 0
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
     #initialize the timestamp
@@ -249,7 +250,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             biggest_area = found_area
             motion_found = True
 
-    if motion_found:
+    if motion_found and motion_loop_count < 20:
         if state == WAITING:
             id = uuid()  # give same ID to all detections. This will help find errors
             clear_screen()
@@ -348,6 +349,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                     print("Not enough frames captured ({})".format(len(mph_list)))
 
                 last_x = x
+        motion_loop_count += 1
     else:
         if state != WAITING:
             state = WAITING
@@ -359,7 +361,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     # only update image and wait for a keypress when waiting for a car
     # or if 50 frames have been processed in the WAITING state.
     # This is required since waitkey slows processing.
-    if (state == WAITING) or (loop_count > 50):    
+    if (state == WAITING) or (loop_count > 50):
  
         # draw the text and timestamp on the frame
         cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
