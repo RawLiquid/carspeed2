@@ -5,7 +5,7 @@ import time
 import math
 import datetime
 import cv2
-import numpy
+from statistics import median
 from uuid import uuid4 as uuid
 
 from sqlalchemy import create_engine, MetaData, Table
@@ -296,10 +296,13 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                             mph_list = []
 
                             if commited == False:
+
+                                median_speed = median(mph_list)
+
                                 new_speeder = Speeders(
                                     uniqueID = uuid(),
                                     datetime = datetime.datetime.now(),
-                                    speed = last_mph,
+                                    speed = median_speed,
                                     rating = None  # Not yet utilized
                                 )
 
@@ -313,12 +316,15 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                         # and its last position
                         last_mph = mph
 
-                    elif ((x <= 2) and (direction == RIGHT_TO_LEFT))\
+                    elif ((x <= 2) and (direction == RIGHT_TO_LEFT)) and commited == False\
                             or ((x + w >= monitored_width - 2) and (direction == LEFT_TO_RIGHT)) and commited == False:
+
+                        median_speed = median(mph_list)
+
                         new_vehicle = Vehicles(  # Table for statistics calculations
                             uniqueID = uuid(),
                             datetime = datetime.datetime.now(),
-                            speed = mph,
+                            speed = median_speed,
                             rating = None
                         )
                         session.add(new_vehicle)
