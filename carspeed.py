@@ -306,7 +306,6 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                         # if the object hasn't reached the end of the monitored area, just remember the speed
                         # and its last position
                         last_mph = mph
-                        last_x = x
 
                     elif ((x <= 2) and (direction == RIGHT_TO_LEFT))\
                             or ((x + w >= monitored_width - 2)
@@ -323,6 +322,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
                 else:
                     print("Not enough frames captured")
+
+                last_x = x
     else:
         if state != WAITING:
             state = WAITING
