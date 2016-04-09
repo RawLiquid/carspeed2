@@ -16,9 +16,6 @@ from db import Speeders, Vehicles, Log
 timeOn = datetime.datetime.now()  # This is used for the log
 sessionID = uuid()
 
-current_log_id = log_entry("in")
-
-
 def log_entry(in_out):
     """
     Put usage in log table
@@ -91,6 +88,10 @@ def draw_rectangle(event,x,y,flags,param):
         image = org_image.copy()
         prompt_on_image(prompt)
         cv2.rectangle(image,(ix,iy),(fx,fy),(0,255,0),2)
+
+
+# Log usage
+current_log_id = log_entry("in")
 
 # define somec constants
 DISTANCE = 70  #<---- enter your distance-to-road value here
