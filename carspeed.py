@@ -11,29 +11,51 @@ import os
 
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.orm import sessionmaker
-from db import Speeders, Vehicles
+from db import Speeders, Vehicles, Log
+
+timeOn = datetime.datetime.now()  # This is used for the log
+sessionID = uuid()
+
+
+def log_entry():
+    """
+    Put usage in log table
+    """
+
+    new_entry = Log(
+        timeOn = timeOn,
+        timeOff = datetime.datetime.now()
+    )
+
+
+    session.add(new_entry)
+    session.commit
 
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
+
 
 # place a prompt on the displayed image
 def prompt_on_image(txt):
     global image
     cv2.putText(image, txt, (10, 35),
     cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
-     
+
+
 # calculate speed from pixels and time
 def get_speed(pixels, ftperpixel, secs):
     if secs > 0.0:
         return ((pixels * ftperpixel)/ secs) * 0.681818  
     else:
         return 0.0
- 
+
+
 # calculate elapsed seconds
 def secs_diff(endTime, begTime):
     diff = (endTime - begTime).total_seconds()
     return diff    
+
 
 # mouse callback function for drawing capture area
 def draw_rectangle(event,x,y,flags,param):
@@ -55,7 +77,7 @@ def draw_rectangle(event,x,y,flags,param):
         image = org_image.copy()
         prompt_on_image(prompt)
         cv2.rectangle(image,(ix,iy),(fx,fy),(0,255,0),2)
-        
+
 # define somec constants
 DISTANCE = 70  #<---- enter your distance-to-road value here
 THRESHOLD = 15
@@ -198,20 +220,6 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 
-def create_base_image():
-    """
-    Creeate new base image for comparison.
-    """
-
-    base_image = image[upper_left_y:lower_right_y,upper_left_x:lower_right_x]
-    base_image = cv2.cvtColor(base_image, cv2.COLOR_BGR2GRAY)
-    base_image = cv2.GaussianBlur(base_image, BLURSIZE, 0)
-    rawCapture.truncate(0)
-    cv2.imshow("Speed Camera", image)
-
-    return base_image
-
-
 mph_list = []
 id = None
 motion_loop_count = 0
@@ -230,17 +238,13 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     # convert it to grayscale, and blur it
     gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
     gray = cv2.GaussianBlur(gray, BLURSIZE, 0)
- 
-    # if the base image has not been defined, initialize it
-    #if base_image is None:
-    #    base_image = gray.copy().astype("float")
-    #    lastTime = timestamp
-    #    rawCapture.truncate(0)
-    #    cv2.imshow("Speed Camera", image)
-    #    continue
 
-    if base_image is None:
-        base_image = create_base_image()
+    if base_image is None or motion_loop >= 10 and motion_found == False:
+        base_image = gray.copy().astype("float")
+        lastTime = timestamp
+        rawCapture.truncate(0)
+        cv2.imshow("Speed Camera", image)
+        continue
  
     # compute the absolute difference between the current image and
     # base image and then turn eveything lighter than THRESHOLD into
@@ -279,18 +283,20 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             last_mph = 0
             text_on_image = 'Tracking'
             print(text_on_image)
+
         else:
 
             if state == TRACKING:
-                clear_screen()
                 if x >= last_x:
                     direction = LEFT_TO_RIGHT
                     abs_chg = x + w - initial_x
+
                 else:
                     direction = RIGHT_TO_LEFT
                     abs_chg = initial_x - x
                 secs = secs_diff(timestamp,initial_time)
                 mph = get_speed(abs_chg,ftperpixel,secs)
+
                 if mph > MINIMUM_SPEED and mph <= MAXIMUM_SPEED:  # Filter out cars in parking lot behind road and crazy-high readings
                    mph_list.append(mph)
 
@@ -300,6 +306,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                         print("--> chg={}  secs={}  mph={} this_x={} w={} ".format(abs_chg,secs,"%.0f" % mph,x,w))
                         real_y = upper_left_y + y
                         real_x = upper_left_x + x
+
                         # is front of object outside the monitored boundary? Then write date, time and speed on image
                         # and save it
                         if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and last_mph > SPEED_THRESHOLD\
@@ -307,34 +314,38 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                                 and (direction == LEFT_TO_RIGHT))\
                                 and last_mph > SPEED_THRESHOLD:  # Prevent writing of speeds less than realistic min.
                             # timestamp the image
-                            cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
-                                (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 1)
-                            # write the speed: first get the size of the text
-                            size, base = cv2.getTextSize( "%.0f mph" % last_mph, cv2.FONT_HERSHEY_SIMPLEX, 2, 3)
-                            # then center it horizontally on the image
-                            cntr_x = int((IMAGEWIDTH - size[0]) / 2)
-                            cv2.putText(image, "%.0f mph" % last_mph,
-                                (cntr_x , int(IMAGEHEIGHT * 0.2)), cv2.FONT_HERSHEY_SIMPLEX, 2.00, (0, 255, 0), 3)
-                            # and save the image to disk
-                            cv2.imwrite("speed_tracking_images/car_at_"+datetime.datetime.now().strftime("%Y%m%d_%H%M%S")+".jpg",
-                                image)
-                            state = SAVING
 
-                            if id:
-                                median_speed = median(mph_list)
+                            median_speed = median(mph_list)
 
-                                new_speeder = Speeders(
-                                    uniqueID = uuid(),
-                                    datetime = datetime.datetime.now(),
-                                    speed = median_speed,
-                                    rating = (median_speed / len(mph_list))
-                                )
+                            if median_speed / len(mph_list) > 1:  # Values less than one typically indicate faulty setup
 
-                                session.add(new_speeder)
-                                session.commit()
+                                cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
+                                    (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 1)
+                                # write the speed: first get the size of the text
+                                size, base = cv2.getTextSize( "%.0f mph" % last_mph, cv2.FONT_HERSHEY_SIMPLEX, 2, 3)
+                                # then center it horizontally on the image
+                                cntr_x = int((IMAGEWIDTH - size[0]) / 2)
+                                cv2.putText(image, "%.0f mph" % last_mph,
+                                    (cntr_x , int(IMAGEHEIGHT * 0.2)), cv2.FONT_HERSHEY_SIMPLEX, 2.00, (0, 255, 0), 3)
+                                # and save the image to disk
+                                cv2.imwrite("speed_tracking_images/car_at_"+datetime.datetime.now().strftime("%Y%m%d_%H%M%S")+".jpg",
+                                    image)
+                                state = SAVING
 
-                                clear_screen()
-                                print("Added new speeder to database")
+                                if id:
+
+                                    new_speeder = Speeders(
+                                        sessionID = sessionID,
+                                        datetime = datetime.datetime.now(),
+                                        speed = median_speed,
+                                        rating = (median_speed / len(mph_list))
+                                    )
+
+                                    session.add(new_speeder)
+                                    session.commit()
+
+                                    clear_screen()
+                                    print("Added new speeder to database")
 
                         # if the object hasn't reached the end of the monitored area, just remember the speed
                         # and its last position
@@ -345,21 +356,22 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
                         median_speed = median(mph_list)
 
-                        new_vehicle = Vehicles(  # Table for statistics calculations
-                            uniqueID = uuid(),
-                            datetime = datetime.datetime.now(),
-                            speed = median_speed,
-                            rating = (median_speed / len(mph_list))
-                        )
-                        session.add(new_vehicle)
-                        session.commit()
-                        id = None
+                        if median_speed / len(mph_list) > 1:  # Values less than one typically indicate faulty setup
 
-                        clear_screen()
-                        print("Added new vehicle to database")
+                            new_vehicle = Vehicles(  # Table for statistics calculations
+                                sessionID = sessionID,
+                                datetime = datetime.datetime.now(),
+                                speed = median_speed,
+                                rating = (median_speed / len(mph_list))
+                            )
+                            session.add(new_vehicle)
+                            session.commit()
+                            id = None
+
+                            clear_screen()
+                            print("Added new vehicle to database")
 
                 else:
-                    clear_screen()
                     print("Not enough frames captured ({})".format(len(mph_list)))
 
                 last_x = x
@@ -393,6 +405,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         if showImage:
             prompt_on_image(prompt)
             cv2.imshow("Speed Camera", image)
+
         if state == WAITING:
             last_x = 0
             cv2.accumulateWeighted(gray, base_image, 0.25)
@@ -402,6 +415,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
       
         # if the `q` key is pressed, break from the loop and terminate processing
         if key == ord("q"):
+            log_entry()
             break
         loop_count = 0
          
@@ -411,4 +425,3 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
   
 # cleanup the camera and close any open windows
 cv2.destroyAllWindows()
-
