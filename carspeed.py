@@ -386,7 +386,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
                             clear_screen()
                             print("Added new vehicle to database")
-                            sleep(1)
+                            time.sleep(1)
 
                 else:
                     print("Not enough frames captured ({})".format(len(mph_list)))
