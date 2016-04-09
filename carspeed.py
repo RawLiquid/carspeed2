@@ -13,6 +13,10 @@ from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.orm import sessionmaker
 from db import Speeders, Vehicles, Log
 
+engine = create_engine('postgresql://speedcam:Rward0232@localhost/speedcamdb')
+DBSession = sessionmaker(bind=engine)
+session = DBSession()
+
 timeOn = datetime.datetime.now()  # This is used for the log
 sessionID = uuid()
 
@@ -229,11 +233,6 @@ print(" monitored_area {}".format(monitored_width * monitored_height))
 #   This keeps the picamera in capture mode - it doesn't need
 #   to prep for each frame's capture.
 #   First, open up the PostgreSQL database.
-
-engine = create_engine('postgresql://speedcam:Rward0232@localhost/speedcamdb')
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
-
 
 mph_list = []
 id = None
