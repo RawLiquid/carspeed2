@@ -239,7 +239,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
     gray = cv2.GaussianBlur(gray, BLURSIZE, 0)
 
-    if base_image is None or motion_loop >= 10 and motion_found == False:
+    if base_image is None or motion_loop_count >= 10 and motion_found == False:
         base_image = gray.copy().astype("float")
         lastTime = timestamp
         rawCapture.truncate(0)
