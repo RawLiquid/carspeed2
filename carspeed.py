@@ -41,8 +41,9 @@ def log_entry(in_out, current_id):
 
 
     elif in_out == "out" and current_id:
-
-        update(Log).where(Log.id==current_id).values(timeOff='{}'.format(datetime.datetime.now()))
+        logEntry = Log.query.filter_by(sessionID=sessionID).first()
+        logEntry.timeOff = datetime.datetime.now()
+        session.commit()
 
         return None
 
@@ -286,8 +287,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             motion_found = True
 
     if motion_found and motion_loop_count < 25:
+        committed = False
         if state == WAITING:
-            id = uuid()  # give same ID to all detections. This will help find errors
             clear_screen()
             # intialize tracking
             state = TRACKING
@@ -365,8 +366,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                         # and its last position
                         last_mph = mph
 
-                    if ((x <= 2) and (direction == RIGHT_TO_LEFT))\
-                            or ((x + w >= monitored_width - 2) and (direction == LEFT_TO_RIGHT)):
+                    if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and commited == False\
+                            or ((x + w >= monitored_width - 2) and (direction == LEFT_TO_RIGHT)) and committed == False:
 
                         median_speed = median(mph_list)
 
@@ -381,9 +382,11 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                             session.add(new_vehicle)
                             session.commit()
                             id = None
+                            committed = True
 
                             clear_screen()
                             print("Added new vehicle to database")
+                            sleep(1)
 
                 else:
                     print("Not enough frames captured ({})".format(len(mph_list)))

@@ -38,36 +38,52 @@ ui <- fluidPage(
   
   sidebarLayout(
     sidebarPanel(
-      sliderInput("range", "Time Range (N hours ago - Now)", min = 1, max = 12, value = 5)
+      sliderInput("range", "Time Range (N hours ago - Now)", min = 1, max = 12, value = 5),
+      actionButton("update", label = "Update")
     ),
-    mainPanel("main panel")
+    
+    mainPanel("Plots",
+              plotOutput(outputId = "bbox"),
+              plotOutput(outputId = "loess")
+    )
   )
 )
 
 server <- function(input, output) {
-  # Send query
-  dbGetQuery(con, remove_dupes)
   
-  # query the data from postgreSQL 
-  #vehicles <- dbGetQuery(con, "SELECT * from vehicles")
-  
-  vehicles <- vehicles[ which(vehicles$rating <= 5), ]  # Only keep good values
-  vehicles <- vehicles[ which(vehicles$rating > 0), ]
-  vehicles <- vehicles[ which(vehicles$speed <= 50), ]
-  #vehicles <- vehicles[ which(vehicles$datetime >= Sys.time() - 14400), ]  # should subset past six hours
-  median <- median(vehicles$speed)
-  
-  bar_plot <- ggplot(vehicles, aes(x = as.factor(as.POSIXct(strptime(vehicles$datetime, '%Y-%m-%d %H'))), 
-                       y = vehicles$speed)) + geom_boxplot() + geom_hline(yintercept = 35, colour = "red") +
-    geom_hline(yintercept = median, colour = "forestgreen") + xlab("Time") + ylab("Speed")
-  
-  loess <- ggplot(vehicles, aes(x = as.POSIXct(strptime(vehicles$datetime, '%Y-%m-%d %H:%M')), 
-                       y = vehicles$speed)) + stat_smooth(level = .99) + geom_point() + xlab("Time") + ylab("Speed") +
-    geom_hline(yintercept = 35, colour = "red") + geom_hline(yintercept = median, colour = "forestgreen")
-  
-  
-  grid.arrange(bar_plot, loess, ncol=2, top=textGrob("Driver Speed on Ridgmar Boulevard", gp=gpar(fontsize=16)))
-
+  observe({
+    
+    if(input$update) {
+      # Send query
+      dbGetQuery(con, remove_dupes)
+      
+      # query the data from postgreSQL 
+      vehicles <- dbGetQuery(con, "SELECT * from vehicles")
+      
+      vehicles <- vehicles[ which(vehicles$rating <= 5), ]  # Only keep good values
+      vehicles <- vehicles[ which(vehicles$rating > 0), ]
+      vehicles <- vehicles[ which(vehicles$speed <= 50), ]
+      #vehicles <- vehicles[ which(vehicles$datetime >= Sys.time() - (range * 3600)), ]  # should subset past n hours
+      median <- median(vehicles$speed)
+      output$bbox <- renderPlot({
+        input$update
+        ggplot(vehicles, aes(x = as.factor(as.POSIXct(strptime(vehicles$datetime, '%Y-%m-%d %H'))), 
+                           y = vehicles$speed)) + geom_boxplot() + geom_hline(yintercept = 35, colour = "red") +
+        geom_hline(yintercept = median, colour = "forestgreen") + xlab("Time") + ylab("Speed")
+      })
+      
+      output$loess <- renderPlot({
+        input$update
+        ggplot(vehicles, aes(x = as.POSIXct(strptime(vehicles$datetime, '%Y-%m-%d %H:%M')),
+                                           y = vehicles$speed)) + stat_smooth(level = .99) + geom_point() + xlab("Time") + 
+        ylab("Speed") + geom_hline(yintercept = 35, colour = "red") + geom_hline(yintercept = median, colour = "forestgreen")
+      })
+      
+      
+      #grid.arrange(bar_plot, loess, ncol=1, top=textGrob("Driver Speed on Ridgmar Boulevard", gp=gpar(fontsize=16)))
+      
+      #dbDisconnect(con)
+    }
+  })
 }
-
 shinyApp(ui = ui, server = server)
