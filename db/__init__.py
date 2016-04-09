@@ -11,6 +11,17 @@ Base = declarative_base()
 __all__ = ['speeders', 'vehicles', 'log']
 
 
+class Log(Base):
+    """
+    Table for Log
+    """
+
+    __tablename__ = "log"
+    id = Column(Integer, primary_key=True, index=True)
+    sessionID = Column(String)
+    timeOn = Column(DateTime, index=True)
+    timeOff = Column(DateTime, index=True)
+
 class Speeders(Base):
     """
     Table for Speeders
@@ -34,16 +45,5 @@ class Vehicles(Base):
     datetime = Column(DateTime, index=True)
     speed = Column(Float, index=True)
     rating = Column(Float)
-
-class Log(Base):
-    """
-    Table for Log
-    """
-
-    __tablename__ = "log"
-    id = Column(Integer, primary_key=True, index=True)
-    sessionID = Column(String)
-    timeOn = Column(DateTime, index=True)
-    timeOff = Column(DateTime, index=True)
 
 Base.metadata.create_all(engine, checkfirst=True)
