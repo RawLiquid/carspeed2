@@ -333,27 +333,25 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                                     image)
                                 state = SAVING
 
-                                if id:
+                                new_speeder = Speeders(
+                                    sessionID = sessionID,
+                                    datetime = datetime.datetime.now(),
+                                    speed = median_speed,
+                                    rating = (median_speed / len(mph_list))
+                                )
 
-                                    new_speeder = Speeders(
-                                        sessionID = sessionID,
-                                        datetime = datetime.datetime.now(),
-                                        speed = median_speed,
-                                        rating = (median_speed / len(mph_list))
-                                    )
+                                session.add(new_speeder)
+                                session.commit()
 
-                                    session.add(new_speeder)
-                                    session.commit()
-
-                                    clear_screen()
-                                    print("Added new speeder to database")
+                                clear_screen()
+                                print("Added new speeder to database")
 
                         # if the object hasn't reached the end of the monitored area, just remember the speed
                         # and its last position
                         last_mph = mph
 
-                    if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and id\
-                            or ((x + w >= monitored_width - 2) and (direction == LEFT_TO_RIGHT)) and id:
+                    if ((x <= 2) and (direction == RIGHT_TO_LEFT))\
+                            or ((x + w >= monitored_width - 2) and (direction == LEFT_TO_RIGHT)):
 
                         median_speed = median(mph_list)
 
