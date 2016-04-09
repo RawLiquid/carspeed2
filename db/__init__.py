@@ -18,7 +18,7 @@ class Speeders(Base):
 
     __tablename__ = "speeders"
     id = Column(Integer, primary_key=True, index=True)
-    sessionID = Column(String, ForeignKey('Log.sessionID'))
+    sessionID = Column(String, ForeignKey('log.sessionID'))
     datetime = Column(DateTime, index=True)
     speed = Column(Float, index=True)
     rating = Column(Float)
@@ -30,7 +30,7 @@ class Vehicles(Base):
 
     __tablename__ = "vehicles"
     id = Column(Integer, primary_key=True, index=True)
-    sessionID = Column(String, ForeignKey('Log.sessionID'))
+    sessionID = Column(String, ForeignKey('log.sessionID'))
     datetime = Column(DateTime, index=True)
     speed = Column(Float, index=True)
     rating = Column(Float)
