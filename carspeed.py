@@ -209,6 +209,8 @@ def create_base_image():
     rawCapture.truncate(0)
     cv2.imshow("Speed Camera", image)
 
+    return base_image
+
 
 mph_list = []
 id = None
@@ -238,7 +240,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     #    continue
 
     if base_image is None:
-        create_base_image()
+        base_image = create_base_image()
  
     # compute the absolute difference between the current image and
     # base image and then turn eveything lighter than THRESHOLD into
