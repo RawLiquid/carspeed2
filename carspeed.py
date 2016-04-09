@@ -16,21 +16,34 @@ from db import Speeders, Vehicles, Log
 timeOn = datetime.datetime.now()  # This is used for the log
 sessionID = uuid()
 
+current_log_id = log_entry("in")
 
-def log_entry():
+
+def log_entry(in_out):
     """
     Put usage in log table
     """
 
-    new_entry = Log(
-        sessionID = sessionID,
-        timeOn = timeOn,
-        timeOff = datetime.datetime.now()
-    )
+    if in_out == "in":
+        new_entry = Log(
+            sessionID = sessionID,
+            timeOn = timeOn,
+            timeOff = datetime.datetime.now()
+        )
+
+        session.add(new_entry)
+        session.commit()
+
+        current_log_id = new_entry.id
+
+        return current_log_id
 
 
-    session.add(new_entry)
-    session.commit()
+    elif in_out == "out" and current_log_id:
+
+        update(Log).where(Log.id==current_log_id).values(timeOff='{}'.format(datetime.datetime.now()))
+
+        return None
 
 
 def clear_screen():
@@ -416,7 +429,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
       
         # if the `q` key is pressed, break from the loop and terminate processing
         if key == ord("q"):
-            log_entry()
+            log_entry("out")
             break
         loop_count = 0
          
