@@ -26,7 +26,7 @@ def log_entry(in_out, current_id):
     Put usage in log table
     """
 
-    if in_out == "in" and currend_id == None:
+    if in_out == "in" and currenT_id == None:
         new_entry = Log(
             sessionID = sessionID,
             timeOn = timeOn
