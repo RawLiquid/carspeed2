@@ -29,7 +29,7 @@ def log_entry():
 
 
     session.add(new_entry)
-    session.commit
+    session.commit()
 
 
 def clear_screen():
