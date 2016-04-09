@@ -272,7 +272,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             biggest_area = found_area
             motion_found = True
 
-    if motion_found and motion_loop_count < 10:
+    if motion_found and motion_loop_count < 25:
         if state == WAITING:
             id = uuid()  # give same ID to all detections. This will help find errors
             clear_screen()
@@ -317,6 +317,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                             # timestamp the image
 
                             median_speed = median(mph_list)
+
+                            print("Rating: {}".format(median_speed / len(mph_list)))
 
                             if median_speed / len(mph_list) >= 1:  # Values less than one typically indicate faulty setup
 
