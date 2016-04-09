@@ -19,13 +19,14 @@ session = DBSession()
 
 timeOn = datetime.datetime.now()  # This is used for the log
 sessionID = uuid()
+current_id = None
 
-def log_entry(in_out):
+def log_entry(in_out, current_id):
     """
     Put usage in log table
     """
 
-    if in_out == "in":
+    if in_out == "in" and currend_id == None:
         new_entry = Log(
             sessionID = sessionID,
             timeOn = timeOn
@@ -39,9 +40,9 @@ def log_entry(in_out):
         return current_log_id
 
 
-    elif in_out == "out" and current_log_id:
+    elif in_out == "out" and current_id:
 
-        update(Log).where(Log.id==current_log_id).values(timeOff='{}'.format(datetime.datetime.now()))
+        update(Log).where(Log.id==current_id).values(timeOff='{}'.format(datetime.datetime.now()))
 
         return None
 
@@ -94,7 +95,7 @@ def draw_rectangle(event,x,y,flags,param):
 
 
 # Log usage
-current_log_id = log_entry("in")
+current_id = log_entry("in", current_id)
 
 # define somec constants
 DISTANCE = 70  #<---- enter your distance-to-road value here
@@ -428,7 +429,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
       
         # if the `q` key is pressed, break from the loop and terminate processing
         if key == ord("q"):
-            log_entry("out")
+            log_entry("out", current_id)
             break
         loop_count = 0
          
