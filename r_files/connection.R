@@ -39,6 +39,7 @@ dbGetQuery(con, remove_dupes)
 vehicles <- dbGetQuery(con, "SELECT * from vehicles")
 
 vehicles <- vehicles[ which(vehicles$rating <= 5), ]  # Only keep good values
+vehicles <- vehicles[ which(vehicles$rating > 0), ]
 vehicles <- vehicles[ which(vehicles$speed <= 50), ]
 vehicles <- vehicles[ which(vehicles$datetime >= Sys.time() - 14400), ]  # should subset past six hours
 median <- median(vehicles$speed)

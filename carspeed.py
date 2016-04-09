@@ -198,6 +198,18 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 
+def create_base_image():
+    """
+    Creeate new base image for comparison.
+    """
+
+    base_image = image[upper_left_y:lower_right_y,upper_left_x:lower_right_x]
+    base_image = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
+    gray = cv2.GaussianBlur(gray, BLURSIZE, 0)
+    rawCapture.truncate(0)
+    cv2.imshow("Speed Camera", image)
+
+
 mph_list = []
 id = None
 motion_loop_count = 0
@@ -218,12 +230,15 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     gray = cv2.GaussianBlur(gray, BLURSIZE, 0)
  
     # if the base image has not been defined, initialize it
+    #if base_image is None:
+    #    base_image = gray.copy().astype("float")
+    #    lastTime = timestamp
+    #    rawCapture.truncate(0)
+    #    cv2.imshow("Speed Camera", image)
+    #    continue
+
     if base_image is None:
-        base_image = gray.copy().astype("float")
-        lastTime = timestamp
-        rawCapture.truncate(0)
-        cv2.imshow("Speed Camera", image)
-        continue
+        create_base_image()
  
     # compute the absolute difference between the current image and
     # base image and then turn eveything lighter than THRESHOLD into
