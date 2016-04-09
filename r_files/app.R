@@ -42,7 +42,7 @@ ui <- fluidPage(
       actionButton("update", label = "Update")
     ),
     
-    mainPanel("Plots",
+    mainPanel("",
               plotOutput(outputId = "bbox"),
               plotOutput(outputId = "loess")
     )
@@ -63,7 +63,7 @@ server <- function(input, output) {
       vehicles <- vehicles[ which(vehicles$rating <= 5), ]  # Only keep good values
       vehicles <- vehicles[ which(vehicles$rating > 0), ]
       vehicles <- vehicles[ which(vehicles$speed <= 50), ]
-      #vehicles <- vehicles[ which(vehicles$datetime >= Sys.time() - (range * 3600)), ]  # should subset past n hours
+      vehicles <- vehicles[ which(vehicles$datetime >= Sys.time() - (input$range * 3600)), ]  # should subset past n hours
       median <- median(vehicles$speed)
       output$bbox <- renderPlot({
         input$update
