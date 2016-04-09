@@ -28,8 +28,7 @@ def log_entry(in_out):
     if in_out == "in":
         new_entry = Log(
             sessionID = sessionID,
-            timeOn = timeOn,
-            timeOff = datetime.datetime.now()
+            timeOn = timeOn
         )
 
         session.add(new_entry)

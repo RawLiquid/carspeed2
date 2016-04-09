@@ -38,7 +38,7 @@ ui <- fluidPage(
   
   sidebarLayout(
     sidebarPanel(
-      sliderInput("obs", "Time Range", min = 10, max = 500, value = 100)
+      sliderInput("range", "Time Range (N hours ago - Now)", min = 1, max = 12, value = 5)
     ),
     mainPanel("main panel")
   )
