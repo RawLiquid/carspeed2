@@ -205,7 +205,7 @@ def create_base_image():
 
     base_image = image[upper_left_y:lower_right_y,upper_left_x:lower_right_x]
     base_image = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
-    gray = cv2.GaussianBlur(gray, BLURSIZE, 0)
+    base_image = cv2.GaussianBlur(gray, BLURSIZE, 0)
     rawCapture.truncate(0)
     cv2.imshow("Speed Camera", image)
 
