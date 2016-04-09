@@ -8,7 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 engine = create_engine('postgresql://speedcam:Rward0232@localhost/speedcamdb')
 Base = declarative_base()
 
-__all__ = ['speeders', 'vehicles']
+__all__ = ['speeders', 'vehicles', 'log']
 
 
 class Speeders(Base):
