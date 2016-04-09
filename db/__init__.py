@@ -18,7 +18,7 @@ class Log(Base):
 
     __tablename__ = "log"
     id = Column(Integer, primary_key=True, index=True)
-    sessionID = Column(String)
+    sessionID = Column(String, unique=True)
     timeOn = Column(DateTime, index=True)
     timeOff = Column(DateTime, index=True)
 
