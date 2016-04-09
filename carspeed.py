@@ -240,7 +240,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
     gray = cv2.GaussianBlur(gray, BLURSIZE, 0)
 
-    if base_image is None or motion_loop_count >= 10 and motion_found == False:
+    if base_image is None or motion_loop_count >= 50 and motion_found == False:
         base_image = gray.copy().astype("float")
         lastTime = timestamp
         rawCapture.truncate(0)
@@ -318,7 +318,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
                             median_speed = median(mph_list)
 
-                            if median_speed / len(mph_list) > 1:  # Values less than one typically indicate faulty setup
+                            if median_speed / len(mph_list) >= 1:  # Values less than one typically indicate faulty setup
 
                                 cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
                                     (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 1)
@@ -355,7 +355,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
                         median_speed = median(mph_list)
 
-                        if median_speed / len(mph_list) > 1:  # Values less than one typically indicate faulty setup
+                        if median_speed / len(mph_list) >= 1:  # Values less than one typically indicate faulty setup
 
                             new_vehicle = Vehicles(  # Table for statistics calculations
                                 sessionID = sessionID,
