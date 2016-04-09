@@ -23,6 +23,7 @@ def log_entry():
     """
 
     new_entry = Log(
+        sessionID = sessionID,
         timeOn = timeOn,
         timeOff = datetime.datetime.now()
     )

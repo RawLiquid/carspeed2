@@ -34,10 +34,12 @@ remove_dupes <- "DELETE FROM vehicles
   WHERE t.rnum > 1);"
 
 ui <- fluidPage(
-  titlePanel("Title Here"),
+  titlePanel("Ridgmar Boulevard Speed Statistics"),
   
   sidebarLayout(
-    sidebarPanel( "sidebar panel"),
+    sidebarPanel(
+      sliderInput("obs", "Time Range", min = 10, max = 500, value = 100)
+    ),
     mainPanel("main panel")
   )
 )
