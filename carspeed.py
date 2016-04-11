@@ -186,7 +186,7 @@ camera.capture(rawCapture, format="bgr", use_video_port=True)
 image = rawCapture.array
 rows,cols,placeholder = image.shape
 M = cv2.getRotationMatrix2D((cols/2,rows/2),rotation_degrees,1)
-org_image = cv2.warpAffine(image,M,(cols,rows))
+image = cv2.warpAffine(image,M,(cols,rows))
 rawCapture.truncate(0)
 org_image = image.copy()
 
