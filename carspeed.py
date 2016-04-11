@@ -139,7 +139,7 @@ print("Image width in feet {} at {} from camera".format("%.0f" % frame_width_ft,
 # (tracking_end_time - tracking_start_time) is the elapsed time
 # from these the speed is calculated and displayed
 
-rotation_degrees = 200  # Rotate image by this amount to create flat road
+rotation_degrees = 190  # Rotate image by this amount to create flat road
  
 state = WAITING
 direction = UNKNOWN
