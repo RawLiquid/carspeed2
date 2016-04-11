@@ -137,7 +137,9 @@ print("Image width in feet {} at {} from camera".format("%.0f" % frame_width_ft,
 # depending upon the direction of travel, the front of the
 # vehicle is either at x, or at x+w 
 # (tracking_end_time - tracking_start_time) is the elapsed time
-# from these the speed is calculated and displayed 
+# from these the speed is calculated and displayed
+
+rotation_degrees = 15  # Rotate image by this amount to create flat road
  
 state = WAITING
 direction = UNKNOWN
@@ -184,6 +186,11 @@ camera.capture(rawCapture, format="bgr", use_video_port=True)
 image = rawCapture.array
 rawCapture.truncate(0)
 org_image = image.copy()
+
+# Rotate image
+rows,cols = org_image.shape
+M = cv2.getRotationMatrix2d((cols/2,rows/2),rotation_degrees,1)
+org_image = cv2.warpAffine(org_image,M,(cols,rows))
 
 prompt = "Define the monitored area - press 'c' to continue" 
 prompt_on_image(prompt)
