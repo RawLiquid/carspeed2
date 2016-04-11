@@ -184,7 +184,7 @@ cv2.setMouseCallback('Speed Camera',draw_rectangle)
 # grab a reference image to use for drawing the monitored area's boundry
 camera.capture(rawCapture, format="bgr", use_video_port=True)
 image = rawCapture.array
-rows,cols = image.shape
+print(image.shape)
 M = cv2.getRotationMatrix2d((cols/2,rows/2),rotation_degrees,1)
 org_image = cv2.warpAffine(org_image,M,(cols,rows))
 rawCapture.truncate(0)
