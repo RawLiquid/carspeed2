@@ -9,7 +9,7 @@ from statistics import median
 from uuid import uuid4 as uuid
 import os
 
-from sqlalchemy import create_engine, MetaData, Table
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from db import Speeders, Vehicles, Log
 
@@ -235,6 +235,14 @@ print(" lower_right_y {}".format(lower_right_y))
 print(" monitored_width {}".format(monitored_width))
 print(" monitored_height {}".format(monitored_height))
 print(" monitored_area {}".format(monitored_width * monitored_height))
+
+# Remove duplicate entries from table
+clean = text("DELETE FROM vehicles\
+  WHERE id IN (SELECT id\
+  FROM (SELECT id,\
+  ROW_NUMBER() OVER (partition BY speed ORDER BY id) AS rnum\
+  FROM vehicles) t\
+  WHERE t.rnum > 1);")
  
 # capture frames from the camera (using capture_continuous.
 #   This keeps the picamera in capture mode - it doesn't need
@@ -361,14 +369,16 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                                 state = SAVING
 
                                 new_speeder = Speeders(
-                                    sessionID = sessionID,
-                                    datetime = datetime.datetime.now(),
-                                    speed = median_speed,
-                                    rating = (median_speed / len(mph_list))
+                                    sessionID=sessionID,
+                                    datetime=datetime.datetime.now(),
+                                    speed=median_speed,
+                                    rating=(median_speed / len(mph_list))
                                 )
 
                                 session.add(new_speeder)
                                 session.commit()
+
+                                session.execute(clean)
 
                                 clear_screen()
                                 print("Added new speeder to database")
@@ -385,19 +395,20 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                         if median_speed / len(mph_list) >= 1:  # Values less than one typically indicate faulty setup
 
                             new_vehicle = Vehicles(  # Table for statistics calculations
-                                sessionID = sessionID,
-                                datetime = datetime.datetime.now(),
-                                speed = median_speed,
-                                rating = (median_speed / len(mph_list))
+                                sessionID=sessionID,
+                                datetime=datetime.datetime.now(),
+                                speed=median_speed,
+                                rating=(median_speed / len(mph_list))
                             )
                             session.add(new_vehicle)
                             session.commit()
                             id = None
                             committed = True
+                            session.execute(clean)
 
                             clear_screen()
                             print("Added new vehicle to database")
-                            time.sleep(1)
+                            time.sleep(.5)
 
                 else:
                     print("Not enough frames captured ({})".format(len(mph_list)))
