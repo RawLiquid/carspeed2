@@ -249,8 +249,13 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     #initialize the timestamp
     timestamp = datetime.datetime.now()
  
-    # grab the raw NumPy array representing the image 
+    # grab the raw NumPy array representing the image, and rotate it so that it's flat
     image = frame.array
+    rows, cols, placeholder = image.shape
+    M = cv2.getRotationMatrix2D((cols / 2, rows / 2), rotation_degrees, 1)
+    image = cv2.warpAffine(image, M, (rows, cols))
+
+
  
     # crop the frame to the monitored area, convert it to grayscale, and blur it
     # crop area defined by [y1:y2,x1:x2]
