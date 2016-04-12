@@ -34,8 +34,8 @@ FPS = 90
 set_by_drawing = False  # Can either set bounding box manually, or by drawing rectangle on screen
 rotation_degrees = 187  # Rotate image by this amount to create flat road
 
-if not os.environ['DISPLAY']:  #If SSH'd in, just use the preset parameters and don't try to open images
-    set_by_drawing = False
+#if not os.environ['DISPLAY']:  #If SSH'd in, just use the preset parameters and don't try to open images
+#    set_by_drawing = False
 
 
 timeOn = datetime.datetime.now()  # This is used for the log
