@@ -1,21 +1,39 @@
 # import the necessary packages
-from picamera.array import PiRGBArray
-from picamera import PiCamera
-import time
-import math
 import datetime
-import cv2
+import math
+import os
+import time
 from statistics import median
 from uuid import uuid4 as uuid
-import os
 
+import cv2
+from picamera import PiCamera
+from picamera.array import PiRGBArray
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
+
 from db import Speeders, Vehicles, Log
 
 engine = create_engine('postgresql://speedcam:Rward0232@localhost/speedcamdb')
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+# define somec constants
+DISTANCE = 70  # <---- enter your distance-to-road value here
+THRESHOLD = 15
+SPEED_THRESHOLD = 40
+MINIMUM_SPEED = 20  # Don't detect cars in parking lots, walkers, and slow drivers
+MAXIMUM_SPEED = 70  # Anything higher than this is likely to be noise.
+MIN_AREA = 225  # 175  # TODO: Experiment with this - it may reduce the sensitivity
+BLURSIZE = (15, 15)
+IMAGEWIDTH = 640
+IMAGEHEIGHT = 480
+RESOLUTION = [IMAGEWIDTH, IMAGEHEIGHT]
+FOV = 53.5
+FPS = 90
+set_by_drawing = False  # Can either set bounding box manually, or by drawing rectangle on screen
+rotation_degrees = 187  # Rotate image by this amount to create flat road
+
 
 timeOn = datetime.datetime.now()  # This is used for the log
 sessionID = uuid()
@@ -98,20 +116,6 @@ def draw_rectangle(event,x,y,flags,param):
 # Log usage
 current_id = log_entry("in", current_id)
 
-# define somec constants
-DISTANCE = 70  #<---- enter your distance-to-road value here
-THRESHOLD = 15
-SPEED_THRESHOLD = 40
-MINIMUM_SPEED = 20  # Don't detect cars in parking lots, walkers, and slow drivers
-MAXIMUM_SPEED = 70  # Anything higher than this is likely to be noise.
-MIN_AREA = 225 #175  # TODO: Experiment with this - it may reduce the sensitivity
-BLURSIZE = (15,15)
-IMAGEWIDTH = 640
-IMAGEHEIGHT = 480
-RESOLUTION = [IMAGEWIDTH,IMAGEHEIGHT]
-FOV = 53.5
-FPS = 90
-
 # the following enumerated values are used to make the program more readable
 WAITING = 0
 TRACKING = 1
@@ -138,8 +142,6 @@ print("Image width in feet {} at {} from camera".format("%.0f" % frame_width_ft,
 # vehicle is either at x, or at x+w 
 # (tracking_end_time - tracking_start_time) is the elapsed time
 # from these the speed is calculated and displayed
-
-rotation_degrees = 187  # Rotate image by this amount to create flat road
  
 state = WAITING
 direction = UNKNOWN
@@ -192,37 +194,45 @@ org_image = image.copy()
 
 prompt = "Define the monitored area - press 'c' to continue" 
 prompt_on_image(prompt)
- 
-# wait while the user draws the monitored area's boundry
-while not setup_complete:
-    cv2.imshow("Speed Camera",image)
- 
-    #wait for for c to be pressed  
-    key = cv2.waitKey(1) & 0xFF
-  
-    # if the `c` key is pressed, break from the loop
-    if key == ord("c"):
-        break
 
-# the monitored area is defined, time to move on
-prompt = "Press 'q' to quit" 
- 
-# since the monitored area's bounding box could be drawn starting 
-# from any corner, normalize the coordinates
- 
-if fx > ix:
-    upper_left_x = ix
-    lower_right_x = fx
+if set_by_drawing:
+
+    # wait while the user draws the monitored area's boundry
+    while not setup_complete:
+        cv2.imshow("Speed Camera", image)
+
+        # wait for for c to be pressed
+        key = cv2.waitKey(1) & 0xFF
+
+        # if the `c` key is pressed, break from the loop
+        if key == ord("c"):
+            break
+
+    # the monitored area is defined, time to move on
+    prompt = "Press 'q' to quit"
+
+    # since the monitored area's bounding box could be drawn starting
+    # from any corner, normalize the coordinates
+
+    if fx > ix:
+        upper_left_x = ix
+        lower_right_x = fx
+    else:
+        upper_left_x = fx
+        lower_right_x = ix
+
+    if fy > iy:
+        upper_left_y = iy
+        lower_right_y = fy
+    else:
+        upper_left_y = fy
+        lower_right_y = iy
 else:
-    upper_left_x = fx
-    lower_right_x = ix
- 
-if fy > iy:
-    upper_left_y = iy
-    lower_right_y = fy
-else:
-    upper_left_y = fy
-    lower_right_y = iy
+    # Define manually because my camera is mounted
+    upper_left_x = 140
+    upper_left_y = 173
+    lower_right_x = 511
+    lower_right_y = 196
      
 monitored_width = lower_right_x - upper_left_x
 monitored_height = lower_right_y - upper_left_y
@@ -353,7 +363,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
                             print("Rating: {}".format(median_speed / len(mph_list)))
 
-                            if median_speed / len(mph_list) >= 1:  # Values less than one typically indicate faulty setup
+                            if median_speed / len(
+                                    mph_list) >= 1:  # Values less than one typically indicate faulty readings
 
                                 cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
                                     (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 1)
