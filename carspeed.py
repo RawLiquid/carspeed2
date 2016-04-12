@@ -22,9 +22,9 @@ session = DBSession()
 DISTANCE = 70  # <---- enter your distance-to-road value here
 THRESHOLD = 15
 SPEED_THRESHOLD = 40
-MINIMUM_SPEED = 20  # Don't detect cars in parking lots, walkers, and slow drivers
+MINIMUM_SPEED = 10  # Don't detect cars in parking lots, walkers, and slow drivers
 MAXIMUM_SPEED = 70  # Anything higher than this is likely to be noise.
-MIN_AREA = 225  # 175  # TODO: Experiment with this - it may reduce the sensitivity
+MIN_AREA = 175  # TODO: Experiment with this - it may reduce the sensitivity
 BLURSIZE = (15, 15)
 IMAGEWIDTH = 640
 IMAGEHEIGHT = 480
@@ -33,6 +33,9 @@ FOV = 53.5
 FPS = 90
 set_by_drawing = False  # Can either set bounding box manually, or by drawing rectangle on screen
 rotation_degrees = 187  # Rotate image by this amount to create flat road
+
+if not os.environ['DISPLAY']:  #If SSH'd in, just use the preset parameters and don't try to open images
+    set_by_drawing = False
 
 
 timeOn = datetime.datetime.now()  # This is used for the log
