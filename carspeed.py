@@ -184,7 +184,8 @@ if showImage:
     cv2.moveWindow("Speed Camera", 10, 40)
 
 # call the draw_rectangle routines when the mouse is used
-cv2.setMouseCallback('Speed Camera',draw_rectangle)
+if showImage:
+    cv2.setMouseCallback('Speed Camera',draw_rectangle)
  
 # grab a reference image to use for drawing the monitored area's boundry
 camera.capture(rawCapture, format="bgr", use_video_port=True)
