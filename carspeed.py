@@ -38,6 +38,8 @@ rotation_degrees = 187  # Rotate image by this amount to create flat road
 timeOn = datetime.datetime.now()  # This is used for the log
 sessionID = uuid()
 current_id = None
+initial_time = None
+last_mph = None
 
 def log_entry(in_out, current_id):
     """
@@ -389,8 +391,6 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                                 session.add(new_speeder)
                                 session.commit()
 
-                                session.execute(clean)
-
                                 clear_screen()
                                 print("Added new speeder to database")
 
@@ -419,7 +419,6 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
                             clear_screen()
                             print("Added new vehicle to database")
-                            time.sleep(.5)
 
                 else:
                     print("Not enough frames captured ({})".format(len(mph_list)))
