@@ -291,7 +291,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         base_image = gray.copy().astype("float")
         lastTime = timestamp
         rawCapture.truncate(0)
-        cv2.imshow("Speed Camera", image)
+        #cv2.imshow("Speed Camera", image)
         continue
  
     # compute the absolute difference between the current image and
