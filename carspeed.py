@@ -317,7 +317,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             biggest_area = found_area
             motion_found = True
 
-    if motion_found and motion_loop_count < 25:
+    if motion_found:
         committed = False
         if state == WAITING:
             clear_screen()
@@ -424,7 +424,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                     print("Not enough frames captured ({})".format(len(mph_list)))
 
                 last_x = x
-                motion_loop_count += 1
+        motion_loop_count += 1
     else:
         if state != WAITING:
             state = WAITING
@@ -433,7 +433,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             print(text_on_image)
             mph_list = []
             id = None
-    motion_loop_count = 0
+        motion_loop_count = 0
     # only update image and wait for a keypress when waiting for a car
     # or if 50 frames have been processed in the WAITING state.
     # This is required since waitkey slows processing.
