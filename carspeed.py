@@ -179,8 +179,9 @@ rawCapture = PiRGBArray(camera, size=camera.resolution)
 time.sleep(0.9)
 
 # create an image window and place it in the upper left corner of the screen
-cv2.namedWindow("Speed Camera")
-cv2.moveWindow("Speed Camera", 10, 40)
+if showImage:
+    cv2.namedWindow("Speed Camera")
+    cv2.moveWindow("Speed Camera", 10, 40)
 
 # call the draw_rectangle routines when the mouse is used
 cv2.setMouseCallback('Speed Camera',draw_rectangle)
