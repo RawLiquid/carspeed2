@@ -288,6 +288,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     gray = cv2.GaussianBlur(gray, BLURSIZE, 0)
 
     if base_image is None or motion_loop_count >= 50 and motion_found == False:
+        if motion_loop_count >= 50 and motion_found == False:
+            print("Caught motion loop. Creating new base snapshot")
         base_image = gray.copy().astype("float")
         lastTime = timestamp
         rawCapture.truncate(0)
