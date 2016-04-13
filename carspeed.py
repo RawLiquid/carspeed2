@@ -279,8 +279,6 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     rows, cols, placeholder = image.shape
     M = cv2.getRotationMatrix2D((cols / 2, rows / 2), rotation_degrees, 1)
     image = cv2.warpAffine(image, M, (rows, cols))
-
-
  
     # crop the frame to the monitored area, convert it to grayscale, and blur it
     # crop area defined by [y1:y2,x1:x2]
@@ -324,7 +322,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             biggest_area = found_area
             motion_found = True
 
-    if motion_found:
+    if motion_found and motion_loop_count < 50:
         committed = False
         if state == WAITING:
             clear_screen()
@@ -336,6 +334,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             last_mph = 0
             text_on_image = 'Tracking'
             print(text_on_image)
+            motion_loop_count = 0
 
         else:
 
@@ -432,6 +431,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
                 last_x = x
         motion_loop_count += 1
+        print(motion_loop_count)
     else:
         if state != WAITING:
             state = WAITING
@@ -440,7 +440,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             print(text_on_image)
             mph_list = []
             id = None
-        motion_loop_count = 0
+
     # only update image and wait for a keypress when waiting for a car
     # or if 50 frames have been processed in the WAITING state.
     # This is required since waitkey slows processing.
