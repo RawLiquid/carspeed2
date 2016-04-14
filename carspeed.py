@@ -292,220 +292,229 @@ clean = text("DELETE FROM vehicles\
 mph_list = []
 id = None
 motion_loop_count = 0
+try:
+    for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 
-for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+        # initialize the timestamp
+        timestamp = datetime.datetime.now()
 
-    #initialize the timestamp
-    timestamp = datetime.datetime.now()
+        # Set frame rate based on time
+        # set_framerate_by_time(FPS, timestamp)
 
-    # Set frame rate based on time
-    # set_framerate_by_time(FPS, timestamp)
- 
-    # grab the raw NumPy array representing the image, and rotate it so that it's flat
-    image = frame.array
-    rows, cols, placeholder = image.shape
-    M = cv2.getRotationMatrix2D((cols / 2, rows / 2), rotation_degrees, 1)
-    image = cv2.warpAffine(image, M, (rows, cols))
- 
-    # crop the frame to the monitored area, convert it to grayscale, and blur it
-    # crop area defined by [y1:y2,x1:x2]
-    gray = image[upper_left_y:lower_right_y,upper_left_x:lower_right_x]
- 
-    # convert it to grayscale, and blur it
-    gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
-    gray = cv2.GaussianBlur(gray, BLURSIZE, 0)
+        # grab the raw NumPy array representing the image, and rotate it so that it's flat
+        image = frame.array
+        rows, cols, placeholder = image.shape
+        M = cv2.getRotationMatrix2D((cols / 2, rows / 2), rotation_degrees, 1)
+        image = cv2.warpAffine(image, M, (rows, cols))
 
-    if base_image is None or motion_loop_count >= 50 and motion_found == False:
-        if motion_loop_count >= 50 and motion_found == False:
-            print("Caught motion loop. Creating new base snapshot")
-            motion_loop_count = 0
-        base_image = gray.copy().astype("float")
-        lastTime = timestamp
-        rawCapture.truncate(0)
+        # crop the frame to the monitored area, convert it to grayscale, and blur it
+        # crop area defined by [y1:y2,x1:x2]
+        gray = image[upper_left_y:lower_right_y, upper_left_x:lower_right_x]
 
-        if use_x:
-            cv2.imshow("Speed Camera", image)
-        continue
- 
-    # compute the absolute difference between the current image and
-    # base image and then turn eveything lighter than THRESHOLD into
-    # white
-    frameDelta = cv2.absdiff(gray, cv2.convertScaleAbs(base_image))
-    thresh = cv2.threshold(frameDelta, THRESHOLD, 255, cv2.THRESH_BINARY)[1]
-  
-    # dilate the thresholded image to fill in any holes, then find contours
-    # on thresholded image
-    thresh = cv2.dilate(thresh, None, iterations=2)
-    (_, cnts, _) = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+        # convert it to grayscale, and blur it
+        gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
+        gray = cv2.GaussianBlur(gray, BLURSIZE, 0)
 
-    # look for motion 
-    motion_found = False
-    biggest_area = 0
- 
-    # examine the contours, looking for the largest one
-    for c in cnts:
-        (x, y, w, h) = cv2.boundingRect(c)
-        # get an approximate area of the contour
-        found_area = w*h
-        # find the largest bounding rectangle
-        if (found_area > MIN_AREA) and (found_area > biggest_area):  
-            biggest_area = found_area
-            motion_found = True
+        if base_image is None or motion_loop_count >= 50 and motion_found == False:
+            if motion_loop_count >= 50 and motion_found == False:
+                print("Caught motion loop. Creating new base snapshot")
+                motion_loop_count = 0
+            base_image = gray.copy().astype("float")
+            lastTime = timestamp
+            rawCapture.truncate(0)
 
-    if motion_found and motion_loop_count < 50:
-        committed = False
-        if state == WAITING:
-            clear_screen()
-            # intialize tracking
-            state = TRACKING
-            initial_x = x
-            last_x = x
-            initial_time = timestamp
-            last_mph = 0
-            text_on_image = 'Tracking'
-            print(text_on_image)
-            motion_loop_count = 0
+            if use_x:
+                cv2.imshow("Speed Camera", image)
+            continue
 
-        else:
+        # compute the absolute difference between the current image and
+        # base image and then turn eveything lighter than THRESHOLD into
+        # white
+        frameDelta = cv2.absdiff(gray, cv2.convertScaleAbs(base_image))
+        thresh = cv2.threshold(frameDelta, THRESHOLD, 255, cv2.THRESH_BINARY)[1]
 
-            if state == TRACKING:
-                if x >= last_x:
-                    direction = LEFT_TO_RIGHT
-                    abs_chg = x + w - initial_x
+        # dilate the thresholded image to fill in any holes, then find contours
+        # on thresholded image
+        thresh = cv2.dilate(thresh, None, iterations=2)
+        (_, cnts, _) = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-                else:
-                    direction = RIGHT_TO_LEFT
-                    abs_chg = initial_x - x
-                secs = secs_diff(timestamp,initial_time)
-                mph = get_speed(abs_chg,ftperpixel,secs)
+        # look for motion
+        motion_found = False
+        biggest_area = 0
 
-                if mph > MINIMUM_SPEED and mph <= MAXIMUM_SPEED:  # Filter out cars in parking lot behind road and crazy-high readings
-                   mph_list.append(mph)
+        # examine the contours, looking for the largest one
+        for c in cnts:
+            (x, y, w, h) = cv2.boundingRect(c)
+            # get an approximate area of the contour
+            found_area = w * h
+            # find the largest bounding rectangle
+            if (found_area > MIN_AREA) and (found_area > biggest_area):
+                biggest_area = found_area
+                motion_found = True
 
-                if len(mph_list) >= 3:
-                    if mph > SPEED_THRESHOLD and mph <= MAXIMUM_SPEED:  # Don't want all drivers, and want a reasonable
-                        # number of frames captured
-                        print("--> chg={}  secs={}  mph={} this_x={} w={} ".format(abs_chg,secs,"%.0f" % mph,x,w))
+        if motion_found and motion_loop_count < 50:
+            committed = False
+            if state == WAITING:
+                clear_screen()
+                # intialize tracking
+                state = TRACKING
+                initial_x = x
+                last_x = x
+                initial_time = timestamp
+                last_mph = 0
+                text_on_image = 'Tracking'
+                print(text_on_image)
+                motion_loop_count = 0
 
-                        # is front of object outside the monitored boundary? Then write date, time and speed on image
-                        # and save it
-                        if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and last_mph > SPEED_THRESHOLD\
-                                or ((x+w >= monitored_width - 2) \
-                                and (direction == LEFT_TO_RIGHT))\
-                                and last_mph > SPEED_THRESHOLD:  # Prevent writing of speeds less than realistic min.
-                            # timestamp the image
+            else:
+
+                if state == TRACKING:
+                    if x >= last_x:
+                        direction = LEFT_TO_RIGHT
+                        abs_chg = x + w - initial_x
+
+                    else:
+                        direction = RIGHT_TO_LEFT
+                        abs_chg = initial_x - x
+                    secs = secs_diff(timestamp, initial_time)
+                    mph = get_speed(abs_chg, ftperpixel, secs)
+
+                    if mph > MINIMUM_SPEED and mph <= MAXIMUM_SPEED:  # Filter out cars in parking lot behind road and crazy-high readings
+                        mph_list.append(mph)
+
+                    if len(mph_list) >= 3:
+                        if mph > SPEED_THRESHOLD and mph <= MAXIMUM_SPEED:  # Don't want all drivers, and want a reasonable
+                            # number of frames captured
+                            print(
+                                "--> chg={}  secs={}  mph={} this_x={} w={} ".format(abs_chg, secs, "%.0f" % mph, x, w))
+
+                            # is front of object outside the monitored boundary? Then write date, time and speed on image
+                            # and save it
+                            if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and last_mph > SPEED_THRESHOLD \
+                                    or ((x + w >= monitored_width - 2) \
+                                                and (direction == LEFT_TO_RIGHT)) \
+                                            and last_mph > SPEED_THRESHOLD:  # Prevent writing of speeds less than realistic min.
+                                # timestamp the image
+
+                                median_speed = median(mph_list)
+
+                                print("Rating: {}".format(median_speed / len(mph_list)))
+
+                                if median_speed / len(
+                                        mph_list) >= 1:  # Values less than one typically indicate faulty readings
+
+                                    cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
+                                                (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0),
+                                                1)
+                                    # write the speed: first get the size of the text
+                                    size, base = cv2.getTextSize("%.0f mph" % last_mph, cv2.FONT_HERSHEY_SIMPLEX, 2, 3)
+                                    # then center it horizontally on the image
+                                    cntr_x = int((IMAGEWIDTH - size[0]) / 2)
+                                    cv2.putText(image, "%.0f mph" % last_mph,
+                                                (cntr_x, int(IMAGEHEIGHT * 0.2)), cv2.FONT_HERSHEY_SIMPLEX, 2.00,
+                                                (0, 255, 0), 3)
+                                    # and save the image to disk
+                                    cv2.imwrite("speed_tracking_images/car_at_" + datetime.datetime.now().strftime(
+                                        "%Y%m%d_%H%M%S") + ".jpg",
+                                                image)
+                                    state = SAVING
+
+                                    new_speeder = Speeders(
+                                        sessionID=sessionID,
+                                        datetime=datetime.datetime.now(),
+                                        speed=median_speed,
+                                        rating=(median_speed / len(mph_list))
+                                    )
+
+                                    session.add(new_speeder)
+                                    session.commit()
+
+                                    clear_screen()
+                                    print("Added new speeder to database")
+
+                            # if the object hasn't reached the end of the monitored area, just remember the speed
+                            # and its last position
+                            last_mph = mph
+
+                        if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and committed == False \
+                                or ((x + w >= monitored_width - 2) and (
+                                            direction == LEFT_TO_RIGHT)) and committed == False:
 
                             median_speed = median(mph_list)
 
-                            print("Rating: {}".format(median_speed / len(mph_list)))
-
                             if median_speed / len(
-                                    mph_list) >= 1:  # Values less than one typically indicate faulty readings
+                                    mph_list) >= 1:  # Values less than one typically indicate faulty setup
 
-                                cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
-                                    (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 1)
-                                # write the speed: first get the size of the text
-                                size, base = cv2.getTextSize( "%.0f mph" % last_mph, cv2.FONT_HERSHEY_SIMPLEX, 2, 3)
-                                # then center it horizontally on the image
-                                cntr_x = int((IMAGEWIDTH - size[0]) / 2)
-                                cv2.putText(image, "%.0f mph" % last_mph,
-                                    (cntr_x , int(IMAGEHEIGHT * 0.2)), cv2.FONT_HERSHEY_SIMPLEX, 2.00, (0, 255, 0), 3)
-                                # and save the image to disk
-                                cv2.imwrite("speed_tracking_images/car_at_"+datetime.datetime.now().strftime("%Y%m%d_%H%M%S")+".jpg",
-                                    image)
-                                state = SAVING
-
-                                new_speeder = Speeders(
+                                new_vehicle = Vehicles(  # Table for statistics calculations
                                     sessionID=sessionID,
                                     datetime=datetime.datetime.now(),
                                     speed=median_speed,
                                     rating=(median_speed / len(mph_list))
                                 )
-
-                                session.add(new_speeder)
+                                session.add(new_vehicle)
                                 session.commit()
+                                id = None
+                                committed = True
+                                session.execute(clean)
 
                                 clear_screen()
-                                print("Added new speeder to database")
+                                print("Added new vehicle to database")
 
-                        # if the object hasn't reached the end of the monitored area, just remember the speed
-                        # and its last position
-                        last_mph = mph
+                    else:
+                        print("Not enough frames captured ({})".format(len(mph_list)))
 
-                    if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and committed == False\
-                            or ((x + w >= monitored_width - 2) and (direction == LEFT_TO_RIGHT)) and committed == False:
+                    last_x = x
+            motion_loop_count += 1
+            print(motion_loop_count)
+        else:
+            if state != WAITING:
+                state = WAITING
+                direction = UNKNOWN
+                text_on_image = 'No Car Detected'
+                print(text_on_image)
+                mph_list = []
+                id = None
 
-                        median_speed = median(mph_list)
+        # only update image and wait for a keypress when waiting for a car
+        # or if 50 frames have been processed in the WAITING state.
+        # This is required since waitkey slows processing.
+        if (state == WAITING) or (loop_count > 50):
 
-                        if median_speed / len(mph_list) >= 1:  # Values less than one typically indicate faulty setup
+            # draw the text and timestamp on the frame
+            cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
+                        (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 1)
+            cv2.putText(image, "Road Status: {}".format(text_on_image), (10, 20),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
 
-                            new_vehicle = Vehicles(  # Table for statistics calculations
-                                sessionID=sessionID,
-                                datetime=datetime.datetime.now(),
-                                speed=median_speed,
-                                rating=(median_speed / len(mph_list))
-                            )
-                            session.add(new_vehicle)
-                            session.commit()
-                            id = None
-                            committed = True
-                            session.execute(clean)
+            if use_x:
+                # define the monitored area right and left boundary
+                cv2.line(image, (upper_left_x, upper_left_y), (upper_left_x, lower_right_y), (0, 255, 0))
+                cv2.line(image, (lower_right_x, upper_left_y), (lower_right_x, lower_right_y), (0, 255, 0))
 
-                            clear_screen()
-                            print("Added new vehicle to database")
+            # show the frame and check for a keypress
+            if use_x:
+                prompt_on_image(prompt)
+                cv2.imshow("Speed Camera", image)
 
-                else:
-                    print("Not enough frames captured ({})".format(len(mph_list)))
+            if state == WAITING:
+                last_x = 0
+                cv2.accumulateWeighted(gray, base_image, 0.25)
 
-                last_x = x
-        motion_loop_count += 1
-        print(motion_loop_count)
-    else:
-        if state != WAITING:
             state = WAITING
-            direction = UNKNOWN
-            text_on_image = 'No Car Detected'
-            print(text_on_image)
-            mph_list = []
-            id = None
+            key = cv2.waitKey(1) & 0xFF
 
-    # only update image and wait for a keypress when waiting for a car
-    # or if 50 frames have been processed in the WAITING state.
-    # This is required since waitkey slows processing.
-    if (state == WAITING) or (loop_count > 50):
- 
-        # draw the text and timestamp on the frame
-        cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
-            (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 1)
-        cv2.putText(image, "Road Status: {}".format(text_on_image), (10, 20),
-            cv2.FONT_HERSHEY_SIMPLEX,0.35, (0, 0, 255), 1)
+            # if the `q` key is pressed, break from the loop and terminate processing
+            if key == ord("q"):
+                log_entry("out", sessionID)
+                break
+            loop_count = 0
 
-        if use_x:
-            #define the monitored area right and left boundary
-            cv2.line(image,(upper_left_x,upper_left_y),(upper_left_x,lower_right_y),(0, 255, 0))
-            cv2.line(image,(lower_right_x,upper_left_y),(lower_right_x,lower_right_y),(0, 255, 0))
-       
-        # show the frame and check for a keypress
-        if use_x:
-            prompt_on_image(prompt)
-            cv2.imshow("Speed Camera", image)
+        # clear the stream in preparation for the next frame
+        rawCapture.truncate(0)
+        loop_count = loop_count + 1
 
-        if state == WAITING:
-            last_x = 0
-            cv2.accumulateWeighted(gray, base_image, 0.25)
-
-        state = WAITING
-        key = cv2.waitKey(1) & 0xFF
-      
-        # if the `q` key is pressed, break from the loop and terminate processing
-        if key == ord("q"):
-            log_entry("out", sessionID)
-            break
-        loop_count = 0
-         
-    # clear the stream in preparation for the next frame
-    rawCapture.truncate(0)
-    loop_count = loop_count + 1
+except KeyboardInterrupt:  # Catch a CTRL+C interrupt as program exit
+    log_entry("out", sessionID)
   
 # cleanup the camera and close any open windows
 cv2.destroyAllWindows()
