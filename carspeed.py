@@ -268,13 +268,14 @@ monitored_width = lower_right_x - upper_left_x
 monitored_height = lower_right_y - upper_left_y
  
 print("Monitored area:")
-print(" upper_left_x {}".format(upper_left_x))
-print(" upper_left_y {}".format(upper_left_y))
-print(" lower_right_x {}".format(lower_right_x))
-print(" lower_right_y {}".format(lower_right_y))
-print(" monitored_width {}".format(monitored_width))
-print(" monitored_height {}".format(monitored_height))
-print(" monitored_area {}".format(monitored_width * monitored_height))
+print(" Upper_left_x {}".format(upper_left_x))
+print(" Upper_left_y {}".format(upper_left_y))
+print(" Lower_right_x {}".format(lower_right_x))
+print(" Lower_right_y {}".format(lower_right_y))
+print(" Monitored_width {}".format(monitored_width))
+print(" Monitored width in feet is {}".format(ftperpixel * monitored_width))
+print(" Monitored_height {}".format(monitored_height))
+print(" Monitored_area {}".format(monitored_width * monitored_height))
 
 # Remove duplicate entries from table
 clean = text("DELETE FROM vehicles\
