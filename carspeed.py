@@ -30,7 +30,7 @@ IMAGEWIDTH = 640
 IMAGEHEIGHT = 480
 RESOLUTION = [IMAGEWIDTH, IMAGEHEIGHT]
 FOV = 53.5
-FPS = 60
+FPS = 15
 set_by_drawing = False  # Can either set bounding box manually, or by drawing rectangle on screen
 rotation_degrees = 187  # Rotate image by this amount to create flat road
 
@@ -299,7 +299,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     timestamp = datetime.datetime.now()
 
     # Set frame rate based on time
-    set_framerate_by_time(FPS, timestamp)
+    # set_framerate_by_time(FPS, timestamp)
  
     # grab the raw NumPy array representing the image, and rotate it so that it's flat
     image = frame.array
