@@ -273,7 +273,7 @@ print(" Upper_left_y {}".format(upper_left_y))
 print(" Lower_right_x {}".format(lower_right_x))
 print(" Lower_right_y {}".format(lower_right_y))
 print(" Monitored_width {}".format(monitored_width))
-print(" Monitored width in feet is {}".format(ftperpixel * monitored_width))
+print(" Monitored width in feet is {}".format(round(ftperpixel * monitored_width), 2))
 print(" Monitored_height {}".format(monitored_height))
 print(" Monitored_area {}".format(monitored_width * monitored_height))
 
