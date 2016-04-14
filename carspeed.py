@@ -65,9 +65,9 @@ def set_framerate_by_time(FPS, now):
             time.sleep(3)
 
     else:
-        if FPS != 60:
+        if FPS != 30:
             print("Setting FPS to 60.")
-            FPS = 60
+            FPS = 30
             camera.framerate = FPS
 
 
@@ -461,7 +461,7 @@ try:
                                 session.execute(clean)
 
                                 clear_screen()
-                                print("Added new vehicle to database")
+                                print("Added new vehicle to database at {0} MPH".format(min(mph_list)))
 
                     else:
                         print("Not enough frames captured ({})".format(len(mph_list)))
