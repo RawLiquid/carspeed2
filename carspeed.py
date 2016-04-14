@@ -51,6 +51,7 @@ def set_framerate_by_time(FPS, now):
     :return: None - passes straight to camera
     """
 
+    now = now.datetime.time()
     if now >= datetime.time(20, 00) and now <= datetime.time(7, 00):
         if FPS != 30:
             FPS = 30
