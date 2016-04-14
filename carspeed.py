@@ -437,6 +437,8 @@ try:
                         # and its last position
                         # last_mph = mph
 
+                        print("Speeds detected: {}".format(mph_list))
+
                         if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and committed == False \
                                 or ((x + w >= monitored_width - 2) and (
                                             direction == LEFT_TO_RIGHT)) and committed == False:
@@ -461,7 +463,7 @@ try:
                                 session.execute(clean)
 
                                 clear_screen()
-                                print("Added new vehicle to database at {0} MPH".format(min(mph_list)))
+                                print("Added new vehicle to database at min = {0}, med = {1} MPH".format(min(mph_list), median_speed))
 
                     else:
                         print("Not enough frames captured ({})".format(len(mph_list)))
