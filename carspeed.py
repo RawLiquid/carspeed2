@@ -12,7 +12,7 @@ from picamera.array import PiRGBArray
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
-from db import Speeders, Vehicles, Log
+from db import Vehicles, Log
 
 use_x = False
 show_bounds = False
@@ -383,58 +383,58 @@ try:
                         mph_list.append(mph)
 
                     if len(mph_list) >= 3:
-                        if mph > SPEED_THRESHOLD and mph <= MAXIMUM_SPEED:  # Don't want all drivers, and want a reasonable
-                            # number of frames captured
-                            print(
-                                "--> chg={}  secs={}  mph={} this_x={} w={} ".format(abs_chg, secs, "%.0f" % mph, x, w))
+                        # if mph > SPEED_THRESHOLD and mph <= MAXIMUM_SPEED:  # Don't want all drivers, and want a reasonable
+                        #    # number of frames captured
+                        #    print(
+                        #        "--> chg={}  secs={}  mph={} this_x={} w={} ".format(abs_chg, secs, "%.0f" % mph, x, w))
 
                             # is front of object outside the monitored boundary? Then write date, time and speed on image
                             # and save it
-                            if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and last_mph > SPEED_THRESHOLD \
-                                    or ((x + w >= monitored_width - 2) \
-                                                and (direction == LEFT_TO_RIGHT)) \
-                                            and last_mph > SPEED_THRESHOLD:  # Prevent writing of speeds less than realistic min.
-                                # timestamp the image
+                        # if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and last_mph > SPEED_THRESHOLD \
+                        #        or ((x + w >= monitored_width - 2) \
+                        #                    and (direction == LEFT_TO_RIGHT)) \
+                        #                and last_mph > SPEED_THRESHOLD:  # Prevent writing of speeds less than realistic min.
+                        #    # timestamp the image
 
-                                median_speed = median(mph_list)
+                        # median_speed = median(mph_list)
 
-                                print("Rating: {}".format(median_speed / len(mph_list)))
+                        # print("Rating: {}".format(median_speed / len(mph_list)))
 
-                                if median_speed / len(
-                                        mph_list) >= 1:  # Values less than one typically indicate faulty readings
+                        # if median_speed / len(
+                        #        mph_list) >= 1:  # Values less than one typically indicate faulty readings
 
-                                    cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
-                                                (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0),
-                                                1)
-                                    # write the speed: first get the size of the text
-                                    size, base = cv2.getTextSize("%.0f mph" % last_mph, cv2.FONT_HERSHEY_SIMPLEX, 2, 3)
-                                    # then center it horizontally on the image
-                                    cntr_x = int((IMAGEWIDTH - size[0]) / 2)
-                                    cv2.putText(image, "%.0f mph" % last_mph,
-                                                (cntr_x, int(IMAGEHEIGHT * 0.2)), cv2.FONT_HERSHEY_SIMPLEX, 2.00,
-                                                (0, 255, 0), 3)
-                                    # and save the image to disk
-                                    cv2.imwrite("speed_tracking_images/car_at_" + datetime.datetime.now().strftime(
-                                        "%Y%m%d_%H%M%S") + ".jpg",
-                                                image)
-                                    state = SAVING
+                        #   cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
+                        #              (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0),
+                        #             1)
+                        # write the speed: first get the size of the text
+                        # size, base = cv2.getTextSize("%.0f mph" % last_mph, cv2.FONT_HERSHEY_SIMPLEX, 2, 3)
+                        # then center it horizontally on the image
+                        # cntr_x = int((IMAGEWIDTH - size[0]) / 2)
+                        # cv2.putText(image, "%.0f mph" % last_mph,
+                        #           (cntr_x, int(IMAGEHEIGHT * 0.2)), cv2.FONT_HERSHEY_SIMPLEX, 2.00,
+                        #          (0, 255, 0), 3)
+                        # and save the image to disk
+                        # cv2.imwrite("speed_tracking_images/car_at_" + datetime.datetime.now().strftime(
+                        #    "%Y%m%d_%H%M%S") + ".jpg",
+                        #            image)
+                        # state = SAVING
 
-                                    new_speeder = Speeders(
-                                        sessionID=sessionID,
-                                        datetime=datetime.datetime.now(),
-                                        speed=median_speed,
-                                        rating=(median_speed / len(mph_list))
-                                    )
+                        # new_speeder = Speeders(
+                        #    sessionID=sessionID,
+                        #    datetime=datetime.datetime.now(),
+                        #    speed=median_speed,
+                        #    rating=(median_speed / len(mph_list))
+                        # )
 
-                                    session.add(new_speeder)
-                                    session.commit()
+                        # session.add(new_speeder)
+                        # session.commit()
 
-                                    clear_screen()
-                                    print("Added new speeder to database")
+                        # clear_screen()
+                        # print("Added new speeder to database")
 
-                            # if the object hasn't reached the end of the monitored area, just remember the speed
-                            # and its last position
-                            last_mph = mph
+                        # if the object hasn't reached the end of the monitored area, just remember the speed
+                        # and its last position
+                        # last_mph = mph
 
                         if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and committed == False \
                                 or ((x + w >= monitored_width - 2) and (
@@ -444,6 +444,8 @@ try:
 
                             if median_speed / len(
                                     mph_list) >= 1:  # Values less than one typically indicate faulty setup
+
+                                state = SAVING
 
                                 new_vehicle = Vehicles(  # Table for statistics calculations
                                     sessionID=sessionID,
@@ -465,7 +467,6 @@ try:
 
                     last_x = x
             motion_loop_count += 1
-            print(motion_loop_count)
         else:
             if state != WAITING:
                 state = WAITING
@@ -514,7 +515,9 @@ try:
         loop_count = loop_count + 1
 
 except KeyboardInterrupt:  # Catch a CTRL+C interrupt as program exit
+    now = datetime.datetime.now()
+    print("Writing exit time ({}) to log table and exiting program.".format(now))
     log_entry("out", sessionID)
-  
+
 # cleanup the camera and close any open windows
 cv2.destroyAllWindows()
