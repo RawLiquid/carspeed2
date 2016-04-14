@@ -30,7 +30,7 @@ IMAGEWIDTH = 640
 IMAGEHEIGHT = 480
 RESOLUTION = [IMAGEWIDTH, IMAGEHEIGHT]
 FOV = 53.5
-FPS = 90
+FPS = 60
 set_by_drawing = False  # Can either set bounding box manually, or by drawing rectangle on screen
 rotation_degrees = 187  # Rotate image by this amount to create flat road
 
@@ -43,6 +43,25 @@ sessionID = uuid()
 current_id = None
 initial_time = None
 last_mph = None
+
+
+def set_framerate_by_time(FPS):
+    """
+    Sets framerate based on time of day, using a lower value for night.
+    :return: None - passes straight to camera
+    """
+
+    now = datetime.datetime.now()
+    if now >= datetime.time(20, 00) and now <= datetime.time(7, 00):
+        if FPS != 30:
+            FPS = 30
+            camera.framerate = FPS
+            time.sleep(3)
+
+    else:
+        FPS = 60
+        camera.framerate = FPS
+
 
 def log_entry(in_out, current_id):
     """
