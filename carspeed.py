@@ -45,13 +45,12 @@ initial_time = None
 last_mph = None
 
 
-def set_framerate_by_time(FPS):
+def set_framerate_by_time(FPS, now):
     """
     Sets framerate based on time of day, using a lower value for night.
     :return: None - passes straight to camera
     """
 
-    now = datetime.datetime.now()
     if now >= datetime.time(20, 00) and now <= datetime.time(7, 00):
         if FPS != 30:
             FPS = 30
@@ -290,8 +289,12 @@ id = None
 motion_loop_count = 0
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+
     #initialize the timestamp
     timestamp = datetime.datetime.now()
+
+    # Set frame rate based on time
+    set_framerate_by_time(FPS, timestamp)
  
     # grab the raw NumPy array representing the image, and rotate it so that it's flat
     image = frame.array
