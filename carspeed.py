@@ -453,7 +453,7 @@ try:
                                 new_vehicle = Vehicles(  # Table for statistics calculations
                                     sessionID=sessionID,
                                     datetime=datetime.datetime.now(),
-                                    speed=median_speed,
+                                    speed=min(mph_list),
                                     rating=(median_speed / len(mph_list))
                                 )
                                 session.add(new_vehicle)
