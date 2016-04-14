@@ -58,9 +58,9 @@ def set_framerate_by_time(FPS, now):
     now = now.time()
 
     if now >= datetime.time(20, 00) and now <= datetime.time(7, 00):
-        if FPS != 30:
+        if FPS != 15:
             print("Setting FPS to 30.")
-            FPS = 30
+            FPS = 15
             camera.framerate = FPS
             time.sleep(3)
 
