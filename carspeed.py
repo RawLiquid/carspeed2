@@ -238,7 +238,7 @@ else:
     # Define manually because my camera is mounted
     upper_left_x = 140
     upper_left_y = 173
-    lower_right_x = 511
+    lower_right_x = 311  # 511
     lower_right_y = 196
      
 monitored_width = lower_right_x - upper_left_x
