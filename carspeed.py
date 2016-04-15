@@ -381,11 +381,11 @@ try:
                         direction = LEFT_TO_RIGHT
                         ftperpixel = calculate_ftperpixel(LTR_Distance, IMAGEWIDTH)
                         abs_chg = x + w - initial_x
-                        dir = "left-right"
+                        dir = "North"
 
                     else:
                         direction = RIGHT_TO_LEFT
-                        dir = "right-left"
+                        dir = "South"
                         abs_chg = initial_x - x
                         ftperpixel = calculate_ftperpixel(RTL_Distance, IMAGEWIDTH)
                     secs = secs_diff(timestamp, initial_time)
