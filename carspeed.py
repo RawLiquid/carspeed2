@@ -23,7 +23,8 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 # define some constants
-DISTANCE = 65  # <---- enter your distance-to-road value here
+RTL_Distance = 72  # Right to left distance to median
+LTR_Distance = 60  # Left to right distance to median
 THRESHOLD = 15
 SPEED_THRESHOLD = 40
 MINIMUM_SPEED = 20  # Don't detect cars in parking lots, walkers, and slow drivers
@@ -157,9 +158,12 @@ LEFT_TO_RIGHT = 1
 RIGHT_TO_LEFT = 2
 
 # calculate the the width of the image at the distance specified
-frame_width_ft = 2*(math.tan(math.radians(FOV*0.5))*DISTANCE)
-ftperpixel = frame_width_ft / float(IMAGEWIDTH)
-print("Image width in feet {} at {} from camera".format("%.0f" % frame_width_ft,"%.0f" % DISTANCE))
+
+def calculate_ftperpixel(DISTANCE, IMAGEWIDTH):
+    frame_width_ft = 2 * (math.tan(math.radians(FOV * 0.5)) * DISTANCE)
+    ftperpixel = frame_width_ft / float(IMAGEWIDTH)
+
+    return ftperpixel
 
 # state maintains the state of the speed computation process
 # if starts as WAITING
@@ -273,7 +277,7 @@ print(" Upper left_y:               {}".format(upper_left_y))
 print(" Lower right_x:              {}".format(lower_right_x))
 print(" Lower right_y:              {}".format(lower_right_y))
 print(" Monitored width:            {}".format(monitored_width))
-print(" Monitored width in feet:    {}".format(round(ftperpixel * monitored_width, 2)))
+# print(" Monitored width in feet:    {}".format(round(ftperpixel * monitored_width, 2)))
 print(" Monitored height:           {}".format(monitored_height))
 print(" Monitored area:             {}".format(monitored_width * monitored_height))
 
@@ -375,11 +379,13 @@ try:
                 if state == TRACKING:
                     if x >= last_x:
                         direction = LEFT_TO_RIGHT
+                        ftperpixel = calculate_ftperpixel(LTR_Distance, IMAGEWIDTH)
                         abs_chg = x + w - initial_x
 
                     else:
                         direction = RIGHT_TO_LEFT
                         abs_chg = initial_x - x
+                        ftperpixel = calculate_ftperpixel(RTL_Distance, IMAGEWIDTH)
                     secs = secs_diff(timestamp, initial_time)
                     mph = get_speed(abs_chg, ftperpixel, secs)
 
