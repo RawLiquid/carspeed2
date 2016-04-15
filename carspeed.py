@@ -23,7 +23,7 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 # define some constants
-RTL_Distance = 72  # Right to left distance to median
+RTL_Distance = 60  # Right to left distance to median
 LTR_Distance = 50  # Left to right distance to median
 THRESHOLD = 15
 SPEED_THRESHOLD = 40
