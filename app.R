@@ -10,8 +10,6 @@ library(zoo)
 
 
 # TODO: Add statistics table
-# TODO: Add histogram showing peak times of speeders
-# TODO: Speeders only check box
 # TODO: Code to allow range to be be available only for ranges for which there are data entries
 # TODO: Option and code to show daily graphs (maybe past week, past month?)
 # TODO: Charts initially display data downloaded in vehicles.Rdata (same dir). "Update" button refreshes data and charts
@@ -58,6 +56,8 @@ ui <- fluidPage(
 			br(),
 			br(),
 			sliderInput("range", "Time Range (N hours ago - Now)", min = 1, max = 48, value = 12),
+			
+			sliderInput("l_span", "Trend Fitting Parameter", min = 0.1, max = 1, value = 0.7),
 			
 			br(),
 			helpText("Display either all data, or data for vehicles travelling above the speed limit."),
@@ -130,7 +130,8 @@ server <- function(input, output) {
 	vehicles <- vehicles[ which(vehicles$datetime >= Sys.time() - (input$range * 3600)), ]
 	vehicles$speeding <- ifelse(vehicles$speed>35, 1,0)
 	vehicles$count <- 1
-	time <- data.frame(time=format(vehicles$datetime, "%H"), speeders=vehicles$speeding, count = vehicles$count)
+	#time <- data.frame(time=format(vehicles$datetime, "%H"), speeders=vehicles$speeding, count = vehicles$count)
+	time <- data.frame(time = as.POSIXct(strptime(vehicles$datetime, '%Y-%m-%d %H')), speeders=vehicles$speeding, count = vehicles$count)
 	speed_agg <- aggregate(. ~ time, data=time, FUN = sum)
 	speed_agg$speed.prop <- (speed_agg$speeders / speed_agg$count)
 
@@ -139,7 +140,7 @@ server <- function(input, output) {
 	}
 
 	output$percentage_speeders <- renderPlot({
-		ggplot(speed_agg, aes(x = as.integer(time), y = speed.prop)) + 
+		ggplot(speed_agg, aes(x = time, y = speed.prop)) + 
   		geom_point(color="#3498db") +
   		geom_smooth(level=0.99, colour='#c0392b', na.rm=TRUE, span=1,se=FALSE, cex=0.7, fill='#34495e', alpha = 0.8) + 
   		xlab("Time") + 
@@ -157,20 +158,22 @@ server <- function(input, output) {
       
 	output$loess <- renderPlot({
 		ggplot(vehicles, aes(x = as.POSIXct(strptime(vehicles$datetime, '%Y-%m-%d %H:%M')),y = vehicles$speed)) + 
-		ggtitle("Speed Trend over Time") + 
-		xlab("Time") +
-		ylab("Speed (MPH)") + 
-		geom_smooth(level=.99, span=0.5, na.rm=TRUE,show.legend=TRUE, colour='white', cex=.7, fill = '#34495e', alpha=0.8) +
-		geom_hline(yintercept = 35, colour = '#c0392b', cex=1.2) +
-		geom_point(aes(color=direction), alpha=0.4) +
-		theme_bw() + 
-		theme(plot.title=element_text(size=20, color="black", margin=margin(10,0,10,0), face="bold"), 
-		axis.title=element_text(color="black", size=12),
-		axis.text=element_text(color="black", size=12), 
-		panel.border=element_blank(), 
-		panel.background = element_blank(), 
-		panel.grid.minor = element_blank(),  
-		panel.grid.major = element_blank())
+  		ggtitle("Speed Trend over Time") + 
+  		xlab("Time") +
+  		ylab("Speed (MPH)") + 
+  		geom_smooth(level=.99, span=input$l_span, na.rm=TRUE,show.legend=F, colour='white', cex=.7, fill = '#2c3e50', alpha=0.8) +
+  		geom_hline(yintercept = 35, colour = '#c0392b', cex=1.2) +
+  		geom_point(aes(color=direction), alpha=0.6) +
+	    scale_colour_manual(name="Direction of Travel", breaks=c('North', 'South'), values=c('#EB9532', '#3498db')) + 
+  		theme_bw() + 
+  		theme(plot.title=element_text(size=20, color="black", margin=margin(10,0,10,0), face="bold"), 
+  		axis.title=element_text(color="black", size=12),
+  		axis.text=element_text(color="black", size=12), 
+  		panel.border=element_blank(),
+  		legend.key=element_blank(),
+  		panel.background = element_blank(), 
+  		panel.grid.minor = element_blank(),  
+  		panel.grid.major = element_blank())
 		})
 
 	output$speed_dens <- renderPlot({
@@ -195,7 +198,8 @@ server <- function(input, output) {
 	
 	output$time_dens <- renderPlot({
     ggplot(data=time, aes(time)) +
-	    geom_density(aes(fill='#34495e'), alpha=0.8, stat='count') + 
+	    geom_density(aes(fill='#27AE60'), alpha=0.8) + 
+	    scale_fill_manual(values=c("#349935")) + 
       ggtitle("Time Densities") +
       guides(fill=FALSE) +
       theme_bw() +
