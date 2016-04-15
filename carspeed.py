@@ -391,7 +391,7 @@ try:
                             sessionID=sessionID,
                             datetime=datetime.datetime.now(),
                             speed=last_mph,
-                            rating=((tracking_start - datetime.datetime.now()) / motion_loop_count)
+                            rating=((tracking_start - datetime.datetime.now()).microseconds / motion_loop_count)
                         )
                         session.add(new_vehicle)
                         session.commit()
