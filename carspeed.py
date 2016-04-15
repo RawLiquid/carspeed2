@@ -24,7 +24,7 @@ session = DBSession()
 
 # define some constants
 RTL_Distance = 72  # Right to left distance to median
-LTR_Distance = 55  # Left to right distance to median
+LTR_Distance = 50  # Left to right distance to median
 THRESHOLD = 15
 SPEED_THRESHOLD = 40
 MINIMUM_SPEED = 20  # Don't detect cars in parking lots, walkers, and slow drivers
