@@ -33,6 +33,7 @@ class Vehicles(Base):
     datetime = Column(DateTime, index=True)
     speed = Column(Float, index=True)
     direction = Column(String, index=True)
+    color = Column(String, index=True)
     rating = Column(Float)
 
 Base.metadata.create_all(engine, checkfirst=True)
