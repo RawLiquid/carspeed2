@@ -384,7 +384,7 @@ try:
                     mph = get_speed(abs_chg, ftperpixel, secs)
 
                     if mph >= MINIMUM_SPEED and mph < MAXIMUM_SPEED:
-                        mph_list.add(mph)
+                        mph_list.append(mph)
 
                     if len(mph_list) >= 3:
                         if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and committed == False \
