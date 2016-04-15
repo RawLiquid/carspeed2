@@ -22,7 +22,7 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 # define somec constants
-DISTANCE = 70  # <---- enter your distance-to-road value here
+DISTANCE = 60  # <---- enter your distance-to-road value here
 THRESHOLD = 15
 SPEED_THRESHOLD = 40
 MINIMUM_SPEED = 20  # Don't detect cars in parking lots, walkers, and slow drivers
@@ -391,7 +391,7 @@ try:
                             sessionID=sessionID,
                             datetime=datetime.datetime.now(),
                             speed=last_mph,
-                            rating=((tracking_start - datetime.datetime.now()).microseconds / motion_loop_count)
+                            rating=math.log((tracking_start - datetime.datetime.now()).microseconds / motion_loop_count)
                         )
                         session.add(new_vehicle)
                         session.commit()
