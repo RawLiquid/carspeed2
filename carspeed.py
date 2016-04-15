@@ -381,9 +381,11 @@ try:
                         direction = LEFT_TO_RIGHT
                         ftperpixel = calculate_ftperpixel(LTR_Distance, IMAGEWIDTH)
                         abs_chg = x + w - initial_x
+                        dir = "left-right"
 
                     else:
                         direction = RIGHT_TO_LEFT
+                        dir = "right-left"
                         abs_chg = initial_x - x
                         ftperpixel = calculate_ftperpixel(RTL_Distance, IMAGEWIDTH)
                     secs = secs_diff(timestamp, initial_time)
@@ -402,6 +404,7 @@ try:
                                 sessionID=sessionID,
                                 datetime=datetime.datetime.now(),
                                 speed=median(mph_list),
+                                direction=dir,
                                 rating=motion_loop_count
                             )
                             session.add(new_vehicle)
