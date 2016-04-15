@@ -3,6 +3,7 @@ import datetime
 import math
 import os
 import time
+from statistics import median
 from uuid import uuid4 as uuid
 
 import cv2
@@ -382,27 +383,32 @@ try:
                     secs = secs_diff(timestamp, initial_time)
                     mph = get_speed(abs_chg, ftperpixel, secs)
 
-                    if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and committed == False \
-                            or ((x + w >= monitored_width - 2) and (
-                                        direction == LEFT_TO_RIGHT)) and committed == False:
-                        state = SAVING
+                    if mph >= MINIMUM_SPEED and mph < MAXIMUM_SPEED:
+                        mph_list.add(mph)
 
-                        new_vehicle = Vehicles(  # Table for statistics calculations
-                            sessionID=sessionID,
-                            datetime=datetime.datetime.now(),
-                            speed=last_mph,
-                            rating=math.log((tracking_start - datetime.datetime.now()).microseconds / motion_loop_count)
-                        )
-                        session.add(new_vehicle)
-                        session.commit()
-                        id = None
-                        committed = True
-                        session.execute(clean)
+                    if len(mph_list) >= 3:
+                        if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and committed == False \
+                                or ((x + w >= monitored_width - 2) and (
+                                            direction == LEFT_TO_RIGHT)) and committed == False:
+                            state = SAVING
 
-                        clear_screen()
-                        print("Added new vehicle to database")
+                            new_vehicle = Vehicles(  # Table for statistics calculations
+                                sessionID=sessionID,
+                                datetime=datetime.datetime.now(),
+                                speed=median(mph_list),
+                                rating=math.log(
+                                    (tracking_start - datetime.datetime.now()).microseconds / motion_loop_count)
+                            )
+                            session.add(new_vehicle)
+                            session.commit()
+                            id = None
+                            committed = True
+                            session.execute(clean)
+                            mph_list = []
 
-                    last_mph = mph
+                            clear_screen()
+                            print("Added new vehicle to database")
+
                     last_x = x
 
             motion_loop_count += 1
