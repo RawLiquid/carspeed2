@@ -57,6 +57,8 @@ ui <- fluidPage(
 			br(),
 			sliderInput("range", "Time Range (N hours ago - Now)", min = 1, max = 48, value = 12),
 			
+			sliderInput("l_span", "Trend Fitting Parameter", min = 0.1, max = 1, value = 0.7),
+			
 			br(),
 			helpText("Display either all data, or data for vehicles travelling above the speed limit."),
 			radioButtons("speedOnly", "Data to analyze", c("All" = "all","Speeders Only" = "speeders")),
@@ -159,7 +161,7 @@ server <- function(input, output) {
   		ggtitle("Speed Trend over Time") + 
   		xlab("Time") +
   		ylab("Speed (MPH)") + 
-  		geom_smooth(level=.99, span=0.5, na.rm=TRUE,show.legend=F, colour='white', cex=.7, fill = '#2c3e50', alpha=0.8) +
+  		geom_smooth(level=.99, span=input$l_span, na.rm=TRUE,show.legend=F, colour='white', cex=.7, fill = '#2c3e50', alpha=0.8) +
   		geom_hline(yintercept = 35, colour = '#c0392b', cex=1.2) +
   		geom_point(aes(color=direction), alpha=0.6) +
 	    scale_colour_manual(name="Direction of Travel", breaks=c('North', 'South'), values=c('#EB9532', '#3498db')) + 
