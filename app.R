@@ -162,7 +162,7 @@ server <- function(input, output) {
   		geom_smooth(level=.99, span=0.5, na.rm=TRUE,show.legend=F, colour='white', cex=.7, fill = '#2c3e50', alpha=0.8) +
   		geom_hline(yintercept = 35, colour = '#c0392b', cex=1.2) +
   		geom_point(aes(color=direction), alpha=0.6) +
-	    scale_colour_manual(name="Direction of Travel", breaks=c('North', 'South'), values=c('#16a085', '#3498db')) + 
+	    scale_colour_manual(name="Direction of Travel", breaks=c('North', 'South'), values=c('#EB9532', '#3498db')) + 
   		theme_bw() + 
   		theme(plot.title=element_text(size=20, color="black", margin=margin(10,0,10,0), face="bold"), 
   		axis.title=element_text(color="black", size=12),
@@ -196,7 +196,8 @@ server <- function(input, output) {
 	
 	output$time_dens <- renderPlot({
     ggplot(data=time, aes(time)) +
-	    geom_density(aes(fill='#34495e'), alpha=0.8) + 
+	    geom_density(aes(fill='#27AE60'), alpha=0.8) + 
+	    scale_fill_manual(values=c("#349935")) + 
       ggtitle("Time Densities") +
       guides(fill=FALSE) +
       theme_bw() +
