@@ -298,6 +298,7 @@ mph_list = []
 id = None
 motion_loop_count = 0
 tracking_start = None
+commit_counter = 0
 
 try:
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
@@ -408,10 +409,10 @@ try:
                                 rating=motion_loop_count
                             )
                             session.add(new_vehicle)
-                            session.commit()
+                            # session.commit()
                             id = None
                             committed = True
-                            session.execute(clean)
+                            #session.execute(clean)
                             mph_list = []
 
                             clear_screen()
@@ -468,6 +469,14 @@ try:
         # clear the stream in preparation for the next frame
         rawCapture.truncate(0)
         loop_count = loop_count + 1
+
+        if commit_counter > FPS * 60:
+            session.commit()
+            session.execute(clean)
+            commit_counter = 0
+
+        else:
+            commit_counter += 1
 
 except KeyboardInterrupt:  # Catch a CTRL+C interrupt as program exit
     now = datetime.datetime.now()
