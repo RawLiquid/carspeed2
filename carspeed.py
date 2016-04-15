@@ -402,7 +402,7 @@ try:
                         clear_screen()
                         print("Added new vehicle to database")
 
-                        last_mph = mph
+                    last_mph = mph
                     last_x = x
 
             motion_loop_count += 1
