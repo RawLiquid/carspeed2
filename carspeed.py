@@ -3,7 +3,6 @@ import datetime
 import math
 import os
 import time
-from statistics import median
 from uuid import uuid4 as uuid
 
 import cv2
@@ -293,6 +292,8 @@ clean = text("DELETE FROM vehicles\
 mph_list = []
 id = None
 motion_loop_count = 0
+tracking_start = None
+
 try:
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 
@@ -359,6 +360,7 @@ try:
                 clear_screen()
                 # intialize tracking
                 state = TRACKING
+                tracking_start = datetime.datetime.now()
                 initial_x = x
                 last_x = x
                 initial_time = timestamp
@@ -380,96 +382,31 @@ try:
                     secs = secs_diff(timestamp, initial_time)
                     mph = get_speed(abs_chg, ftperpixel, secs)
 
-                    if mph > MINIMUM_SPEED and mph <= MAXIMUM_SPEED:  # Filter out cars in parking lot behind road and crazy-high readings
-                        mph_list.append(mph)
+                    if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and committed == False \
+                            or ((x + w >= monitored_width - 2) and (
+                                        direction == LEFT_TO_RIGHT)) and committed == False:
+                        state = SAVING
 
-                    if len(mph_list) >= 3:
-                        # if mph > SPEED_THRESHOLD and mph <= MAXIMUM_SPEED:  # Don't want all drivers, and want a reasonable
-                        #    # number of frames captured
-                        #    print(
-                        #        "--> chg={}  secs={}  mph={} this_x={} w={} ".format(abs_chg, secs, "%.0f" % mph, x, w))
+                        new_vehicle = Vehicles(  # Table for statistics calculations
+                            sessionID=sessionID,
+                            datetime=datetime.datetime.now(),
+                            speed=last_mph,
+                            rating=((tracking_start - datetime.datetime.now()) / motion_loop_count)
+                        )
+                        session.add(new_vehicle)
+                        session.commit()
+                        id = None
+                        committed = True
+                        session.execute(clean)
 
-                            # is front of object outside the monitored boundary? Then write date, time and speed on image
-                            # and save it
-                        # if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and last_mph > SPEED_THRESHOLD \
-                        #        or ((x + w >= monitored_width - 2) \
-                        #                    and (direction == LEFT_TO_RIGHT)) \
-                        #                and last_mph > SPEED_THRESHOLD:  # Prevent writing of speeds less than realistic min.
-                        #    # timestamp the image
+                        clear_screen()
+                        print("Added new vehicle to database")
 
-                        # median_speed = median(mph_list)
-
-                        # print("Rating: {}".format(median_speed / len(mph_list)))
-
-                        # if median_speed / len(
-                        #        mph_list) >= 1:  # Values less than one typically indicate faulty readings
-
-                        #   cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
-                        #              (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0),
-                        #             1)
-                        # write the speed: first get the size of the text
-                        # size, base = cv2.getTextSize("%.0f mph" % last_mph, cv2.FONT_HERSHEY_SIMPLEX, 2, 3)
-                        # then center it horizontally on the image
-                        # cntr_x = int((IMAGEWIDTH - size[0]) / 2)
-                        # cv2.putText(image, "%.0f mph" % last_mph,
-                        #           (cntr_x, int(IMAGEHEIGHT * 0.2)), cv2.FONT_HERSHEY_SIMPLEX, 2.00,
-                        #          (0, 255, 0), 3)
-                        # and save the image to disk
-                        # cv2.imwrite("speed_tracking_images/car_at_" + datetime.datetime.now().strftime(
-                        #    "%Y%m%d_%H%M%S") + ".jpg",
-                        #            image)
-                        # state = SAVING
-
-                        # new_speeder = Speeders(
-                        #    sessionID=sessionID,
-                        #    datetime=datetime.datetime.now(),
-                        #    speed=median_speed,
-                        #    rating=(median_speed / len(mph_list))
-                        # )
-
-                        # session.add(new_speeder)
-                        # session.commit()
-
-                        # clear_screen()
-                        # print("Added new speeder to database")
-
-                        # if the object hasn't reached the end of the monitored area, just remember the speed
-                        # and its last position
-                        # last_mph = mph
-
-                        print("Speeds detected: {}".format(mph_list))
-
-                        if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and committed == False \
-                                or ((x + w >= monitored_width - 2) and (
-                                            direction == LEFT_TO_RIGHT)) and committed == False:
-
-                            median_speed = median(mph_list)
-
-                            if median_speed / len(
-                                    mph_list) >= 1:  # Values less than one typically indicate faulty setup
-
-                                state = SAVING
-
-                                new_vehicle = Vehicles(  # Table for statistics calculations
-                                    sessionID=sessionID,
-                                    datetime=datetime.datetime.now(),
-                                    speed=min(mph_list),
-                                    rating=(median_speed / len(mph_list))
-                                )
-                                session.add(new_vehicle)
-                                session.commit()
-                                id = None
-                                committed = True
-                                session.execute(clean)
-
-                                clear_screen()
-                                print("Added new vehicle to database at min = {0}, med = {1} MPH".format(min(mph_list), median_speed))
-
-                    else:
-                        print("Not enough frames captured ({})".format(len(mph_list)))
-
+                        last_mph = mph
                     last_x = x
+
             motion_loop_count += 1
+
         else:
             if state != WAITING:
                 state = WAITING
@@ -478,6 +415,7 @@ try:
                 print(text_on_image)
                 mph_list = []
                 id = None
+                motion_loop_count = 0
 
         # only update image and wait for a keypress when waiting for a car
         # or if 50 frames have been processed in the WAITING state.
