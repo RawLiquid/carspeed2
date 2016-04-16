@@ -37,7 +37,7 @@ IMAGEWIDTH = 640
 IMAGEHEIGHT = 480
 RESOLUTION = [IMAGEWIDTH, IMAGEHEIGHT]
 FOV = 53.5
-FPS = 15
+FPS = 30
 set_by_drawing = False  # Can either set bounding box manually, or by drawing rectangle on screen
 rotation_degrees = 187  # Rotate image by this amount to create flat road
 
