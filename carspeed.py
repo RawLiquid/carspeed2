@@ -407,7 +407,7 @@ try:
                 motion_found = True
 
                 if not is_nighttime():
-                    rgb = grab_rgb(gray, c)
+                    rgb = grab_rgb(frame, c)
                 else:
                     rgb = 'nighttime'
 
