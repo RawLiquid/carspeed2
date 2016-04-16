@@ -185,7 +185,7 @@ def grab_rgb(image, c):
     # TODO: Convert to real code
     # Detect pixel values (RGB)
     mask = np.zeros_like(image)
-    cv2.drawContours(mask, c, color=255, thickness=-1)
+    cv2.drawContours(mask, c, -1, color=255, thickness=-1)
 
     points = np.where(mask == 255)
 
