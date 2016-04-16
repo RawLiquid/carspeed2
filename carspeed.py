@@ -179,7 +179,7 @@ def grab_rgb(image):
 
     points = np.where(mask == 255)
     for point in points:
-        pixel = (image[point[1], point[0]])
+        pixel = (image[point[1], point[0]], -1)
         pixel = pixel.tolist()
         # pixel = [set(tuple(x) for x in y) for y in pixel]
         print(pixel)
@@ -187,8 +187,8 @@ def grab_rgb(image):
 
     # print(pixels)
 
-    pixel_mode = Counter(pixels).most_common()
-    # pixel_mode = 0
+    # pixel_mode = Counter(pixels).most_common()
+    pixel_mode = 0
     print(pixel_mode)
     return pixel_mode
 
