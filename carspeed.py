@@ -185,7 +185,7 @@ def grab_rgb(image, c):
     # TODO: Convert to real code
     # Detect pixel values (RGB)
     mask = np.zeros_like(image)
-    cv2.drawContours(mask, c, -1, color=255, thickness=-1)
+    cv2.drawContours(mask, c, color=255, thickness=-1)
 
     points = np.where(mask == 255)
 
@@ -360,11 +360,10 @@ try:
         rows, cols, placeholder = image.shape
         M = cv2.getRotationMatrix2D((cols / 2, rows / 2), rotation_degrees, 1)
         image = cv2.warpAffine(image, M, (rows, cols))
-        image = image[upper_left_y:lower_right_y, upper_left_x:lower_right_x]
 
         # crop the frame to the monitored area, convert it to grayscale, and blur it
         # crop area defined by [y1:y2,x1:x2]
-        gray = image
+        gray = image[upper_left_y:lower_right_y, upper_left_x:lower_right_x]
 
         # convert it to grayscale, and blur it
         gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
