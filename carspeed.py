@@ -169,7 +169,7 @@ def calculate_ftperpixel(DISTANCE, IMAGEWIDTH):
     return ftperpixel
 
 
-def grab_rgb(image):
+def grab_rgb(image, c):
     pixels = []
 
     # TODO: Convert to real code
@@ -178,18 +178,17 @@ def grab_rgb(image):
     cv2.drawContours(mask, c, -1, color=255, thickness=-1)
 
     points = np.where(mask == 255)
+    print(len(points))
     for point in points:
         pixel = (image[point[1], point[0]])
         pixel = pixel.tolist()
-        print(pixel)
         pixels.append(pixel)
 
     # print(pixels)
 
     # pixel_mode = Counter(pixels).most_common()
     pixel_mode = 0
-    print(pixel_mode)
-    return pixel_mode
+    print(pixels)
 
 
 # state maintains the state of the speed computation process
@@ -386,8 +385,6 @@ try:
                 biggest_area = found_area
                 motion_found = True
 
-                rgb = grab_rgb(image)
-
         if motion_found and motion_loop_count < 50:
             committed = False
             if state == WAITING:
@@ -402,6 +399,8 @@ try:
                 text_on_image = 'Tracking'
                 print(text_on_image)
                 motion_loop_count = 0
+
+                grab_rgb(image, c)
 
             else:
 
