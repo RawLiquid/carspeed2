@@ -385,9 +385,8 @@ try:
 
                 points = np.where(mask == 255)
                 for point in points:
-                    # pixels.append(frame[points[1], points[0]])
-
                     print(point)
+                    pixels.append(image[points[1], points[0]])
 
                 pixel_mode = Counter(pixels).most_common()
 
