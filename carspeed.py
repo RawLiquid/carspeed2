@@ -1,4 +1,7 @@
 # import the necessary packages
+
+# TODO: Figure out logic to detect if two vehicles are in frame
+
 import math
 import os
 import time
@@ -26,7 +29,7 @@ session = DBSession()
 
 # define some constants
 RTL_Distance = 85  # Right to left distance to median
-LTR_Distance = 61  # Left to right distance to median
+LTR_Distance = 55  # Left to right distance to median
 THRESHOLD = 15
 SPEED_THRESHOLD = 40
 MINIMUM_SPEED = 20  # Don't detect cars in parking lots, walkers, and slow drivers
