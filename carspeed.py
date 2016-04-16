@@ -2,7 +2,6 @@
 import math
 import os
 import time
-from collections import Counter
 from datetime import datetime
 from statistics import median
 from uuid import uuid4 as uuid
@@ -168,19 +167,25 @@ def calculate_ftperpixel(DISTANCE, IMAGEWIDTH):
     return ftperpixel
 
 
-def pixels_in_contour(contour, image):
-    """
-    Gets pixel coordinates within contour for color processing
-    :param contour:
-    :param image:
-    :return:
-    """
+def grab_rgb(image):
+    pixels = []
 
-    mask = np.zeros(image.shape, dtype='uint8')
-    cv2.drawContours(mask, [contour], -1, 255, -1)
-    mean, stddev = cv2.meanStdDev(image, mask=mask)
+    # TODO: Convert to real code
+    # Detect pixel values (RGB)
+    mask = np.zeros_like(image)
+    cv2.drawContours(mask, c, -1, color=255, thickness=-1)
 
-    return mean, stddev
+    points = np.where(mask == 255)
+    for point in points:
+        pixel = (image[points[1], points[0]])
+        pixel = pixel.tolist()
+        pixels.append(pixel)
+
+    print(pixels)
+
+    # pixel_mode = Counter(pixels).most_common()
+    pixel_mode = 0
+    return pixel_mode
 
 
 # state maintains the state of the speed computation process
@@ -288,16 +293,16 @@ else:
      
 monitored_width = lower_right_x - upper_left_x
 monitored_height = lower_right_y - upper_left_y
- 
-print("Monitored area:")
+
+print("Initial Parameters:")
 print(" Upper left_x:               {}".format(upper_left_x))
 print(" Upper left_y:               {}".format(upper_left_y))
 print(" Lower right_x:              {}".format(lower_right_x))
 print(" Lower right_y:              {}".format(lower_right_y))
 print(" Monitored width:            {}".format(monitored_width))
-# print(" Monitored width in feet:    {}".format(round(ftperpixel * monitored_width, 2)))
 print(" Monitored height:           {}".format(monitored_height))
 print(" Monitored area:             {}".format(monitored_width * monitored_height))
+print(" FPS:                        {}".format(FPS))
 
 # Remove duplicate entries from table
 clean = text("DELETE FROM vehicles\
@@ -376,19 +381,8 @@ try:
             if (found_area > MIN_AREA) and (found_area > biggest_area):
                 biggest_area = found_area
                 motion_found = True
-                pixels = []
 
-                # TODO: Convert to real code
-                # Detect pixel values (RGB)
-                mask = np.zeros_like(gray)
-                cv2.drawContours(mask, c, -1, color=255, thickness=-1)
-
-                points = np.where(mask == 255)
-                pixels.append(frame[points[1], points[0]])
-
-                pixel_mode = Counter(pixels).most_common()
-
-                print(pixel_mode)
+                rgb = grab_rgb(image)
 
         if motion_found and motion_loop_count < 50:
             committed = False
