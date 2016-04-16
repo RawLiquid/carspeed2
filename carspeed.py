@@ -52,6 +52,16 @@ initial_time = None
 last_mph = None
 
 
+def is_nighttime():
+    now = datetime.now().time()
+
+    if now >= datetime.time(20, 00) and now <= datetime.time(7, 00):
+        return True
+
+    else:
+        return False
+
+
 def set_framerate_by_time(FPS, now):
     """
     Sets framerate based on time of day, using a lower value for night.
@@ -60,7 +70,7 @@ def set_framerate_by_time(FPS, now):
 
     now = now.time()
 
-    if now >= datetime.time(20, 00) and now <= datetime.time(7, 00):
+    if is_nighttime():
         if FPS != 15:
             FPS = 15
             print("Setting FPS to {0}.".format(FPS))
@@ -185,11 +195,10 @@ def grab_rgb(image):
 
     pixels = [tuple(l) for l in pixels]
 
-    print(pixels[1])
+    car_color = (pixels[1])
+    print("Car RGB: ".format(car_color))
 
-    # pixels = Counter(pixels).most_common()
-    # pixel_mode = 0
-    print(pixels)
+    return car_color
 
 
 # state maintains the state of the speed computation process
@@ -401,8 +410,6 @@ try:
                 print(text_on_image)
                 motion_loop_count = 0
 
-                grab_rgb(image)
-
             else:
 
                 if state == TRACKING:
@@ -424,6 +431,12 @@ try:
                         mph_list.append(mph)
 
                     if len(mph_list) >= 3:
+
+                        if not is_nighttime():
+                            rgb = ",".join(grab_rgb(image))
+                        else:
+                            rgb = 'nighttime'
+
                         if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and committed == False \
                                 or ((x + w >= monitored_width - 2) and (
                                             direction == LEFT_TO_RIGHT)) and committed == False:
@@ -434,6 +447,7 @@ try:
                                 datetime=datetime.now(),
                                 speed=median(mph_list),
                                 direction=dir,
+                                color=rgb,
                                 rating=motion_loop_count
                             )
                             session.add(new_vehicle)
