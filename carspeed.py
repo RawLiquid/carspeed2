@@ -187,8 +187,8 @@ def grab_rgb(image):
 
     # print(pixels)
 
-    # pixel_mode = Counter(pixels).most_common()
-    pixel_mode = 0
+    pixels = Counter(pixels).most_common()
+    # pixel_mode = 0
     print(pixels)
 
 
