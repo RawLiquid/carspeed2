@@ -2,6 +2,7 @@
 import math
 import os
 import time
+from collections import Counter
 from datetime import datetime
 from statistics import median
 from uuid import uuid4 as uuid
@@ -386,13 +387,12 @@ try:
                 points = np.where(mask == 255)
                 for point in points:
                     print(point)
-                    pixels = (image[points[1], points[0]])
-                    print(pixels)
+                    pixel = (image[points[1], points[0]])
+                    pixels.append(pixel)
 
+                pixel_mode = Counter(pixels).most_common()
 
-                    # pixel_mode = Counter(pixels).most_common()
-
-                    # print(pixel_mode)
+                print(pixel_mode)
 
         if motion_found and motion_loop_count < 50:
             committed = False
