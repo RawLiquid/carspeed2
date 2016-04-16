@@ -2,7 +2,7 @@
 import math
 import os
 import time
-from datetime import datetime
+import datetime
 from statistics import median
 from uuid import uuid4 as uuid
 
@@ -45,7 +45,7 @@ rotation_degrees = 187  # Rotate image by this amount to create flat road
 #    use_x = False
 
 
-timeOn = datetime.now()  # This is used for the log
+timeOn = datetime.datetime.now()  # This is used for the log
 sessionID = uuid()
 current_id = None
 initial_time = None
@@ -53,7 +53,7 @@ last_mph = None
 
 
 def is_nighttime():
-    now = datetime.now().time()
+    now = datetime.datetime.now().time()
 
     if now >= datetime.time(20, 00) and now <= datetime.time(7, 00):
         return True
@@ -106,7 +106,7 @@ def log_entry(in_out, current_id):
 
     elif in_out == "out" and current_id:
         logEntry = Log.query.filter_by(sessionID=sessionID).first()
-        logEntry.timeOff = datetime.now()
+        logEntry.timeOff = datetime.datetime.now()
         session.commit()
 
         return None
@@ -339,7 +339,7 @@ try:
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 
         # initialize the timestamp
-        timestamp = datetime.now()
+        timestamp = datetime.datetime.now()
 
         # Set frame rate based on time
         # set_framerate_by_time(FPS, timestamp)
@@ -401,7 +401,7 @@ try:
                 clear_screen()
                 # intialize tracking
                 state = TRACKING
-                tracking_start = datetime.now()
+                tracking_start = datetime.datetime.now()
                 initial_x = x
                 last_x = x
                 initial_time = timestamp
@@ -444,7 +444,7 @@ try:
 
                             new_vehicle = Vehicles(  # Table for statistics calculations
                                 sessionID=sessionID,
-                                datetime=datetime.now(),
+                                datetime=datetime.datetime.now(),
                                 speed=median(mph_list),
                                 direction=dir,
                                 color=rgb,
@@ -480,7 +480,7 @@ try:
         if (state == WAITING) or (loop_count > 50):
 
             # draw the text and timestamp on the frame
-            cv2.putText(image, datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
+            cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
                         (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 1)
             cv2.putText(image, "Road Status: {}".format(text_on_image), (10, 20),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
@@ -513,7 +513,7 @@ try:
         loop_count = loop_count + 1
 
 except KeyboardInterrupt:  # Catch a CTRL+C interrupt as program exit
-    now = datetime.now()
+    now = datetime.datetime.now()
     print("Writing exit time ({}) to log table and exiting program.".format(now))
     log_entry("out", sessionID)
 
