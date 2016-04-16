@@ -344,6 +344,7 @@ mph_list = []
 id = None
 motion_loop_count = 0
 tracking_start = None
+commit_counter = 0
 
 try:
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
@@ -461,12 +462,10 @@ try:
                                 rating=motion_loop_count
                             )
                             session.add(new_vehicle)
-                            session.commit()
                             id = None
                             committed = True
-                            session.execute(clean)
                             clear_screen()
-                            print("Added new vehicle to database: {0} MPH".format(round(median(mph_list), 2)))
+                            print("Added new vehicle: {0} MPH".format(round(median(mph_list), 2)))
 
                             mph_list = []
 
@@ -521,6 +520,15 @@ try:
         # clear the stream in preparation for the next frame
         rawCapture.truncate(0)
         loop_count = loop_count + 1
+
+        if commit_counter >= FPS * 60:
+            print("Adding vehicles to database.")
+            commit_counter = 0
+            session.commit()
+            session.execute(clean)
+        else:
+            commit_counter += 1
+
 
 except KeyboardInterrupt:  # Catch a CTRL+C interrupt as program exit
     now = datetime.datetime.now()
