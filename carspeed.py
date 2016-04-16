@@ -188,6 +188,9 @@ def grab_rgb(image):
     cv2.drawContours(mask, c, -1, color=255, thickness=-1)
 
     points = np.where(mask == 255)
+
+    print(len(points))
+
     for point in points:
         pixel = (image[point[1], point[0]])
         pixel = pixel.tolist()
