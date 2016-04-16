@@ -463,7 +463,7 @@ try:
                             committed = True
                             session.execute(clean)
                             clear_screen()
-                            print("Added new vehicle to database: {0} MPH".format(median(mph_list)))
+                            print("Added new vehicle to database: {0} MPH".format(round(median(mph_list), 2)))
 
                             mph_list = []
 
