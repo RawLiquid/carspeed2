@@ -462,10 +462,10 @@ try:
                             id = None
                             committed = True
                             session.execute(clean)
-                            mph_list = []
-
                             clear_screen()
                             print("Added new vehicle to database: {0} MPH".format(median(mph_list)))
+
+                            mph_list = []
 
                     last_x = x
 
