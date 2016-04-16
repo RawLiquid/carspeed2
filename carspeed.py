@@ -200,7 +200,7 @@ def grab_rgb(image):
     g = car_color[1]
     b = car_color[2]
 
-    pixel_string = '{0},{1},{2}'
+    pixel_string = '{0},{1},{2}'.format(r, g, b)
 
     print("Car RGB: ".format(pixel_string))
 
