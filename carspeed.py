@@ -183,7 +183,7 @@ def grab_rgb(image):
         pixel = pixel.tolist()
         pixels.append(pixel)
 
-    # pixels = [set(tuple(x) for y in pixels)]
+    pixels = [tuple(l) for l in pixels]
 
     # print(pixels)
 
