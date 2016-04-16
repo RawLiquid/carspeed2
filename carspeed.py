@@ -189,7 +189,7 @@ def grab_rgb(image, c):
 
     points = np.where(mask == 255)
 
-    input(c)
+    input(mask)
 
     for point in points:
         pixel = (image[point[1], point[0]])
@@ -405,8 +405,6 @@ try:
             if (found_area > MIN_AREA) and (found_area > biggest_area):
                 biggest_area = found_area
                 motion_found = True
-
-                input("Bounding Rect {}".format(cv2.boundingRect(c)))
 
                 if not is_nighttime():
                     rgb = grab_rgb(image, c)
