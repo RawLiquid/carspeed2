@@ -179,7 +179,8 @@ def grab_rgb(image):
     for point in points:
         pixel = (image[point[1], point[0]])
         pixel = pixel.tolist()
-        pixels.append(pixel)
+        for p in pixel:
+            pixels.append(p)
 
     print(pixels)
 
