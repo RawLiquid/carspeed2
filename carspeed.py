@@ -1,12 +1,14 @@
 # import the necessary packages
-import datetime
 import math
 import os
 import time
+from collections import Counter
+from datetime import datetime
 from statistics import median
 from uuid import uuid4 as uuid
 
 import cv2
+import numpy as np
 from picamera import PiCamera
 from picamera.array import PiRGBArray
 from sqlalchemy import create_engine, text
@@ -24,12 +26,12 @@ session = DBSession()
 
 # define some constants
 RTL_Distance = 60  # Right to left distance to median
-LTR_Distance = 50  # Left to right distance to median
+LTR_Distance = 55  # Left to right distance to median
 THRESHOLD = 15
 SPEED_THRESHOLD = 40
 MINIMUM_SPEED = 20  # Don't detect cars in parking lots, walkers, and slow drivers
 MAXIMUM_SPEED = 70  # Anything higher than this is likely to be noise.
-MIN_AREA = 175  # TODO: Experiment with this - it may reduce the sensitivity
+MIN_AREA = 175
 BLURSIZE = (15, 15)
 IMAGEWIDTH = 640
 IMAGEHEIGHT = 480
@@ -43,7 +45,7 @@ rotation_degrees = 187  # Rotate image by this amount to create flat road
 #    use_x = False
 
 
-timeOn = datetime.datetime.now()  # This is used for the log
+timeOn = datetime.now()  # This is used for the log
 sessionID = uuid()
 current_id = None
 initial_time = None
@@ -93,7 +95,7 @@ def log_entry(in_out, current_id):
 
     elif in_out == "out" and current_id:
         logEntry = Log.query.filter_by(sessionID=sessionID).first()
-        logEntry.timeOff = datetime.datetime.now()
+        logEntry.timeOff = datetime.now()
         session.commit()
 
         return None
@@ -164,6 +166,22 @@ def calculate_ftperpixel(DISTANCE, IMAGEWIDTH):
     ftperpixel = frame_width_ft / float(IMAGEWIDTH)
 
     return ftperpixel
+
+
+def pixels_in_contour(contour, image):
+    """
+    Gets pixel coordinates within contour for color processing
+    :param contour:
+    :param image:
+    :return:
+    """
+
+    mask = np.zeros(image.shape, dtype='uint8')
+    cv2.drawContours(mask, [contour], -1, 255, -1)
+    mean, stddev = cv2.meanStdDev(image, mask=mask)
+
+    return mean, stddev
+
 
 # state maintains the state of the speed computation process
 # if starts as WAITING
@@ -303,7 +321,7 @@ try:
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 
         # initialize the timestamp
-        timestamp = datetime.datetime.now()
+        timestamp = datetime.now()
 
         # Set frame rate based on time
         # set_framerate_by_time(FPS, timestamp)
@@ -358,6 +376,19 @@ try:
             if (found_area > MIN_AREA) and (found_area > biggest_area):
                 biggest_area = found_area
                 motion_found = True
+                pixels = []
+
+                # TODO: Convert to real code
+                # Detect pixel values (RGB)
+                mask = np.zeros_like(gray)
+                cv2.drawContours(mask, c, -1, color=255, thickness=-1)
+
+                points = np.where(mask == 255)
+                pixels.append(frame[points[1], points[0]])
+
+                pixel_mode = Counter(pixels).most_common()
+
+                print(pixel_mode)
 
         if motion_found and motion_loop_count < 50:
             committed = False
@@ -365,7 +396,7 @@ try:
                 clear_screen()
                 # intialize tracking
                 state = TRACKING
-                tracking_start = datetime.datetime.now()
+                tracking_start = datetime.now()
                 initial_x = x
                 last_x = x
                 initial_time = timestamp
@@ -402,7 +433,7 @@ try:
 
                             new_vehicle = Vehicles(  # Table for statistics calculations
                                 sessionID=sessionID,
-                                datetime=datetime.datetime.now(),
+                                datetime=datetime.now(),
                                 speed=median(mph_list),
                                 direction=dir,
                                 rating=motion_loop_count
@@ -437,7 +468,7 @@ try:
         if (state == WAITING) or (loop_count > 50):
 
             # draw the text and timestamp on the frame
-            cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
+            cv2.putText(image, datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
                         (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 1)
             cv2.putText(image, "Road Status: {}".format(text_on_image), (10, 20),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
@@ -470,7 +501,7 @@ try:
         loop_count = loop_count + 1
 
 except KeyboardInterrupt:  # Catch a CTRL+C interrupt as program exit
-    now = datetime.datetime.now()
+    now = datetime.now()
     print("Writing exit time ({}) to log table and exiting program.".format(now))
     log_entry("out", sessionID)
 
