@@ -8,6 +8,7 @@ from uuid import uuid4 as uuid
 
 import cv2
 import numpy as np
+from collections import Counter
 from picamera import PiCamera
 from picamera.array import PiRGBArray
 from sqlalchemy import create_engine, text
