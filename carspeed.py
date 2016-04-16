@@ -192,6 +192,7 @@ def grab_rgb(image, c):
     input(image)
 
     for point in points:
+        print(point)
         pixel = (image[point[1], point[0]])
         pixel = pixel.tolist()
         pixels.append(pixel)
@@ -408,7 +409,7 @@ try:
                 motion_found = True
 
                 if not is_nighttime():
-                    rgb = grab_rgb(image, c)
+                    rgb = grab_rgb(gray, c)
                 else:
                     rgb = 'nighttime'
 
