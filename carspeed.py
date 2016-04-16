@@ -169,7 +169,7 @@ def calculate_ftperpixel(DISTANCE, IMAGEWIDTH):
     return ftperpixel
 
 
-def grab_rgb(image, c):
+def grab_rgb(image):
     pixels = []
 
     # TODO: Convert to real code
@@ -178,11 +178,12 @@ def grab_rgb(image, c):
     cv2.drawContours(mask, c, -1, color=255, thickness=-1)
 
     points = np.where(mask == 255)
-    print(len(points))
     for point in points:
         pixel = (image[point[1], point[0]])
         pixel = pixel.tolist()
         pixels.append(pixel)
+
+    pixel = [set(tuple(x) for x in y) for y in pixels]
 
     # print(pixels)
 
@@ -400,7 +401,7 @@ try:
                 print(text_on_image)
                 motion_loop_count = 0
 
-                grab_rgb(image, c)
+                grab_rgb(image)
 
             else:
 
