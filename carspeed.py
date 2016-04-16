@@ -196,9 +196,9 @@ def grab_rgb(image):
     pixels = [tuple(l) for l in pixels]
     car_color = (pixels[1])
 
-    r = [v[0] for v in car_color]
-    g = [v[1] for v in car_color]
-    b = [v[2] for v in car_color]
+    r = car_color[0]
+    g = car_color[1]
+    b = car_color[2]
 
     pixel_string = '{0},{1},{2}'
 
