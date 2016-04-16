@@ -179,7 +179,7 @@ def calculate_ftperpixel(DISTANCE, IMAGEWIDTH):
     return ftperpixel
 
 
-def grab_rgb(image):
+def grab_rgb(image, c):
     pixels = []
 
     # TODO: Convert to real code
@@ -406,6 +406,11 @@ try:
                 biggest_area = found_area
                 motion_found = True
 
+                if not is_nighttime():
+                    rgb = grab_rgb(image, c)
+                else:
+                    rgb = 'nighttime'
+
         if motion_found and motion_loop_count < 50:
             committed = False
             if state == WAITING:
@@ -442,11 +447,6 @@ try:
                         mph_list.append(mph)
 
                     if len(mph_list) >= 3:
-
-                        if not is_nighttime():
-                            rgb = grab_rgb(image)
-                        else:
-                            rgb = 'nighttime'
 
                         if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and committed == False \
                                 or ((x + w >= monitored_width - 2) and (
