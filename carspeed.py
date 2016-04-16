@@ -190,20 +190,15 @@ def grab_rgb(image, c):
     mask = np.zeros_like(image)
     cv2.drawContours(mask, c, -1, color=255, thickness=-1)
 
-    input(mask)
     points = np.where(mask == 255)
-    input(points)
 
     for point in points:
         pixel = (image[point[1], point[0]])
         pixel = pixel.tolist()
-        input(pixel)
         pixels.append(pixel)
 
     pixels = [tuple(l) for l in pixels]
-    input(pixels)
     car_color = (pixels[1])
-    input(car_color)
 
     r = car_color[0]
     g = car_color[1]
@@ -410,10 +405,10 @@ try:
                 biggest_area = found_area
                 motion_found = True
 
-                if not is_nighttime():
-                    rgb = grab_rgb(image, c)
-                else:
-                    rgb = 'nighttime'
+                # if not is_nighttime():
+                #    rgb = grab_rgb(image, c)
+                # else:
+                #    rgb = 'nighttime'
 
         if motion_found and motion_loop_count < 50:
             committed = False
