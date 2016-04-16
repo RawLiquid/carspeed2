@@ -192,13 +192,11 @@ def grab_rgb(image, c):
     input(image)
 
     for point in points:
-        print(point)
         pixel = (image[point[1], point[0]])
         pixel = pixel.tolist()
         pixels.append(pixel)
 
-    print(pixels)
-    # pixels = [tuple(l) for l in pixels]
+    pixels = [tuple(l) for l in pixels]
 
     print(pixels)
     car_color = (pixels[1])
@@ -362,11 +360,10 @@ try:
         rows, cols, placeholder = image.shape
         M = cv2.getRotationMatrix2D((cols / 2, rows / 2), rotation_degrees, 1)
         image = cv2.warpAffine(image, M, (rows, cols))
-        image = image[upper_left_y:lower_right_y, upper_left_x:lower_right_x]
 
         # crop the frame to the monitored area, convert it to grayscale, and blur it
         # crop area defined by [y1:y2,x1:x2]
-        gray = image
+        gray = image[upper_left_y:lower_right_y, upper_left_x:lower_right_x]
 
         # convert it to grayscale, and blur it
         gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
@@ -410,7 +407,7 @@ try:
                 motion_found = True
 
                 if not is_nighttime():
-                    rgb = grab_rgb(gray, c)
+                    rgb = grab_rgb(image, c)
                 else:
                     rgb = 'nighttime'
 
