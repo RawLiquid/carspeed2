@@ -382,6 +382,8 @@ try:
                 biggest_area = found_area
                 motion_found = True
 
+                rgb = grab_rgb(image)
+
         if motion_found and motion_loop_count < 50:
             committed = False
             if state == WAITING:
@@ -418,8 +420,6 @@ try:
                         mph_list.append(mph)
 
                     if len(mph_list) >= 3:
-                        rgb = grab_rgb(image)
-                        print(rgb)
                         if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and committed == False \
                                 or ((x + w >= monitored_width - 2) and (
                                             direction == LEFT_TO_RIGHT)) and committed == False:
