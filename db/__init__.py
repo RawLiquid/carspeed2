@@ -23,19 +23,6 @@ class Log(Base):
     timeOff = Column(DateTime, index=True)
 
 
-class Speeders(Base):
-    """
-    Table for Speeders
-    """
-
-    __tablename__ = "speeders"
-    id = Column(Integer, primary_key=True, index=True)
-    sessionID = Column(String, ForeignKey(Log.sessionID))
-    datetime = Column(DateTime, index=True)
-    speed = Column(Float, index=True)
-    rating = Column(Float)
-
-
 class Vehicles(Base):
     """
     Table for all vehicles
