@@ -179,13 +179,13 @@ def grab_rgb(image):
     for point in points:
         pixel = (image[point[1], point[0]])
         pixel = pixel.tolist()
-        for p in pixel:
-            pixels.append(p)
+        pixels.append(pixel)
 
-    print(pixels)
+    # print(pixels)
 
-    # pixel_mode = Counter(pixels).most_common()
-    pixel_mode = 0
+    pixel_mode = Counter(pixels).most_common()
+    # pixel_mode = 0
+    print(pixel_mode)
     return pixel_mode
 
 
