@@ -34,6 +34,7 @@ class Vehicles(Base):
     datetime = Column(DateTime, index=True)
     speed = Column(Float, index=True)
     direction = Column(Float, index=True)
+    color = Column(String)
     rating = Column(Float)
 
 
