@@ -297,6 +297,7 @@ print(" Monitored width:            {}".format(monitored_width))
 # print(" Monitored width in feet:    {}".format(round(ftperpixel * monitored_width, 2)))
 print(" Monitored height:           {}".format(monitored_height))
 print(" Monitored area:             {}".format(monitored_width * monitored_height))
+print("FPS:                         {}".format(FPS))
 
 # Remove duplicate entries from table
 clean = text("DELETE FROM vehicles\
