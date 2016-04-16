@@ -2,7 +2,6 @@
 import math
 import os
 import time
-from collections import Counter
 from datetime import datetime
 from statistics import median
 from uuid import uuid4 as uuid
@@ -380,17 +379,19 @@ try:
 
                 # TODO: Convert to real code
                 # Detect pixel values (RGB)
-                mask = np.zeros_like(gray)
+                mask = np.zeros_like(image)
                 cv2.drawContours(mask, c, -1, color=255, thickness=-1)
 
                 points = np.where(mask == 255)
                 for point in points:
                     print(point)
-                    pixels.append(image[points[1], points[0]])
+                    pixels = (image[points[1], points[0]])
+                    print(pixels)
 
-                pixel_mode = Counter(pixels).most_common()
 
-                print(pixel_mode)
+                    # pixel_mode = Counter(pixels).most_common()
+
+                    # print(pixel_mode)
 
         if motion_found and motion_loop_count < 50:
             committed = False
