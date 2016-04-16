@@ -402,10 +402,10 @@ try:
                 biggest_area = found_area
                 motion_found = True
 
-                if not is_nighttime():
-                    rgb = grab_rgb(image, c)
-                else:
-                    rgb = 'nighttime'
+                # if not is_nighttime():
+                #    rgb = grab_rgb(image, c)
+                # else:
+                #    rgb = 'nighttime'
 
         if motion_found and motion_loop_count < 50:
             committed = False
@@ -454,7 +454,7 @@ try:
                                 datetime=datetime.datetime.now(),
                                 speed=median(mph_list),
                                 direction=dir,
-                                color=rgb,
+                                #color=rgb,
                                 rating=motion_loop_count
                             )
                             session.add(new_vehicle)
