@@ -465,7 +465,7 @@ try:
                             mph_list = []
 
                             clear_screen()
-                            print("Added new vehicle to database")
+                            print("Added new vehicle to database: {0} MPH".format(median(mph_list)))
 
                     last_x = x
 
