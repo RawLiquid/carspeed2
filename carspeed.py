@@ -384,7 +384,8 @@ try:
                 cv2.drawContours(mask, c, -1, color=255, thickness=-1)
 
                 points = np.where(mask == 255)
-                pixels.append(frame[points[1], points[0]])
+                # pixels.append(frame[points[1], points[0]])
+                print(points)
 
                 pixel_mode = Counter(pixels).most_common()
 
