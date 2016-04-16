@@ -185,9 +185,9 @@ def grab_rgb(image):
 
     pixels = [tuple(l) for l in pixels]
 
-    print(pixels)
+    print(pixels[1])
 
-    pixels = Counter(pixels).most_common()
+    # pixels = Counter(pixels).most_common()
     # pixel_mode = 0
     print(pixels)
 
