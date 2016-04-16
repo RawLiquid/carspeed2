@@ -194,11 +194,17 @@ def grab_rgb(image):
         pixels.append(pixel)
 
     pixels = [tuple(l) for l in pixels]
-
     car_color = (pixels[1])
-    print("Car RGB: ".format(car_color))
 
-    return car_color
+    r = [v[0] for v in car_color]
+    g = [v[1] for v in car_color]
+    b = [v[2] for v in car_color]
+
+    pixel_string = '{0},{1},{2}'
+
+    print("Car RGB: ".format(pixel_string))
+
+    return pixel_string
 
 
 # state maintains the state of the speed computation process
@@ -433,7 +439,7 @@ try:
                     if len(mph_list) >= 3:
 
                         if not is_nighttime():
-                            rgb = ",".join(grab_rgb(image))
+                            rgb = grab_rgb(image)
                         else:
                             rgb = 'nighttime'
 
