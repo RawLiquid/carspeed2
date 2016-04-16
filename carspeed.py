@@ -406,6 +406,8 @@ try:
                 biggest_area = found_area
                 motion_found = True
 
+                print("Bounding Rect {}".format(cv2.boundingRect(c)))
+
                 if not is_nighttime():
                     rgb = grab_rgb(image, c)
                 else:
