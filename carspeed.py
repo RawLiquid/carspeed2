@@ -189,7 +189,7 @@ def grab_rgb(image, c):
 
     points = np.where(mask == 255)
 
-    print(c)
+    print(points)
 
     for point in points:
         pixel = (image[point[1], point[0]])
