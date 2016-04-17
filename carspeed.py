@@ -65,13 +65,11 @@ def is_nighttime():
         return False
 
 
-def set_framerate_by_time(FPS, now):
+def set_framerate_by_time(FPS):
     """
     Sets framerate based on time of day, using a lower value for night.
     :return: None - passes straight to camera
     """
-
-    now = now.time()
 
     if is_nighttime():
         if FPS != 15:
@@ -211,6 +209,34 @@ def grab_rgb(image, c):
     return pixel_string
 
 
+def display(mode):
+    """
+    Prints a status display to screen
+    :param mode: which info should be displayed: tracking, car added, etc.
+    :return: stdout.
+    """
+
+    # TODO: Finish this function and use it.
+
+    print("====================")
+    print("Car Speed Detector")
+    print("====================")
+    print("Last car detected: {}")
+    print("Last database commit: {}")
+
+    if mode == 'waiting':
+        print("No vehicle within bounding box.")
+        pass
+    elif mode == 'tracking':
+        print("Tracking vehicle.")
+        pass
+    elif mode == 'stuckinloop':
+        print("Got caught in tracking loop. Capturing new base image.")
+        pass
+    elif mode == 'startup':
+        pass
+
+
 # state maintains the state of the speed computation process
 # if starts as WAITING
 # the first motion detected sets it to TRACKING
@@ -348,6 +374,9 @@ commit_counter = 0
 
 try:
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+
+        set
+        set_framerate_by_time(FPS)
 
         # initialize the timestamp
         timestamp = datetime.datetime.now()
