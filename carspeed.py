@@ -315,6 +315,11 @@ def display(mode, ccounter):
     now = datetime.datetime.now()
     now = now.strftime('%Y-%m-%d %H:%M:%S')
 
+    next_commit = FPS * 60 - ccounter
+
+    if next_commit % 10 == 0:
+
+
     print("====================")
     print("Car Speed Detector")
     print("====================")
@@ -323,9 +328,9 @@ def display(mode, ccounter):
 
     if mode == 'waiting':
         print("\nStatus: No vehicle within bounding box.")
-        print("\nTime: {}".format(now))
-        print("\nLast detection: {}")
-        print("\nNext DB commit: {}".format(FPS * 60 - ccounter))
+        print("Time: {}".format(now))
+        print("Last detection: {}")
+        print("Next DB commit: {}".format())
         pass
     elif mode == 'tracking':
         print("Tracking vehicle.")
@@ -428,7 +433,10 @@ try:
     current_id = log_entry("in", current_id)
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 
-        display('waiting', commit_counter)
+        if commit_counter % 10 == 0:
+            display_counter = commit_counter
+
+        display('waiting', display_counter)
         # initialize the timestamp
         timestamp = datetime.datetime.now()
 
