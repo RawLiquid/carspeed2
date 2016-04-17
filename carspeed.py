@@ -54,8 +54,76 @@ current_id = None
 initial_time = None
 last_mph = None
 
+# Log usage
+current_id = log_entry("in", current_id)
+
+# the following enumerated values are used to make the program more readable
+WAITING = 0
+TRACKING = 1
+SAVING = 2
+UNKNOWN = 0
+LEFT_TO_RIGHT = 1
+RIGHT_TO_LEFT = 2
+
+# state maintains the state of the speed computation process
+# if starts as WAITING
+# the first motion detected sets it to TRACKING
+
+# if it is tracking and no motion is found or the x value moves
+# out of bounds, state is set to SAVING and the speed of the object
+# is calculated
+# initial_x holds the x value when motion was first detected
+# last_x holds the last x value before tracking was was halted
+# depending upon the direction of travel, the front of the
+# vehicle is either at x, or at x+w
+# (tracking_end_time - tracking_start_time) is the elapsed time
+# from these the speed is calculated and displayed
+
+state = WAITING
+direction = UNKNOWN
+initial_x = 0
+last_x = 0
+
+# -- other values used in program
+base_image = None
+abs_chg = 0
+mph = 0
+secs = 0.0
+ix, iy = -1, -1
+fx, fy = -1, -1
+drawing = False
+setup_complete = False
+tracking = False
+text_on_image = 'No cars'
+loop_count = 0
+prompt = ''
+
+# Remove duplicate entries from table
+clean = text("DELETE FROM vehicles\
+  WHERE id IN (SELECT id\
+  FROM (SELECT id,\
+  ROW_NUMBER() OVER (partition BY speed ORDER BY id) AS rnum\
+  FROM vehicles) t\
+  WHERE t.rnum > 1);")
+
+# capture frames from the camera (using capture_continuous.
+#   This keeps the picamera in capture mode - it doesn't need
+#   to prep for each frame's capture.
+#   First, open up the PostgreSQL database.
+
+mph_list = []
+id = None
+motion_loop_count = 0
+tracking_start = None
+commit_counter = 0
+
 
 def is_nighttime():
+    """
+    Determines if hour falls within range of nighttime hours.
+    :return:
+    """
+
     now = datetime.datetime.now().time()
 
     if now >= datetime.time(20, 00) and now <= datetime.time(7, 00):
@@ -116,33 +184,60 @@ def log_entry(in_out, current_id):
 
 
 def clear_screen():
+    """
+    Clears the terminal window for cleaner output.
+    :return:
+    """
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
-# place a prompt on the displayed image
 def prompt_on_image(txt):
+    """
+    Places prompt on image.
+    :param txt:
+    :return:
+    """
     global image
     cv2.putText(image, txt, (10, 35),
     cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
 
 
-# calculate speed from pixels and time
 def get_speed(pixels, ftperpixel, secs):
+    """
+    Calculates the speed of a vehicle using pixels, and time.
+    :param pixels:
+    :param ftperpixel:
+    :param secs:
+    :return:
+    """
     if secs > 0.0:
         return ((pixels * ftperpixel)/ secs) * 0.681818  
     else:
         return 0.0
 
 
-# calculate elapsed seconds
 def secs_diff(endTime, begTime):
+    """
+    Calculates how many seconds have elapsed.
+    :param endTime:
+    :param begTime:
+    :return:
+    """
     diff = (endTime - begTime).total_seconds()
     return diff    
 
 
-# mouse callback function for drawing capture area
 def draw_rectangle(event,x,y,flags,param):
-    global ix,iy,fx,fy,drawing,setup_complete,image, org_image, prompt
+    """
+    Allows user to draw rectangle on screen to select bounding area.
+    :param event:
+    :param x:
+    :param y:
+    :param flags:
+    :param param:
+    :return:
+    """
+    global ix, iy, fx, fy, drawing, setup_complete, image, org_image, prompt  #TODO: No global variables
  
     if event == cv2.EVENT_LBUTTONDOWN:
         drawing = True
@@ -162,20 +257,13 @@ def draw_rectangle(event,x,y,flags,param):
         cv2.rectangle(image,(ix,iy),(fx,fy),(0,255,0),2)
 
 
-# Log usage
-current_id = log_entry("in", current_id)
-
-# the following enumerated values are used to make the program more readable
-WAITING = 0
-TRACKING = 1
-SAVING = 2
-UNKNOWN = 0
-LEFT_TO_RIGHT = 1
-RIGHT_TO_LEFT = 2
-
-# calculate the the width of the image at the distance specified
-
 def calculate_ftperpixel(DISTANCE, IMAGEWIDTH):
+    """
+    Calculates the number of feet a single pixel represents.
+    :param DISTANCE:
+    :param IMAGEWIDTH:
+    :return:
+    """
     frame_width_ft = 2 * (math.tan(math.radians(FOV * 0.5)) * DISTANCE)
     ftperpixel = frame_width_ft / float(IMAGEWIDTH)
 
@@ -183,6 +271,12 @@ def calculate_ftperpixel(DISTANCE, IMAGEWIDTH):
 
 
 def grab_rgb(image, c):
+    """
+    Determines values of pixels that fall within a contour provided by OpenCV.
+    :param image: an image object
+    :param c: a contour
+    :return: a string value representing the most common rgb value found within a contour.
+    """
     pixels = []
 
     # TODO: Finish fixing this function
@@ -238,39 +332,6 @@ def display(mode):
     elif mode == 'startup':
         pass
 
-
-# state maintains the state of the speed computation process
-# if starts as WAITING
-# the first motion detected sets it to TRACKING
- 
-# if it is tracking and no motion is found or the x value moves
-# out of bounds, state is set to SAVING and the speed of the object
-# is calculated
-# initial_x holds the x value when motion was first detected
-# last_x holds the last x value before tracking was was halted
-# depending upon the direction of travel, the front of the
-# vehicle is either at x, or at x+w 
-# (tracking_end_time - tracking_start_time) is the elapsed time
-# from these the speed is calculated and displayed
- 
-state = WAITING
-direction = UNKNOWN
-initial_x = 0
-last_x = 0
- 
-#-- other values used in program
-base_image = None
-abs_chg = 0
-mph = 0
-secs = 0.0
-ix,iy = -1,-1
-fx,fy = -1,-1
-drawing = False
-setup_complete = False
-tracking = False
-text_on_image = 'No cars'
-loop_count = 0
-prompt = ''
 
 # initialize the camera 
 camera = PiCamera()
@@ -355,24 +416,6 @@ print(" Monitored height:           {}".format(monitored_height))
 print(" Monitored area:             {}".format(monitored_width * monitored_height))
 print(" FPS:                        {}".format(FPS))
 
-# Remove duplicate entries from table
-clean = text("DELETE FROM vehicles\
-  WHERE id IN (SELECT id\
-  FROM (SELECT id,\
-  ROW_NUMBER() OVER (partition BY speed ORDER BY id) AS rnum\
-  FROM vehicles) t\
-  WHERE t.rnum > 1);")
-
-# capture frames from the camera (using capture_continuous.
-#   This keeps the picamera in capture mode - it doesn't need
-#   to prep for each frame's capture.
-#   First, open up the PostgreSQL database.
-
-mph_list = []
-id = None
-motion_loop_count = 0
-tracking_start = None
-commit_counter = 0
 
 try:
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
