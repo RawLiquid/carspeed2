@@ -434,7 +434,6 @@ try:
         if commit_counter % 10 == 0:
             display_counter = commit_counter
 
-        display('waiting', display_counter, last_db_commit, last_vehicle_detected)
         # initialize the timestamp
         timestamp = datetime.datetime.now()
 
@@ -569,6 +568,7 @@ try:
                 mph_list = []
                 id = None
                 motion_loop_count = 0
+                display('waiting', display_counter, last_db_commit, last_vehicle_detected)
 
         # only update image and wait for a keypress when waiting for a car
         # or if 50 frames have been processed in the WAITING state.
