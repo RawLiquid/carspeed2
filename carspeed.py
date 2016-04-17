@@ -319,8 +319,6 @@ def display(mode, ccounter, last_db_commit, last_vehicle_detected, last_mph_dete
     now = datetime.datetime.now()
     now = now.strftime('%Y-%m-%d %H:%M')
 
-    last_mph_detected = round(last_mph_detected, 2)
-
     next_commit = FPS * 60 - ccounter
 
     print("=========================================================")
@@ -557,7 +555,7 @@ try:
                             clear_screen()
                             print("Added new vehicle: {0} MPH".format(round(median(mph_list), 2)))
                             last_vehicle_detected = timestamp.strftime('%Y-%m-%d %H:%M:%S')
-                            last_mph_detected = median(mph_list)
+                            last_mph_detected = round(median(mph_list), 2)
                             mph_list = []
 
                     last_x = x
