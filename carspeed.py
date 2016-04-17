@@ -96,6 +96,7 @@ loop_count = 0
 prompt = ''
 last_vehicle_detected = 'N/A'
 last_db_commit = 'N/A'
+display_counter = 0
 
 # Remove duplicate entries from table
 clean = text("DELETE FROM vehicles\
@@ -568,7 +569,11 @@ try:
                 mph_list = []
                 id = None
                 motion_loop_count = 0
-                display('waiting', display_counter, last_db_commit, last_vehicle_detected)
+
+        if state == WAITING:
+            display('waiting', display_counter, last_db_commit, last_vehicle_detected)
+        elif state == TRACKING:
+            pass
 
         # only update image and wait for a keypress when waiting for a car
         # or if 50 frames have been processed in the WAITING state.
