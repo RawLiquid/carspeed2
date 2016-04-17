@@ -40,7 +40,7 @@ IMAGEWIDTH = 640
 IMAGEHEIGHT = 480
 RESOLUTION = [IMAGEWIDTH, IMAGEHEIGHT]
 FOV = 53.5
-FPS = 60
+FPS = 15
 set_by_drawing = False  # Can either set bounding box manually, or by drawing rectangle on screen
 rotation_degrees = 187  # Rotate image by this amount to create flat road
 
@@ -65,11 +65,13 @@ def is_nighttime():
         return False
 
 
-def set_framerate_by_time(FPS):
+def set_framerate_by_time(FPS, now):
     """
     Sets framerate based on time of day, using a lower value for night.
     :return: None - passes straight to camera
     """
+
+    now = now.time()
 
     if is_nighttime():
         if FPS != 15:
@@ -84,9 +86,6 @@ def set_framerate_by_time(FPS):
             print("Setting FPS to {0}.".format(FPS))
             FPS = 30
             camera.framerate = FPS
-            time.sleep(3)
-
-    return FPS
 
 
 def log_entry(in_out, current_id):
@@ -276,7 +275,7 @@ prompt = ''
 # initialize the camera 
 camera = PiCamera()
 camera.resolution = RESOLUTION
-# camera.framerate = FPS
+camera.framerate = FPS
 camera.vflip = False
 camera.hflip = False
 camera.rotate = 90
@@ -363,7 +362,7 @@ clean = text("DELETE FROM vehicles\
   ROW_NUMBER() OVER (partition BY speed ORDER BY id) AS rnum\
   FROM vehicles) t\
   WHERE t.rnum > 1);")
- 
+
 # capture frames from the camera (using capture_continuous.
 #   This keeps the picamera in capture mode - it doesn't need
 #   to prep for each frame's capture.
@@ -377,8 +376,6 @@ commit_counter = 0
 
 try:
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-
-        FPS = set_framerate_by_time(FPS)
 
         # initialize the timestamp
         timestamp = datetime.datetime.now()
