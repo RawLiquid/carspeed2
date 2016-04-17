@@ -54,9 +54,6 @@ current_id = None
 initial_time = None
 last_mph = None
 
-# Log usage
-current_id = log_entry("in", current_id)
-
 # the following enumerated values are used to make the program more readable
 WAITING = 0
 TRACKING = 1
@@ -418,6 +415,8 @@ print(" FPS:                        {}".format(FPS))
 
 
 try:
+    # Log usage
+    current_id = log_entry("in", current_id)
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 
         # initialize the timestamp
