@@ -317,7 +317,7 @@ def display(mode, ccounter, last_db_commit, last_vehicle_detected, last_mph_dete
 
     clear_screen()
     now = datetime.datetime.now()
-    now = now.strftime('%Y-%m-%d %H:%M:%S')
+    now = now.strftime('%Y-%m-%d %H:%M')
 
     next_commit = FPS * 60 - ccounter
 
