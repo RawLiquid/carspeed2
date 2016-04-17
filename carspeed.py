@@ -601,7 +601,8 @@ try:
         loop_count = loop_count + 1
 
         if commit_counter >= FPS * 60:
-            print("Adding vehicles to database.")
+            clear_screen()
+            print("***Adding vehicles to database.***")
             commit_counter = 0
             session.commit()
             session.execute(clean)
