@@ -94,6 +94,8 @@ tracking = False
 text_on_image = 'No cars'
 loop_count = 0
 prompt = ''
+last_vehicle_detected = 'N/A'
+last_db_commit = 'N/A'
 
 # Remove duplicate entries from table
 clean = text("DELETE FROM vehicles\
@@ -302,7 +304,7 @@ def grab_rgb(image, c):
     return pixel_string
 
 
-def display(mode, ccounter):
+def display(mode, ccounter, last_db_commit, last_vehicle_detected):
     """
     Prints a status display to screen
     :param mode: which info should be displayed: tracking, car added, etc.
@@ -317,16 +319,15 @@ def display(mode, ccounter):
 
     next_commit = FPS * 60 - ccounter
 
-    print("====================")
+    print("==============================")
     print("Car Speed Detector")
-    print("====================")
-    print("Last car detected: {}")
-    print("Last database commit: {}")
+    print("==============================")
 
     if mode == 'waiting':
         print("\nStatus: No vehicle within bounding box.")
+        print("Last vehicle detected: {}".format(last_vehicle_detected))
+        print("Last database commit: {}".format(last_db_commit))
         print("Time: {}".format(now))
-        print("Last detection: {}")
         print("Next DB commit: {}".format(next_commit))
         pass
     elif mode == 'tracking':
@@ -433,7 +434,7 @@ try:
         if commit_counter % 10 == 0:
             display_counter = commit_counter
 
-        display('waiting', display_counter)
+        display('waiting', display_counter, last_db_commit, last_vehicle_detected)
         # initialize the timestamp
         timestamp = datetime.datetime.now()
 
@@ -537,21 +538,22 @@ try:
                                 or ((x + w >= monitored_width - 2) and (
                                             direction == LEFT_TO_RIGHT)) and committed == False:
                             state = SAVING
-
+                            timestamp = datetime.datetime.now()
                             new_vehicle = Vehicles(  # Table for statistics calculations
                                 sessionID=sessionID,
-                                datetime=datetime.datetime.now(),
+                                datetime=timestamp,
                                 speed=median(mph_list),
                                 direction=dir,
                                 #color=rgb,
                                 rating=motion_loop_count
                             )
+
                             session.add(new_vehicle)
                             id = None
                             committed = True
                             clear_screen()
                             print("Added new vehicle: {0} MPH".format(round(median(mph_list), 2)))
-
+                            last_vehicle_detected = timestamp.strftime('%Y-%m-%d %H:%M:%S')
                             mph_list = []
 
                     last_x = x
@@ -612,6 +614,7 @@ try:
             commit_counter = 0
             session.commit()
             session.execute(clean)
+            last_db_commit = timestamp.strftime('%Y-%m-%d %H:%M:%S')
         else:
             commit_counter += 1
 
