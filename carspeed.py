@@ -84,6 +84,9 @@ def set_framerate_by_time(FPS):
             print("Setting FPS to {0}.".format(FPS))
             FPS = 30
             camera.framerate = FPS
+            time.sleep(3)
+
+    return FPS
 
 
 def log_entry(in_out, current_id):
@@ -273,7 +276,7 @@ prompt = ''
 # initialize the camera 
 camera = PiCamera()
 camera.resolution = RESOLUTION
-camera.framerate = FPS
+# camera.framerate = FPS
 camera.vflip = False
 camera.hflip = False
 camera.rotate = 90
@@ -375,8 +378,7 @@ commit_counter = 0
 try:
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 
-        set
-        set_framerate_by_time(FPS)
+        FPS = set_framerate_by_time(FPS)
 
         # initialize the timestamp
         timestamp = datetime.datetime.now()
