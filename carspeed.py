@@ -317,9 +317,6 @@ def display(mode, ccounter):
 
     next_commit = FPS * 60 - ccounter
 
-    if next_commit % 10 == 0:
-
-
     print("====================")
     print("Car Speed Detector")
     print("====================")
