@@ -311,6 +311,9 @@ def display(mode):
 
     # TODO: Finish this function and use it.
 
+    clear_screen()
+    now = datetime.datetime.now()
+
     print("====================")
     print("Car Speed Detector")
     print("====================")
@@ -318,7 +321,10 @@ def display(mode):
     print("Last database commit: {}")
 
     if mode == 'waiting':
-        print("No vehicle within bounding box.")
+        print("\nStatus: No vehicle within bounding box.")
+        print("\nTime: {}".format(now))
+        print("\nLast detection: {}")
+        print("\nNext DB commit: {}")
         pass
     elif mode == 'tracking':
         print("Tracking vehicle.")
@@ -328,6 +334,8 @@ def display(mode):
         pass
     elif mode == 'startup':
         pass
+    else:
+        print("Error in display function.")
 
 
 # initialize the camera 
@@ -419,6 +427,7 @@ try:
     current_id = log_entry("in", current_id)
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 
+        display('waiting')
         # initialize the timestamp
         timestamp = datetime.datetime.now()
 
