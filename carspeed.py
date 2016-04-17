@@ -185,12 +185,12 @@ def calculate_ftperpixel(DISTANCE, IMAGEWIDTH):
 def grab_rgb(image, c):
     pixels = []
 
-    # TODO: Convert to real code
+    # TODO: Finish fixing this function
     # Detect pixel values (RGB)
-    mask = np.zeros_like(image)
+    mask = np.zeros(image)
     cv2.drawContours(mask, c, -1, color=255, thickness=-1)
 
-    points = np.where(mask == 255)
+    points = zip(*np.where(mask == 255))
 
     for point in points:
         pixel = (image[point[1], point[0]])
@@ -434,10 +434,10 @@ try:
                 biggest_area = found_area
                 motion_found = True
 
-                # if not is_nighttime():
-                #    rgb = grab_rgb(image, c)
-                # else:
-                #    rgb = 'nighttime'
+                if not is_nighttime():
+                    rgb = grab_rgb(image, c)
+                else:
+                    rgb = 'nighttime'
 
         if motion_found and motion_loop_count < 50:
             committed = False
