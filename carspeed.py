@@ -572,7 +572,7 @@ try:
                 id = None
                 motion_loop_count = 0
 
-        if state == WAITING:
+        if state == WAITING and loop_count % 10 == 0:
             display('waiting', display_counter, last_db_commit, last_vehicle_detected, last_mph_detected)
         elif state == TRACKING:
             pass
