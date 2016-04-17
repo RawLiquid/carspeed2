@@ -305,7 +305,7 @@ def grab_rgb(image, c):
     return pixel_string
 
 
-def display(mode, ccounter, last_db_commit, last_vehicle_detected):
+def display(mode, ccounter, last_db_commit, last_vehicle_detected, last_mph_detected):
     """
     Prints a status display to screen
     :param mode: which info should be displayed: tracking, car added, etc.
@@ -326,7 +326,7 @@ def display(mode, ccounter, last_db_commit, last_vehicle_detected):
 
     if mode == 'waiting':
         print("\nStatus: No vehicle within bounding box.")
-        print("Last vehicle detected: {}".format(last_vehicle_detected))
+        print("Last vehicle detected: {0} at {1} MPH".format(last_vehicle_detected, last_mph_detected))
         print("Last database commit: {}".format(last_db_commit))
         print("Time: {}".format(now))
         print("Next DB commit: {}".format(next_commit))
@@ -554,6 +554,7 @@ try:
                             clear_screen()
                             print("Added new vehicle: {0} MPH".format(round(median(mph_list), 2)))
                             last_vehicle_detected = timestamp.strftime('%Y-%m-%d %H:%M:%S')
+                            last_mph_detected = median(mph_list)
                             mph_list = []
 
                     last_x = x
@@ -571,7 +572,7 @@ try:
                 motion_loop_count = 0
 
         if state == WAITING:
-            display('waiting', display_counter, last_db_commit, last_vehicle_detected)
+            display('waiting', display_counter, last_db_commit, last_vehicle_detected, last_mph_detected)
         elif state == TRACKING:
             pass
 
