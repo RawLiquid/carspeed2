@@ -302,7 +302,7 @@ def grab_rgb(image, c):
     return pixel_string
 
 
-def display(mode):
+def display(mode, ccounter):
     """
     Prints a status display to screen
     :param mode: which info should be displayed: tracking, car added, etc.
@@ -313,6 +313,7 @@ def display(mode):
 
     clear_screen()
     now = datetime.datetime.now()
+    now = now.strftime('%Y-%m-%d %H:%M:%S')
 
     print("====================")
     print("Car Speed Detector")
@@ -324,7 +325,7 @@ def display(mode):
         print("\nStatus: No vehicle within bounding box.")
         print("\nTime: {}".format(now))
         print("\nLast detection: {}")
-        print("\nNext DB commit: {}")
+        print("\nNext DB commit: {}".format(FPS * 60 - ccounter))
         pass
     elif mode == 'tracking':
         print("Tracking vehicle.")
@@ -427,7 +428,7 @@ try:
     current_id = log_entry("in", current_id)
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 
-        display('waiting')
+        display('waiting', commit_counter)
         # initialize the timestamp
         timestamp = datetime.datetime.now()
 
