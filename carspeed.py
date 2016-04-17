@@ -95,6 +95,7 @@ text_on_image = 'No cars'
 loop_count = 0
 prompt = ''
 last_vehicle_detected = 'N/A'
+last_mph_detected = 'N/A'
 last_db_commit = 'N/A'
 display_counter = 0
 
