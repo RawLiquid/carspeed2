@@ -327,7 +327,7 @@ def display(mode, ccounter):
         print("\nStatus: No vehicle within bounding box.")
         print("Time: {}".format(now))
         print("Last detection: {}")
-        print("Next DB commit: {}".format())
+        print("Next DB commit: {}".format(next_commit))
         pass
     elif mode == 'tracking':
         print("Tracking vehicle.")
