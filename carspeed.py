@@ -20,8 +20,8 @@ from sqlalchemy.orm import sessionmaker
 from db import Vehicles, Log
 
 use_x = False
-show_bounds = False
-showImage = False
+show_bounds = True
+showImage = True
 
 engine = create_engine('postgresql://speedcam:Rward0232@localhost/speedcamdb')
 DBSession = sessionmaker(bind=engine)
@@ -29,19 +29,19 @@ session = DBSession()
 
 # define some constants
 RTL_Distance = 85  # Right to left distance to median
-LTR_Distance = 50  # Left to right distance to median
+LTR_Distance = 60  # Left to right distance to median
 THRESHOLD = 15
 SPEED_THRESHOLD = 40
 MINIMUM_SPEED = 10  # # Don't detect cars in parking lots, walkers, and slow drivers
 MAXIMUM_SPEED = 100  # 70  # Anything higher than this is likely to be noise.
-MIN_AREA = 175
+MIN_AREA = 150
 BLURSIZE = (15, 15)
 IMAGEWIDTH = 640
 IMAGEHEIGHT = 480
 RESOLUTION = [IMAGEWIDTH, IMAGEHEIGHT]
 FOV = 53.5
-FPS = 15
-set_by_drawing = False  # Can either set bounding box manually, or by drawing rectangle on screen
+FPS = 30
+set_by_drawing = True  # Can either set bounding box manually, or by drawing rectangle on screen
 rotation_degrees = 187  # Rotate image by this amount to create flat road
 
 #if not os.environ['DISPLAY']:  #If SSH'd in, just use the preset parameters and don't try to open images
@@ -359,7 +359,7 @@ time.sleep(0.9)
 # Set up the bounding box for speed detection
 # create an image window and place it in the upper left corner of the screen
 if use_x:
-    cv2.namedWindow("Speed Camera")
+    cv2.namedWindow("Speed Camera", cv2.WINDOW_AUTOSIZE)
     cv2.moveWindow("Speed Camera", 10, 40)
 
     # call the draw_rectangle routines when the mouse is used
@@ -409,10 +409,10 @@ if use_x:
         lower_right_y = iy
 else:
     # Define manually because my camera is mounted
-    upper_left_x = 140
-    upper_left_y = 173
-    lower_right_x = 311
-    lower_right_y = 205
+    upper_left_x = 138
+    upper_left_y = 167
+    lower_right_x = 462
+    lower_right_y = 192
      
 monitored_width = lower_right_x - upper_left_x
 monitored_height = lower_right_y - upper_left_y
@@ -498,7 +498,7 @@ try:
                 else:
                     rgb = 'nighttime'
 
-        if motion_found and motion_loop_count < 50:
+        if motion_found:
             committed = False
             if state == WAITING:
                 clear_screen()
@@ -550,6 +550,7 @@ try:
                             )
 
                             session.add(new_vehicle)
+                            commit_counter += 1
                             id = None
                             committed = True
                             clear_screen()
@@ -615,15 +616,13 @@ try:
         rawCapture.truncate(0)
         loop_count = loop_count + 1
 
-        if commit_counter >= FPS * 60:
+        if commit_counter >= 3:
             clear_screen()
             print("***Adding vehicles to database.***")
             commit_counter = 0
             session.commit()
             session.execute(clean)
             last_db_commit = timestamp.strftime('%Y-%m-%d %H:%M:%S')
-        else:
-            commit_counter += 1
 
 
 except KeyboardInterrupt:  # Catch a CTRL+C interrupt as program exit
