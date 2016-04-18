@@ -58,6 +58,7 @@ last_mph = None
 WAITING = 0
 TRACKING = 1
 SAVING = 2
+STUCK = 3
 UNKNOWN = 0
 LEFT_TO_RIGHT = 1
 RIGHT_TO_LEFT = 2
@@ -98,6 +99,7 @@ last_vehicle_detected = 'N/A'
 last_mph_detected = 'N/A'
 last_db_commit = 'N/A'
 display_counter = 0
+motion_found = False
 
 # Remove duplicate entries from table
 clean = text("DELETE FROM vehicles\
@@ -456,10 +458,11 @@ try:
         gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
         gray = cv2.GaussianBlur(gray, BLURSIZE, 0)
 
-        if base_image is None or motion_loop_count >= 50 and motion_found == False:
-            if motion_loop_count >= 50 and motion_found == False:
+        if base_image is None or state == STUCK:
+            if motion_loop_count >= 50 and not motion_found:
                 print("Caught motion loop. Creating new base snapshot")
                 motion_loop_count = 0
+                state = WAITING
             base_image = gray.copy().astype("float")
             lastTime = timestamp
             rawCapture.truncate(0)
@@ -564,7 +567,7 @@ try:
             motion_loop_count += 1
 
         else:
-            if state != WAITING:
+            if state != WAITING and state != STUCK:
                 state = WAITING
                 direction = UNKNOWN
                 text_on_image = 'No Car Detected'
@@ -577,6 +580,9 @@ try:
             display('waiting', display_counter, last_db_commit, last_vehicle_detected, last_mph_detected)
         elif state == TRACKING:
             pass
+
+        if motion_loop_count >= 50:
+            state = STUCK
 
         # only update image and wait for a keypress when waiting for a car
         # or if 50 frames have been processed in the WAITING state.
