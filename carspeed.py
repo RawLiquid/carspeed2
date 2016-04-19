@@ -157,14 +157,14 @@ def set_framerate_by_time(FPS, now, camera):
     return FPS
 
 
-def log_entry(in_out, id):
+def log_entry(in_out, uid):
     """
     Put usage in log table
     """
 
     if in_out == "in":
         new_entry = Log(
-            sessionID = sessionID,
+            sessionID=uid,
             timeOn=timeOn
         )
 
@@ -174,7 +174,7 @@ def log_entry(in_out, id):
 
     elif in_out == "out" and current_id:
         print("Writing exit time ({}) to log table and exiting program.".format(now))
-        logEntry = session.query(Log).filter_by(id=current_id).first()
+        logEntry = session.query(Log).filter_by(id=uid).first()
         logEntry.timeOff = datetime.datetime.now()
         session.commit()
 
