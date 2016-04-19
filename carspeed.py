@@ -1,6 +1,7 @@
 # import the necessary packages
 
 # TODO: Figure out logic to detect if two vehicles are in frame
+# TODO: Figure out how to use background subtraction algos
 
 import math
 import os
@@ -45,11 +46,6 @@ day_fps = 30
 night_fps = 15
 set_by_drawing = True  # Can either set bounding box manually, or by drawing rectangle on screen
 rotation_degrees = 187  # Rotate image by this amount to create flat road
-
-#if not os.environ['DISPLAY']:  #If SSH'd in, just use the preset parameters and don't try to open images
-#    use_x = False
-
-
 timeOn = datetime.datetime.now()  # This is used for the log
 sessionID = uuid()
 current_id = None
