@@ -177,7 +177,7 @@ def log_entry(in_out, current_id):
         return current_log_id
 
     elif in_out == "out" and current_id:
-        logEntry = Log.filter_by(sessionID=sessionID).first()
+        logEntry = session.query(Log).filter_by(sessionID=sessionID).first()
         logEntry.timeOff = datetime.datetime.now()
         session.commit()
 
