@@ -34,13 +34,13 @@ THRESHOLD = 15
 SPEED_THRESHOLD = 40
 MINIMUM_SPEED = 10  # # Don't detect cars in parking lots, walkers, and slow drivers
 MAXIMUM_SPEED = 100  # 70  # Anything higher than this is likely to be noise.
-MIN_AREA = 150
+MIN_AREA = 50
 BLURSIZE = (15, 15)
 IMAGEWIDTH = 640
 IMAGEHEIGHT = 480
 RESOLUTION = [IMAGEWIDTH, IMAGEHEIGHT]
 FOV = 53.5
-FPS = 30
+FPS = 15
 set_by_drawing = True  # Can either set bounding box manually, or by drawing rectangle on screen
 rotation_degrees = 187  # Rotate image by this amount to create flat road
 
@@ -303,7 +303,7 @@ def grab_rgb(image, c):
 
     pixel_string = '{0},{1},{2}'.format(r, g, b)
 
-    print("Car RGB: {0}".format(pixel_string))
+    #print("Car RGB: {0}".format(pixel_string))
 
     return pixel_string
 
@@ -581,7 +581,7 @@ try:
         elif state == TRACKING:
             pass
 
-        if motion_loop_count >= 50:
+        if motion_loop_count >= 25:
             state = STUCK
 
         # only update image and wait for a keypress when waiting for a car
