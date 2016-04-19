@@ -56,6 +56,7 @@ WAITING = 0
 TRACKING = 1
 SAVING = 2
 STUCK = 3
+NEW_BASE_IMG_NEEDED = 4
 UNKNOWN = 0
 LEFT_TO_RIGHT = 1
 RIGHT_TO_LEFT = 2
@@ -100,10 +101,12 @@ motion_found = False
 mph_list = []
 id = None
 motion_loop_count = 0
-tracking_start = None
 commit_counter = 0
 nighttime = False
 camera = None
+rgb = None
+time_base_image = None
+time_last_detection = None
 
 # Remove duplicate entries from table
 clean = text("DELETE FROM vehicles\
@@ -483,14 +486,22 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
             gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
             gray = cv2.GaussianBlur(gray, blur_size, 0)
 
-            if base_image is None or state == STUCK and not motion_found:
+            if base_image is None or state == STUCK and not motion_found \
+                    or state == NEW_BASE_IMG_NEEDED and not motion_found:
                 if state == STUCK:
                     print("Caught motion loop. Creating new base snapshot")
                     motion_loop_count = 0
                     state = UNKNOWN
+
+                elif state == NEW_BASE_IMG_NEEDED:
+                    print("Creating new base image")
+                    motion_loop_count = 0
+                    state = UNKNOWN
+
                 base_image = gray.copy().astype("float")
                 lastTime = timestamp
                 rawCapture.truncate(0)
+                time_base_image = datetime.datetime.now()
 
                 if use_x:
                     cv2.imshow("Speed Camera", image)
@@ -532,7 +543,6 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                     clear_screen()
                     # intialize tracking
                     state = TRACKING
-                    tracking_start = datetime.datetime.now()
                     initial_x = x
                     last_x = x
                     initial_time = timestamp
@@ -563,9 +573,9 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
 
                         if len(mph_list) >= 3 and motion_loop_count > 1:
 
-                            if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and committed == False \
+                            if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and not committed \
                                     or ((x + w >= monitored_width - 2) and (
-                                                direction == LEFT_TO_RIGHT)) and committed == False:
+                                                direction == LEFT_TO_RIGHT)) and not committed:
                                 state = SAVING
                                 timestamp = datetime.datetime.now()
                                 new_vehicle = Vehicles(  # Table for statistics calculations
@@ -584,6 +594,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                 clear_screen()
                                 print("Added new vehicle: {0} MPH".format(round(median(mph_list), 2)))
                                 last_vehicle_detected = timestamp.strftime('%Y-%m-%d %H:%M:%S')
+                                time_last_detection = timestamp
                                 last_mph_detected = round(median(mph_list), 2)
                                 mph_list = []
 
@@ -608,6 +619,10 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
 
             if motion_loop_count >= 50:
                 state = STUCK
+
+            if time_base_image - now > 3600 and time_last_detection - now > 120:
+                state = NEW_BASE_IMG_NEEDED
+                print("Creating new base image")
 
             # only update image and wait for a keypress when waiting for a car
             # or if 50 frames have been processed in the WAITING state.
@@ -643,7 +658,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
 
             # clear the stream in preparation for the next frame
             rawCapture.truncate(0)
-            loop_count = loop_count + 1
+            loop_count += 1
 
             if commit_counter >= 5:
                 clear_screen()
@@ -659,6 +674,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                 need_to_reset = True
                 session.commit()
                 break
+
 
     except KeyboardInterrupt:  # Catch a CTRL+C interrupt as program exit and close gracefully
         now = datetime.datetime.now()
