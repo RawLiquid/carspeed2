@@ -334,8 +334,6 @@ def display(mode, ccounter, last_db_commit, last_vehicle_detected, last_mph_dete
     now = datetime.datetime.now()
     now = now.strftime('%Y-%m-%d %H:%M')
 
-    next_commit = FPS * 60 - ccounter
-
     print("=========================================================")
     print("                 Car Speed Detector")
     print("=========================================================")
@@ -345,7 +343,6 @@ def display(mode, ccounter, last_db_commit, last_vehicle_detected, last_mph_dete
         print("Last vehicle detected:   {0} at {1} MPH".format(last_vehicle_detected, last_mph_detected))
         print("Last database commit:    {0}".format(last_db_commit))
         print("Time:                    {0}".format(now))
-        print("Next DB commit:          {0}".format(next_commit))
         pass
     elif mode == 'tracking':
         print("Tracking vehicle.")
