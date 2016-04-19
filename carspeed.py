@@ -362,7 +362,7 @@ def display(mode, ccounter, last_db_commit, last_vehicle_detected, last_mph_dete
 # initialize the camera 
 camera = PiCamera()
 camera.resolution = image_resolution
-camera.framerate = FPS
+set_framerate_by_time(FPS, timeOn)  # Set initial frame rate.
 camera.vflip = False
 camera.hflip = False
 camera.rotate = 90
@@ -370,8 +370,6 @@ camera.rotate = 90
 rawCapture = PiRGBArray(camera, size=camera.resolution)
 # allow the camera to warm up
 time.sleep(0.9)
-
-FPS = set_framerate_by_time(FPS, timeOn)  # Set initial frame rate.
 
 
 # Set up the bounding box for speed detection
