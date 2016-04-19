@@ -374,6 +374,8 @@ def initialize_camera(camera, res):
     rawCapture = PiRGBArray(camera, size=camera.resolution)
     time.sleep(0.9)  # allow the camera to warm up
 
+    print("Camera initialized")
+
     return camera, rawCapture
 
 
