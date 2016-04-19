@@ -614,25 +614,23 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
             # This is required since waitkey slows processing.
             if (state == WAITING) or (loop_count > 50):
 
-                # draw the text and timestamp on the frame
-                cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
-                            (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 1)
-                cv2.putText(image, "Road Status: {}".format(text_on_image), (10, 20),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
-
                 if use_x:
+                    # draw the text and timestamp on the frame
+                    cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
+                                (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 1)
+                    cv2.putText(image, "Road Status: {}".format(text_on_image), (10, 20),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
+
                     # define the monitored area right and left boundary
                     cv2.line(image, (upper_left_x, upper_left_y), (upper_left_x, lower_right_y), (0, 255, 0))
                     cv2.line(image, (lower_right_x, upper_left_y), (lower_right_x, lower_right_y), (0, 255, 0))
 
-                # show the frame and check for a keypress
-                if use_x:
                     prompt_on_image(prompt)
                     cv2.imshow("Speed Camera", image)
 
                 if state == WAITING:
                     last_x = 0
-                    cv2.accumulateWeighted(gray, base_image, 0.1)  # original is 0.25
+                    cv2.accumulateWeighted(gray, base_image, 0.25)  # original is 0.25
 
                 state = WAITING
                 key = cv2.waitKey(1) & 0xFF
