@@ -454,7 +454,6 @@ fps_is_set = True
 while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime threshold is crossed.
     try:
         fps_is_set = False
-        camera, rawCapture = initialize_camera(image_resolution)  # Fire up camera!
         current_id = log_entry("in", current_id)  # Log usage
 
         for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
@@ -657,6 +656,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
             if not nighttime and is_nighttime():  # reset loop so camera FPS can be changed.
                 nighttime = True
                 fps_is_set = True
+                camera, rawCapture = initialize_camera(image_resolution)  # Fire up camera!
                 break
 
     except KeyboardInterrupt:  # Catch a CTRL+C interrupt as program exit
