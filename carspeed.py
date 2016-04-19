@@ -166,7 +166,7 @@ def log_entry(in_out, current_id):
     if in_out == "in" and not current_id:
         new_entry = Log(
             sessionID = sessionID,
-            timeOn = timeOn
+            timeOn=timeOn
         )
 
         session.add(new_entry)
@@ -177,7 +177,9 @@ def log_entry(in_out, current_id):
         return current_log_id
 
     elif in_out == "out" and current_id:
+        print("Writing exit time ({}) to log table and exiting program.".format(now))
         logEntry = session.query(Log).filter_by(sessionID=sessionID).first()
+        print(logEntry)
         logEntry.timeOff = datetime.datetime.now()
         session.commit()
 
@@ -673,7 +675,6 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
 
     except KeyboardInterrupt:  # Catch a CTRL+C interrupt as program exit and close gracefully
         now = datetime.datetime.now()
-        print("Writing exit time ({}) to log table and exiting program.".format(now))
         log_entry("out", current_id)
         camera.close()
 
