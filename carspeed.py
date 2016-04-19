@@ -458,8 +458,8 @@ try:
         gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
         gray = cv2.GaussianBlur(gray, BLURSIZE, 0)
 
-        if base_image is None or state == STUCK:
-            if motion_loop_count >= 50 and not motion_found:
+        if base_image is None or state == STUCK and not motion_found:
+            if state == STUCK:
                 print("Caught motion loop. Creating new base snapshot")
                 motion_loop_count = 0
                 state = WAITING
@@ -492,7 +492,7 @@ try:
             # get an approximate area of the contour
             found_area = w * h
             # find the largest bounding rectangle
-            if (found_area > MIN_AREA) and (found_area > biggest_area):
+            if (found_area > MIN_AREA) and (found_area > biggest_area) and state != STUCK:
                 biggest_area = found_area
                 motion_found = True
 
