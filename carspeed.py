@@ -171,7 +171,6 @@ def log_entry(in_out, uid):
         session.add(new_entry)
         session.commit()
 
-
     elif in_out == "out":
         print("Writing exit time ({}) to log table and exiting program.".format(now))
         logEntry = session.query(Log).filter_by(sessionID=str(uid)).first()
