@@ -63,7 +63,6 @@ STUCK = 3
 UNKNOWN = 0
 LEFT_TO_RIGHT = 1
 RIGHT_TO_LEFT = 2
-camera = None
 
 # state maintains the state of the speed computation process
 # if starts as WAITING
