@@ -157,12 +157,12 @@ def set_framerate_by_time(FPS, now, camera):
     return FPS
 
 
-def log_entry(in_out, current_id):
+def log_entry(in_out, id):
     """
     Put usage in log table
     """
 
-    if in_out == "in" and not current_id:
+    if in_out == "in":
         new_entry = Log(
             sessionID = sessionID,
             timeOn=timeOn
@@ -170,17 +170,13 @@ def log_entry(in_out, current_id):
 
         session.add(new_entry)
         session.commit()
-        current_log_id = new_entry.id
 
-        return current_log_id
 
-    elif in_out == "out":
+    elif in_out == "out" and current_id:
         print("Writing exit time ({}) to log table and exiting program.".format(now))
         logEntry = session.query(Log).filter_by(id=current_id).first()
         logEntry.timeOff = datetime.datetime.now()
         session.commit()
-
-        return None
 
 
 def clear_screen():
@@ -463,7 +459,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
 
     try:
         fps_is_set = False
-        current_id = log_entry("in", current_id)  # Log usage
+        log_entry("in", current_id)  # Log usage
 
         for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 
@@ -647,7 +643,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
 
                 # if the `q` key is pressed, break from the loop and terminate processing
                 if key == ord("q"):
-                    log_entry("out", current_id)
+                    log_entry("out", sessionID)
                     break
                 loop_count = 0
 
@@ -672,7 +668,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
 
     except KeyboardInterrupt:  # Catch a CTRL+C interrupt as program exit and close gracefully
         now = datetime.datetime.now()
-        log_entry("out", current_id)
+        log_entry("out", sessionID)
         camera.close()
 
 # cleanup the camera and close any open windows
