@@ -382,7 +382,7 @@ def initialize_camera(camera, res):
     return camera, rawCapture
 
 
-camera, rawCapture = initialize_camera(image_resolution)
+camera, rawCapture = initialize_camera(camera, image_resolution)
 
 # Set up the bounding box for speed detection
 # create an image window and place it in the upper left corner of the screen
@@ -459,7 +459,7 @@ need_to_reset = False
 
 while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime threshold is crossed.
     if need_to_reset:
-        camera, rawCapture = initialize_camera(image_resolution)  # Fire up camera!
+        camera, rawCapture = initialize_camera(camera, image_resolution)  # Fire up camera!
 
     try:
         fps_is_set = False
