@@ -34,7 +34,7 @@ THRESHOLD = 15
 SPEED_THRESHOLD = 40
 MINIMUM_SPEED = 10  # # Don't detect cars in parking lots, walkers, and slow drivers
 MAXIMUM_SPEED = 100  # 70  # Anything higher than this is likely to be noise.
-MIN_AREA = 150
+MIN_AREA = 75
 blur_size = (15, 15)
 image_width = 640
 image_height = 480
@@ -460,6 +460,7 @@ need_to_reset = False
 while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime threshold is crossed.
     if need_to_reset:
         camera, rawCapture = initialize_camera(camera, image_resolution)  # Fire up camera!
+        need_to_reset = False
 
     try:
         fps_is_set = False
@@ -495,7 +496,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                 if state == STUCK:
                     print("Caught motion loop. Creating new base snapshot")
                     motion_loop_count = 0
-                    state = WAITING
+                    state = UNKNOWN
                 base_image = gray.copy().astype("float")
                 lastTime = timestamp
                 rawCapture.truncate(0)
@@ -647,7 +648,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
 
                 # if the `q` key is pressed, break from the loop and terminate processing
                 if key == ord("q"):
-                    log_entry("out", sessionID)
+                    log_entry("out", current_id)
                     break
                 loop_count = 0
 
@@ -667,12 +668,14 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                 nighttime = True
                 fps_is_set = True
                 need_to_reset = True
+                session.commit()
                 break
 
-    except KeyboardInterrupt:  # Catch a CTRL+C interrupt as program exit
+    except KeyboardInterrupt:  # Catch a CTRL+C interrupt as program exit and close gracefully
         now = datetime.datetime.now()
         print("Writing exit time ({}) to log table and exiting program.".format(now))
-        log_entry("out", sessionID)
+        log_entry("out", current_id)
+        camera.close()
 
 # cleanup the camera and close any open windows
 cv2.destroyAllWindows()
