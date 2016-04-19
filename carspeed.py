@@ -107,6 +107,7 @@ motion_loop_count = 0
 tracking_start = None
 commit_counter = 0
 nighttime = False
+camera = None
 
 # Remove duplicate entries from table
 clean = text("DELETE FROM vehicles\
@@ -365,7 +366,7 @@ def initialize_camera(camera, res):
 
     try:  # Release the camera resources if already exist
         camera.close()
-    except NameError:  # Camera doesn't already exist
+    except AttributeError:  # Camera doesn't already exist
         pass
 
     camera = PiCamera()
