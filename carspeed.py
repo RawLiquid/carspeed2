@@ -35,12 +35,14 @@ SPEED_THRESHOLD = 40
 MINIMUM_SPEED = 10  # # Don't detect cars in parking lots, walkers, and slow drivers
 MAXIMUM_SPEED = 100  # 70  # Anything higher than this is likely to be noise.
 MIN_AREA = 150
-BLURSIZE = (15, 15)
-IMAGEWIDTH = 640
-IMAGEHEIGHT = 480
-RESOLUTION = [IMAGEWIDTH, IMAGEHEIGHT]
-FOV = 53.5
-FPS = 30
+blur_size = (15, 15)
+image_width = 640
+image_height = 480
+image_resolution = [image_width, image_height]
+field_of_view = 53.5
+FPS = None
+day_fps = 30
+night_fps = 15
 set_by_drawing = True  # Can either set bounding box manually, or by drawing rectangle on screen
 rotation_degrees = 187  # Rotate image by this amount to create flat road
 
@@ -100,6 +102,11 @@ last_mph_detected = 'N/A'
 last_db_commit = 'N/A'
 display_counter = 0
 motion_found = False
+mph_list = []
+id = None
+motion_loop_count = 0
+tracking_start = None
+commit_counter = 0
 
 # Remove duplicate entries from table
 clean = text("DELETE FROM vehicles\
@@ -108,17 +115,6 @@ clean = text("DELETE FROM vehicles\
   ROW_NUMBER() OVER (partition BY speed ORDER BY id) AS rnum\
   FROM vehicles) t\
   WHERE t.rnum > 1);")
-
-# capture frames from the camera (using capture_continuous.
-#   This keeps the picamera in capture mode - it doesn't need
-#   to prep for each frame's capture.
-#   First, open up the PostgreSQL database.
-
-mph_list = []
-id = None
-motion_loop_count = 0
-tracking_start = None
-commit_counter = 0
 
 
 def is_nighttime():
@@ -158,13 +154,15 @@ def set_framerate_by_time(FPS, now):
             FPS = 30
             camera.framerate = FPS
 
+    return FPS
+
 
 def log_entry(in_out, current_id):
     """
     Put usage in log table
     """
 
-    if in_out == "in" and current_id == None:
+    if in_out == "in" and not current_id:
         new_entry = Log(
             sessionID = sessionID,
             timeOn = timeOn
@@ -177,9 +175,8 @@ def log_entry(in_out, current_id):
 
         return current_log_id
 
-
     elif in_out == "out" and current_id:
-        logEntry = Log.query.filter_by(sessionID=sessionID).first()
+        logEntry = Log.filter_by(sessionID=sessionID).first()
         logEntry.timeOff = datetime.datetime.now()
         session.commit()
 
@@ -205,16 +202,16 @@ def prompt_on_image(txt):
     cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
 
 
-def get_speed(pixels, ftperpixel, secs):
+def get_speed(pixels, feet_per_pixel, secs):
     """
     Calculates the speed of a vehicle using pixels, and time.
     :param pixels:
-    :param ftperpixel:
+    :param feet_per_pixel:
     :param secs:
     :return:
     """
     if secs > 0.0:
-        return ((pixels * ftperpixel)/ secs) * 0.681818  
+        return ((pixels * feet_per_pixel) / secs) * 0.681818
     else:
         return 0.0
 
@@ -227,10 +224,10 @@ def secs_diff(endTime, begTime):
     :return:
     """
     diff = (endTime - begTime).total_seconds()
-    return diff    
+    return diff
 
 
-def draw_rectangle(event,x,y,flags,param):
+def draw_rectangle(event, x, y):
     """
     Allows user to draw rectangle on screen to select bounding area.
     :param event:
@@ -260,15 +257,15 @@ def draw_rectangle(event,x,y,flags,param):
         cv2.rectangle(image,(ix,iy),(fx,fy),(0,255,0),2)
 
 
-def calculate_ftperpixel(DISTANCE, IMAGEWIDTH):
+def calculate_ftperpixel(distance, imagewidth):
     """
     Calculates the number of feet a single pixel represents.
-    :param DISTANCE:
-    :param IMAGEWIDTH:
+    :param distance:
+    :param imagewidth:
     :return:
     """
-    frame_width_ft = 2 * (math.tan(math.radians(FOV * 0.5)) * DISTANCE)
-    ftperpixel = frame_width_ft / float(IMAGEWIDTH)
+    frame_width_ft = 2 * (math.tan(math.radians(field_of_view * 0.5)) * distance)
+    ftperpixel = frame_width_ft / float(imagewidth)
 
     return ftperpixel
 
@@ -303,9 +300,25 @@ def grab_rgb(image, c):
 
     pixel_string = '{0},{1},{2}'.format(r, g, b)
 
-    print("Car RGB: {0}".format(pixel_string))
-
     return pixel_string
+
+
+def create_base():
+    """
+    Creates a base image using background subtraction.
+    :return:
+    """
+    mask = None
+
+    cv2.VideoCapture.set(CV_CAP_PROP_FRAME_COUNT=100)  # Capture 100 frames
+    cap = cv2.VideoCapture(0)  # Open the videocapture device
+    subtractor = cv2.createBackgroundSubtractorMOG2()
+    ret, frames = cap.read()
+
+    for frame in frames:
+        mask = subtractor.apply(frame)
+
+    return mask
 
 
 def display(mode, ccounter, last_db_commit, last_vehicle_detected, last_mph_detected):
@@ -348,7 +361,7 @@ def display(mode, ccounter, last_db_commit, last_vehicle_detected, last_mph_dete
 
 # initialize the camera 
 camera = PiCamera()
-camera.resolution = RESOLUTION
+camera.resolution = image_resolution
 camera.framerate = FPS
 camera.vflip = False
 camera.hflip = False
@@ -357,6 +370,9 @@ camera.rotate = 90
 rawCapture = PiRGBArray(camera, size=camera.resolution)
 # allow the camera to warm up
 time.sleep(0.9)
+
+FPS = set_framerate_by_time(FPS, timeOn)  # Set initial frame rate.
+
 
 # Set up the bounding box for speed detection
 # create an image window and place it in the upper left corner of the screen
@@ -427,12 +443,10 @@ print(" Lower right_y:              {}".format(lower_right_y))
 print(" Monitored width:            {}".format(monitored_width))
 print(" Monitored height:           {}".format(monitored_height))
 print(" Monitored area:             {}".format(monitored_width * monitored_height))
-print(" FPS:                        {}".format(FPS))
 
 
 try:
-    # Log usage
-    current_id = log_entry("in", current_id)
+    current_id = log_entry("in", current_id)  # Log usage
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 
         if commit_counter % 10 == 0:
@@ -456,7 +470,7 @@ try:
 
         # convert it to grayscale, and blur it
         gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
-        gray = cv2.GaussianBlur(gray, BLURSIZE, 0)
+        gray = cv2.GaussianBlur(gray, blur_size, 0)
 
         if base_image is None or state == STUCK and not motion_found:
             if state == STUCK:
@@ -472,7 +486,7 @@ try:
             continue
 
         # compute the absolute difference between the current image and
-        # base image and then turn eveything lighter than THRESHOLD into
+        # base image and then turn everything lighter than THRESHOLD into
         # white
         frameDelta = cv2.absdiff(gray, cv2.convertScaleAbs(base_image))
         thresh = cv2.threshold(frameDelta, THRESHOLD, 255, cv2.THRESH_BINARY)[1]
@@ -521,7 +535,7 @@ try:
                 if state == TRACKING:
                     if x >= last_x:
                         direction = LEFT_TO_RIGHT
-                        ftperpixel = calculate_ftperpixel(LTR_Distance, IMAGEWIDTH)
+                        ftperpixel = calculate_ftperpixel(LTR_Distance, image_width)
                         abs_chg = x + w - initial_x
                         dir = "North"
 
@@ -529,7 +543,7 @@ try:
                         direction = RIGHT_TO_LEFT
                         dir = "South"
                         abs_chg = initial_x - x
-                        ftperpixel = calculate_ftperpixel(RTL_Distance, IMAGEWIDTH)
+                        ftperpixel = calculate_ftperpixel(RTL_Distance, image_width)
                     secs = secs_diff(timestamp, initial_time)
                     mph = get_speed(abs_chg, ftperpixel, secs)
 
@@ -548,7 +562,7 @@ try:
                                 datetime=timestamp,
                                 speed=median(mph_list),
                                 direction=dir,
-                                #color=rgb,
+                                color=rgb,
                                 rating=motion_loop_count
                             )
 
@@ -622,7 +636,7 @@ try:
         rawCapture.truncate(0)
         loop_count = loop_count + 1
 
-        if commit_counter >= 3:
+        if commit_counter >= 5:
             clear_screen()
             print("***Adding vehicles to database.***")
             commit_counter = 0
