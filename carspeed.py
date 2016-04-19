@@ -461,7 +461,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
 
     try:
         fps_is_set = False
-        log_entry("in", current_id)  # Log usage
+        log_entry("in", sessionID)  # Log usage
 
         for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 
