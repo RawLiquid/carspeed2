@@ -450,8 +450,12 @@ print(" Monitored height:           {}".format(monitored_height))
 print(" Monitored area:             {}".format(monitored_width * monitored_height))
 
 fps_is_set = True
+need_to_reset = False
 
 while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime threshold is crossed.
+    if need_to_reset:
+        camera, rawCapture = initialize_camera(image_resolution)  # Fire up camera!
+
     try:
         fps_is_set = False
         current_id = log_entry("in", current_id)  # Log usage
@@ -657,7 +661,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                 input("TEST: Changing camera FPS.")
                 nighttime = True
                 fps_is_set = True
-                camera, rawCapture = initialize_camera(image_resolution)  # Fire up camera!
+                need_to_reset = True
                 break
 
     except KeyboardInterrupt:  # Catch a CTRL+C interrupt as program exit
