@@ -468,7 +468,8 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
         for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 
             if commit_counter % 10 == 0:
-                display_counter = commit_counter
+                #    display_counter = commit_counter
+                pass
 
             # initialize the timestamp
             timestamp = datetime.datetime.now()
@@ -663,7 +664,6 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                 last_db_commit = timestamp.strftime('%Y-%m-%d %H:%M:%S')
 
             if not nighttime and is_nighttime():  # reset loop so camera FPS can be changed.
-                input("TEST: Changing camera FPS.")
                 nighttime = True
                 fps_is_set = True
                 need_to_reset = True
