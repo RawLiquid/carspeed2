@@ -133,7 +133,7 @@ def is_nighttime():
         return False
 
 
-def set_framerate_by_time(FPS, now):
+def set_framerate_by_time(FPS, now, camera):
     """
     Sets framerate based on time of day, using a lower value for night.
     :return: None - passes straight to camera
@@ -366,7 +366,7 @@ def initialize_camera(res):
 
     camera = PiCamera()
     camera.resolution = res
-    set_framerate_by_time(FPS, timeOn)  # Set initial frame rate.
+    set_framerate_by_time(FPS, timeOn, camera)  # Set initial frame rate.
     camera.vflip = False
     camera.hflip = False
     camera.rotate = 90
