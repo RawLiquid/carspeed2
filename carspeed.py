@@ -171,15 +171,13 @@ def log_entry(in_out, current_id):
 
         session.add(new_entry)
         session.commit()
-
         current_log_id = new_entry.id
 
         return current_log_id
 
     elif in_out == "out" and current_id:
         print("Writing exit time ({}) to log table and exiting program.".format(now))
-        logEntry = session.query(Log).filter_by(sessionID=sessionID).first()
-        print(logEntry)
+        logEntry = session.query(Log).filter_by(sessionID=sessionID)
         logEntry.timeOff = datetime.datetime.now()
         session.commit()
 
