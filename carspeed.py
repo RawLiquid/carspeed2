@@ -126,7 +126,7 @@ def is_nighttime():
 
     now = datetime.datetime.now().time()
 
-    if now >= datetime.time(20, 00) and now <= datetime.time(7, 00):
+    if now >= datetime.time(20, 00) or now <= datetime.time(7, 00):
         return True
 
     else:
