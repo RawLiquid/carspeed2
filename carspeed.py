@@ -34,7 +34,7 @@ THRESHOLD = 15
 SPEED_THRESHOLD = 40
 MINIMUM_SPEED = 10  # # Don't detect cars in parking lots, walkers, and slow drivers
 MAXIMUM_SPEED = 100  # 70  # Anything higher than this is likely to be noise.
-MIN_AREA = 75
+MIN_AREA = 125
 blur_size = (15, 15)
 image_width = 640
 image_height = 480
@@ -565,7 +565,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                         if mph >= MINIMUM_SPEED and mph < MAXIMUM_SPEED:
                             mph_list.append(mph)
 
-                        if len(mph_list) >= 3:
+                        if len(mph_list) >= 3 and motion_loop_count > 1:
 
                             if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and committed == False \
                                     or ((x + w >= monitored_width - 2) and (
@@ -610,7 +610,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
             elif state == TRACKING:
                 pass
 
-            if motion_loop_count >= 25:
+            if motion_loop_count >= 50:
                 state = STUCK
 
             # only update image and wait for a keypress when waiting for a car
