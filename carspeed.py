@@ -55,7 +55,6 @@ sessionID = uuid()
 current_id = None
 initial_time = None
 last_mph = None
-
 # the following enumerated values are used to make the program more readable
 WAITING = 0
 TRACKING = 1
@@ -64,6 +63,7 @@ STUCK = 3
 UNKNOWN = 0
 LEFT_TO_RIGHT = 1
 RIGHT_TO_LEFT = 2
+camera = None
 
 # state maintains the state of the speed computation process
 # if starts as WAITING
@@ -357,12 +357,17 @@ def display(mode, ccounter, last_db_commit, last_vehicle_detected, last_mph_dete
         print("Error in display function.")
 
 
-def initialize_camera(res):
+def initialize_camera(camera, res):
     """
     Initializes this camera using current time to set framerate
     :param res: image resolution to use
     :return: None
     """
+
+    try:  # Release the camera resources if already exist
+        camera.close()
+    except NameError:  # Camera doesn't already exist
+        pass
 
     camera = PiCamera()
     camera.resolution = res
