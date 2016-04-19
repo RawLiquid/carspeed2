@@ -620,7 +620,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
             if motion_loop_count >= 50:
                 state = STUCK
 
-            if time_base_image - now > 3600 and time_last_detection - now > 120:
+            if time_base_image - timestamp > 3600 and time_last_detection - timestamp > 120:
                 state = NEW_BASE_IMG_NEEDED
                 print("Creating new base image")
 
