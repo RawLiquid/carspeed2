@@ -595,7 +595,7 @@ try:
         elif state == TRACKING:
             pass
 
-        if motion_loop_count >= 50:
+        if motion_loop_count >= 25:
             state = STUCK
 
         # only update image and wait for a keypress when waiting for a car
