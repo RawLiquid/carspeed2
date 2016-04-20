@@ -435,7 +435,9 @@ try:
     current_id = log_entry("in", current_id)
     capture = cv2.VideoCapture(0)
     # for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-    for frame in capture.read():
+    while (True):
+
+        ret, frame = capture.read()
 
         if commit_counter % 10 == 0:
             display_counter = commit_counter
