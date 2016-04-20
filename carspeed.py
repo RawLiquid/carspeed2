@@ -437,7 +437,7 @@ try:
     # for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
     while (True):
 
-        ret, frame = capture.read()
+        _, frame = capture.read()
 
         if commit_counter % 10 == 0:
             display_counter = commit_counter
@@ -449,7 +449,7 @@ try:
         # set_framerate_by_time(FPS, timestamp)
 
         # grab the raw NumPy array representing the image, and rotate it so that it's flat
-        image = frame.array
+        image = frame
         rows, cols, placeholder = image.shape
         M = cv2.getRotationMatrix2D((cols / 2, rows / 2), rotation_degrees, 1)
         image = cv2.warpAffine(image, M, (rows, cols))
