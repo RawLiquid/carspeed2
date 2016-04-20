@@ -141,16 +141,15 @@ def set_framerate_by_time(FPS, now, camera):
     now = now.time()
 
     if is_nighttime():
-        if FPS != 15:
+        if FPS != night_fps:
             FPS = 15
-            print("Setting FPS to {0}.".format(FPS))
+            print("Setting FPS to {0}.".format(night_fps))
             camera.framerate = FPS
 
     else:
-        if FPS != 30:
-            FPS = 30
-            print("Setting FPS to {0}.".format(FPS))
-            FPS = 30
+        if FPS != day_fps:
+            FPS = day_fps
+            print("Setting FPS to {0}.".format(day_fps))
             camera.framerate = FPS
 
     return FPS
