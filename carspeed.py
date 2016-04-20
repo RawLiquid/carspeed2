@@ -2,6 +2,7 @@
 
 # TODO: Figure out logic to detect if two vehicles are in frame
 # TODO: Figure out how to use background subtraction algos
+# TODO: Add feature to detect pedestrians, and use this to temporarily disable detection as it will be inaccurate.
 
 import math
 import os
@@ -231,17 +232,17 @@ def draw_rectangle(event, x, y):
     :return:
     """
     global ix, iy, fx, fy, drawing, setup_complete, image, org_image, prompt  #TODO: No global variables
- 
+
     if event == cv2.EVENT_LBUTTONDOWN:
         drawing = True
         ix,iy = x,y
- 
+
     elif event == cv2.EVENT_MOUSEMOVE:
         if drawing == True:
             image = org_image.copy()
             prompt_on_image(prompt)
             cv2.rectangle(image,(ix,iy),(x,y),(0,255,0),2)
-  
+
     elif event == cv2.EVENT_LBUTTONUP:
         drawing = False
         fx,fy = x,y
@@ -432,10 +433,10 @@ if use_x:
 else:
     # Define manually because my camera is mounted
     upper_left_x = 138
-    upper_left_y = 167
+    upper_left_y = 157
     lower_right_x = 462
-    lower_right_y = 192
-     
+    lower_right_y = 183
+
 monitored_width = lower_right_x - upper_left_x
 monitored_height = lower_right_y - upper_left_y
 
@@ -647,7 +648,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                     if is_nighttime():
                         cv2.accumulateWeighted(gray, base_image, 0.25)  # original is 0.25
                     else:
-                        cv2.accumulateWeighted(gray, base_image, 0.25)  # original is 0.25
+                        cv2.accumulateWeighted(gray, base_image, 0.05)  # original is 0.25
 
                 state = WAITING
                 key = cv2.waitKey(1) & 0xFF
