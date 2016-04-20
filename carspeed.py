@@ -42,8 +42,8 @@ image_height = 480
 image_resolution = [image_width, image_height]
 field_of_view = 53.5
 FPS = None
-day_fps = 60
-night_fps = 30
+day_fps = 30
+night_fps = 15
 set_by_drawing = True  # Can either set bounding box manually, or by drawing rectangle on screen
 rotation_degrees = 187  # Rotate image by this amount to create flat road
 timeOn = datetime.datetime.now()  # This is used for the log
@@ -485,8 +485,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
             gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
             gray = cv2.GaussianBlur(gray, blur_size, 0)
 
-            if base_image is None or state == STUCK \
-                    or state == NEW_BASE_IMG_NEEDED:
+            if base_image is None or state == STUCK or state == NEW_BASE_IMG_NEEDED:
                 if state == STUCK:
                     print("Caught motion loop. Creating new base snapshot")
                     motion_loop_count = 0
@@ -564,6 +563,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                             dir = "South"
                             abs_chg = initial_x - x
                             ftperpixel = calculate_ftperpixel(RTL_Distance, image_width)
+
                         secs = secs_diff(timestamp, initial_time)
                         mph = get_speed(abs_chg, ftperpixel, secs)
 
@@ -647,7 +647,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                     if is_nighttime():
                         cv2.accumulateWeighted(gray, base_image, 0.25)  # original is 0.25
                     else:
-                        cv2.accumulateWeighted(gray, base_image, 0.05)  # original is 0.25
+                        cv2.accumulateWeighted(gray, base_image, 0.25)  # original is 0.25
 
                 state = WAITING
                 key = cv2.waitKey(1) & 0xFF
