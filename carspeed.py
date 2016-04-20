@@ -645,7 +645,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
 
                 if state == WAITING:
                     last_x = 0
-                    cv2.accumulateWeighted(gray, base_image, 0.25)  # original is 0.25
+                    cv2.accumulateWeighted(gray, base_image, 0.05)  # original is 0.25
 
                 state = WAITING
                 key = cv2.waitKey(1) & 0xFF
@@ -674,7 +674,6 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                 need_to_reset = True
                 session.commit()
                 break
-
 
     except KeyboardInterrupt:  # Catch a CTRL+C interrupt as program exit and close gracefully
         now = datetime.datetime.now()
