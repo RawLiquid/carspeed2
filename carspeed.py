@@ -485,8 +485,8 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
             gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
             gray = cv2.GaussianBlur(gray, blur_size, 0)
 
-            if base_image is None or state == STUCK and not motion_found \
-                    or state == NEW_BASE_IMG_NEEDED and not motion_found:
+            if base_image is None or state == STUCK \
+                    or state == NEW_BASE_IMG_NEEDED:
                 if state == STUCK:
                     print("Caught motion loop. Creating new base snapshot")
                     motion_loop_count = 0
