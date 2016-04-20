@@ -437,7 +437,11 @@ try:
     # for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
     while (True):
 
-        _, frame = capture.read()
+        ret, frame = capture.read()
+
+        if not ret:
+            print("No camera object return. Fail.")
+            break
 
         if commit_counter % 10 == 0:
             display_counter = commit_counter
