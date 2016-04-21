@@ -567,10 +567,10 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
 
                         secs = secs_diff(timestamp, initial_time)
                         mph = get_speed(abs_chg, ftperpixel, secs)
-                        print(mph)
+                        print(mean(mph))
 
-                        # if mph >= MINIMUM_SPEED and mph < MAXIMUM_SPEED:
-                        #    mph_list.append(mph)
+                        if mph >= 1:
+                            mph_list.append(mph)
 
                         # if len(mph_list) >= 3 and motion_loop_count > 1:
                         if motion_loop_count > 1 and last_mph > MINIMUM_SPEED:
@@ -582,7 +582,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                 new_vehicle = Vehicles(  # Table for statistics calculations
                                     sessionID=sessionID,
                                     datetime=timestamp,
-                                    speed=last_mph,  #median(mph_list),
+                                    speed=median(mph_list),
                                     direction=dir,
                                     color=rgb,
                                     rating=motion_loop_count
@@ -593,10 +593,10 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                 id = None
                                 committed = True
                                 clear_screen()
-                                # print("Added new vehicle: {0} MPH".format(round(median(mph_list), 2)))
+                                print("Added new vehicle: {0} MPH".format(round(median(mph_list), 2)))
                                 last_vehicle_detected = timestamp.strftime('%Y-%m-%d %H:%M:%S')
                                 time_last_detection = timestamp
-                                # last_mph_detected = round(median(mph_list), 2)
+                                last_mph_detected = round(median(mph_list), 2)
                                 mph_list = []
 
                         last_x = x
