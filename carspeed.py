@@ -567,6 +567,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
 
                         secs = secs_diff(timestamp, initial_time)
                         mph = get_speed(abs_chg, ftperpixel, secs)
+                        print(mph)
 
                         if mph >= MINIMUM_SPEED and mph < MAXIMUM_SPEED:
                             mph_list.append(mph)
