@@ -569,11 +569,11 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                         mph = get_speed(abs_chg, ftperpixel, secs)
                         print(mph)
 
-                        if mph >= MINIMUM_SPEED and mph < MAXIMUM_SPEED:
-                            mph_list.append(mph)
+                        # if mph >= MINIMUM_SPEED and mph < MAXIMUM_SPEED:
+                        #    mph_list.append(mph)
 
-                        if len(mph_list) >= 3 and motion_loop_count > 1:
-
+                        # if len(mph_list) >= 3 and motion_loop_count > 1:
+                        if motion_loop_count > 1 and last_mph > MINIMUM_SPEED:
                             if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and not committed \
                                     or ((x + w >= monitored_width - 2) and (
                                                 direction == LEFT_TO_RIGHT)) and not committed:
@@ -582,7 +582,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                 new_vehicle = Vehicles(  # Table for statistics calculations
                                     sessionID=sessionID,
                                     datetime=timestamp,
-                                    speed=median(mph_list),
+                                    speed=last_mph,  #median(mph_list),
                                     direction=dir,
                                     color=rgb,
                                     rating=motion_loop_count
@@ -600,6 +600,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                 mph_list = []
 
                         last_x = x
+                        last_mph = mph
 
                 motion_loop_count += 1
 
