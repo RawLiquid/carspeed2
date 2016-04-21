@@ -646,7 +646,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                 if state == WAITING:
                     last_x = 0
                     if is_nighttime():
-                        cv2.accumulateWeighted(gray, base_image, 0.1)  # original is 0.25
+                        cv2.accumulateWeighted(gray, base_image, 0.5)  # original is 0.25
                     else:
                         cv2.accumulateWeighted(gray, base_image, 0.25)  # original is 0.25
 
