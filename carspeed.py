@@ -528,6 +528,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                 # get an approximate area of the contour
                 found_area = w * h
                 # find the largest bounding rectangle
+                print(found_area)
                 if (found_area > MIN_AREA) and (found_area > biggest_area) and state != STUCK:
                     biggest_area = found_area
                     motion_found = True
@@ -569,7 +570,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                         secs = secs_diff(timestamp, initial_time)
                         mph = get_speed(abs_chg, ftperpixel, secs)
 
-                        if mph >= MINIMUM_SPEED and mph < MAXIMUM_SPEED:
+                        if MINIMUM_SPEED <= mph < MAXIMUM_SPEED:
                             mph_list.append(mph)
 
                         if len(mph_list) >= 3 and motion_loop_count > 1:
