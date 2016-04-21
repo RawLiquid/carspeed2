@@ -593,7 +593,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                 id = None
                                 committed = True
                                 clear_screen()
-                                print("Added new vehicle: {0} MPH".format(round(median(mph_list), 2)))
+                                # print("Added new vehicle: {0} MPH".format(round(median(mph_list), 2)))
                                 last_vehicle_detected = timestamp.strftime('%Y-%m-%d %H:%M:%S')
                                 time_last_detection = timestamp
                                 last_mph_detected = round(median(mph_list), 2)
