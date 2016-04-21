@@ -528,7 +528,6 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                 # get an approximate area of the contour
                 found_area = w * h
                 # find the largest bounding rectangle
-                print(found_area)
                 if (found_area > MIN_AREA) and (found_area > biggest_area) and state != STUCK:
                     biggest_area = found_area
                     motion_found = True
@@ -683,6 +682,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
     except KeyboardInterrupt:  # Catch a CTRL+C interrupt as program exit and close gracefully
         now = datetime.datetime.now()
         log_entry("out", sessionID)
+        session.commit()
         camera.close()
 
 # cleanup the camera and close any open windows
