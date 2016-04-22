@@ -10,6 +10,7 @@ import time
 import datetime
 import statistics
 from uuid import uuid4 as uuid
+import argparse
 
 import cv2
 import numpy as np
@@ -21,9 +22,19 @@ from sqlalchemy.orm import sessionmaker
 
 from db import Vehicles, Log
 
-use_x = False
-show_bounds = True
-showImage = True
+parser = argparse.ArgumentParser()
+parser.add_argument("-x", "--x", help="Use X-server.", action="store_true")
+
+args = parser.parse_args()
+
+if args.x:
+    use_x = True
+    show_bounds = True
+    showImage = True
+else:
+    use_x = False
+    show_bounds = False
+    showImage = False
 
 engine = create_engine('postgresql://speedcam:Rward0232@localhost/speedcamdb')
 DBSession = sessionmaker(bind=engine)
