@@ -581,7 +581,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                 new_vehicle = Vehicles(  # Table for statistics calculations
                                     sessionID=sessionID,
                                     datetime=timestamp,
-                                    speed=last_mph,  # median(mph_list),
+                                    speed=median(mph_list),
                                     direction=dir,
                                     color=rgb,
                                     rating=motion_loop_count
