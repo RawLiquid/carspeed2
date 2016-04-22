@@ -435,7 +435,7 @@ else:
     upper_left_x = 138
     upper_left_y = 157
     lower_right_x = 462
-    lower_right_y = 183
+    lower_right_y = 193  # 183
 
 monitored_width = lower_right_x - upper_left_x
 monitored_height = lower_right_y - upper_left_y
