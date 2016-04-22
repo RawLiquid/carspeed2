@@ -495,7 +495,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
 
             # Use median filter at night to get rid of graininess
             if is_nighttime():
-                gray = cv2.medianBlur(gray, 10)  # TODO: Test this
+                gray = cv2.medianBlur(gray, 15)  # TODO: Test this
                 # gray = cv2.GaussianBlur(gray, blur_size, 0)
             else:
                 gray = cv2.medianBlur(gray, 10)  # TODO: Test this
