@@ -480,9 +480,6 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
             # initialize the timestamp
             timestamp = datetime.datetime.now()
 
-            # Set frame rate based on time
-            # set_framerate_by_time(FPS, timestamp)
-
             # grab the raw NumPy array representing the image, and rotate it so that it's flat
             image = frame.array
             rows, cols, placeholder = image.shape
@@ -495,8 +492,8 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
 
             # convert it to grayscale, and blur it
             gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
-            # gray = cv2.GaussianBlur(gray, blur_size, 0)
-            gray = cv2.medianBlur(gray, 15)  # TODO: Test this
+            gray = cv2.GaussianBlur(gray, blur_size, 0)
+            # gray = cv2.medianBlur(gray, 15)  # TODO: Test this
 
             if base_image is None or state == STUCK or state == NEW_BASE_IMG_NEEDED:
                 if state == STUCK:
