@@ -8,7 +8,7 @@ import math
 import os
 import time
 import datetime
-from statistics import median
+import statistics
 from uuid import uuid4 as uuid
 
 import cv2
@@ -581,7 +581,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                 new_vehicle = Vehicles(  # Table for statistics calculations
                                     sessionID=sessionID,
                                     datetime=timestamp,
-                                    speed=median(mph_list),
+                                    speed=statistics.mean(mph_list),
                                     direction=dir,
                                     color=rgb,
                                     rating=motion_loop_count
@@ -592,7 +592,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                 id = None
                                 committed = True
                                 clear_screen()
-                                print("Added new vehicle: {0} MPH".format(round(median(mph_list), 2)))
+                                print("Added new vehicle: {0} MPH".format(round(statistics.mean(mph_list), 2)))
                                 last_vehicle_detected = timestamp.strftime('%Y-%m-%d %H:%M:%S')
                                 time_last_detection = timestamp
                                 last_mph_detected = round(median(mph_list), 2)
