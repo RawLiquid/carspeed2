@@ -86,6 +86,7 @@ def test_processing(base, frame):
 
     if cnts is not None:
         areas = [cv2.contourArea(c) for c in cnts]  # Get contour areas
+        print(areas)
         max_index = np.argmax(areas)
         cnt = cnts[max_index]
 
