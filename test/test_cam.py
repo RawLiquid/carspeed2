@@ -118,9 +118,10 @@ def show_webcam(camera, capture):
             cv2.namedWindow('Blurred')
             cv2.imshow('Blurred', base_image)  # Show the frame in a window
 
-            cv2.namedWindow('Contours', cv2.WINDOW_AUTOSIZE)
-            cv2.imshow('Contours', rectangle)
-            capture.truncate(0)  # Then, clear the window in prep for next frame
+            if len(rectangle) > 0:
+                cv2.namedWindow('Contours', cv2.WINDOW_AUTOSIZE)
+                cv2.imshow('Contours', rectangle)
+                capture.truncate(0)  # Then, clear the window in prep for next frame
 
             if cv2.waitKey(1) == 27:
                 break  # esc to quit
