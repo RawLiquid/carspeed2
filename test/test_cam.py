@@ -5,6 +5,7 @@ Tests camera output
 import time
 
 import cv2
+import numpy as np
 import picamera
 from picamera.array import PiRGBArray
 
@@ -17,6 +18,7 @@ lower_right_x = 462
 lower_right_y = 193  # 183
 
 THRESHOLD = 15
+MIN_AREA = 50
 blur_size = (15, 15)
 
 
@@ -82,9 +84,16 @@ def test_processing(base, frame):
     thresh = cv2.dilate(thresh, None, iterations=2)
     (_, cnts, _) = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
+    areas = [cv2.contourArea(c) for c in cnts]  # Get contour areas
+    max_index = np.argmax(areas)
+    cnt = cnts[max_index]
+
+    x, y, w, h = cv2.boundingRect(cnt)
+    cv2.rectangle(gray, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
     base = cv2.accumulateWeighted(gray, base, 0.1)  # attempt background removal
 
-    return base, gray, cnts
+    return base, gray
 
 
 def show_webcam(camera, capture):
@@ -100,14 +109,14 @@ def show_webcam(camera, capture):
         for frame in camera.capture_continuous(capture, format='bgr', use_video_port=True):
             image = frame.array
             image = rotate_image(image)  # Rotate the image
-            base_image, blurred, contours = test_processing(base_image, image)  # Run openCV image processing
+            base_image, blurred = test_processing(base_image, image)  # Run openCV image processing
 
             cv2.namedWindow('Blurred')
             cv2.imshow('Blurred', base_image)  # Show the frame in a window
 
-            cv2.namedWindow('Contours', cv2.WINDOW_AUTOSIZE)
-            cv2.drawContours(blurred, contours, -1, (255, 0, 0), 3)
-            cv2.imshow('Contours', blurred)
+            # cv2.namedWindow('Contours', cv2.WINDOW_AUTOSIZE)
+            # cv2.drawContours(blurred, contours, -1, (255, 0, 0), 3)
+            # cv2.imshow('Contours', blurred)
             capture.truncate(0)  # Then, clear the window in prep for next frame
 
             if cv2.waitKey(1) == 27:
