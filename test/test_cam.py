@@ -119,6 +119,7 @@ def show_webcam(camera, capture):
             cv2.imshow('Blurred', base_image)  # Show the frame in a window
 
             cv2.namedWindow('Contours', cv2.WINDOW_AUTOSIZE)
+            cv2.drawContours(image, rectangle, -1, (0, 255, 0), -1)
             cv2.imshow('Contours', rectangle)
             capture.truncate(0)  # Then, clear the window in prep for next frame
 
