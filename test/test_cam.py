@@ -82,14 +82,15 @@ def test_processing(base, frame):
     # dilate the thresholded image to fill in any holes, then find contours
     # on thresholded image
     thresh = cv2.dilate(thresh, None, iterations=2)
-    (_, cnts, _) = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    (ret, cnts, _) = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    areas = [cv2.contourArea(c) for c in cnts]  # Get contour areas
-    max_index = np.argmax(areas)
-    cnt = cnts[max_index]
+    if ret:
+        areas = [cv2.contourArea(c) for c in cnts]  # Get contour areas
+        max_index = np.argmax(areas)
+        cnt = cnts[max_index]
 
-    x, y, w, h = cv2.boundingRect(cnt)
-    cv2.rectangle(gray, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        x, y, w, h = cv2.boundingRect(cnt)
+        cv2.rectangle(gray, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
     base = cv2.accumulateWeighted(gray, base, 0.1)  # attempt background removal
 
