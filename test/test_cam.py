@@ -82,9 +82,9 @@ def test_processing(base, frame):
     # dilate the thresholded image to fill in any holes, then find contours
     # on thresholded image
     thresh = cv2.dilate(thresh, None, iterations=2)
-    (ret, cnts, _) = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    (_, cnts, _) = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    if ret:
+    if cnts not None:
         areas = [cv2.contourArea(c) for c in cnts]  # Get contour areas
         max_index = np.argmax(areas)
         cnt = cnts[max_index]
