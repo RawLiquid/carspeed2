@@ -6,7 +6,7 @@ import cv2
 
 
 def show_webcam(mirror=False):
-    cam = cv2.VideoCapture(0)  # Initialize camera
+    cam = cv2.VideoCapture()  # Initialize camera
 
     while True:
         ret, img = cam.read()
@@ -17,6 +17,7 @@ def show_webcam(mirror=False):
             cv2.imshow('Camera Output', img)
         else:
             print("No camera output!")
+
         if cv2.waitKey(1) == 27:
             break  # esc to quit
 
