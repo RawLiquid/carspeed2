@@ -93,7 +93,8 @@ def test_processing(base, frame):
         cnt = cnts[max_index]
 
         x, y, w, h = cv2.boundingRect(cnt)
-        rectangle = cv2.rectangle(gray, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        rectangle = frame.copy().astype("float")
+        cv2.rectangle(rectangle, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
     base = cv2.accumulateWeighted(gray, base, 0.1)  # attempt background removal
 
@@ -119,7 +120,6 @@ def show_webcam(camera, capture):
             cv2.imshow('Blurred', base_image)  # Show the frame in a window
 
             cv2.namedWindow('Contours', cv2.WINDOW_AUTOSIZE)
-            cv2.drawContours(image, rectangle, -1, (0, 255, 0), -1)
             cv2.imshow('Contours', rectangle)
             capture.truncate(0)  # Then, clear the window in prep for next frame
 
