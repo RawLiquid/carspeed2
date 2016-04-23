@@ -99,13 +99,12 @@ def show_webcam(camera, capture):
             image = rotate_image(image)  # Rotate the image
             base_image, blurred, contours = test_processing(base_image, image)  # Run openCV image processing
 
-            cv2.namedWindow('Blurred')
-            cv2.imshow('Blurred', blurred)  # Show the frame in a window
+            # cv2.namedWindow('Blurred')
+            # cv2.imshow('Blurred', blurred)  # Show the frame in a window
 
             cv2.namedWindow('Contours')
-            img1 = image.copy()
-            cv2.drawContours(img1, contours, -1, (255, 0, 0), 3)
-            cv2.imshow('Contours', img1)
+            cv2.drawContours(blurred, contours, -1, (255, 0, 0), 3)
+            cv2.imshow('Contours', blurred)
             capture.truncate(0)  # Then, clear the window in prep for next frame
 
             if cv2.waitKey(1) == 27:
