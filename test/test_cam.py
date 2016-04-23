@@ -64,7 +64,7 @@ def test_processing(base, frame):
     gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
 
     # Use median filter at night to get rid of graininess
-    gray = cv2.medianBlur(gray, 3)  # TODO: Test this
+    gray = cv2.medianBlur(gray, 25)  # TODO: Test this
     # gray = cv2.GaussianBlur(gray, blur_size, 0)
 
     if base is None:
