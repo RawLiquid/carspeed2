@@ -60,15 +60,15 @@ def test_processing(base, frame):
     # gray = frame[upper_left_y:lower_right_y, upper_left_x:lower_right_x]
     gray = frame
 
-    if not base:
-        base_image = gray.copy().astype("float")
-
     # convert it to grayscale, and blur it
     gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
 
     # Use median filter at night to get rid of graininess
     gray = cv2.medianBlur(gray, 3)  # TODO: Test this
     # gray = cv2.GaussianBlur(gray, blur_size, 0)
+
+    if not base:
+        base_image = gray.copy().astype("float")  # create a base image if it doesn't yet exist
 
     # compute the absolute difference between the current image and
     # base image and then turn everything lighter than THRESHOLD into
