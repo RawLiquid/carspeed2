@@ -67,7 +67,7 @@ def test_processing(base, frame):
     gray = cv2.medianBlur(gray, 3)  # TODO: Test this
     # gray = cv2.GaussianBlur(gray, blur_size, 0)
 
-    if not base:
+    if base is None:
         base = gray.copy().astype("float")  # create a base image if it doesn't yet exist
 
     # compute the absolute difference between the current image and
