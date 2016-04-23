@@ -8,7 +8,13 @@ import cv2
 import picamera
 from picamera.array import PiRGBArray
 
-rotation_degrees = 187
+rotation_degrees = 187  # Rotate camera output
+
+# Define bounding box
+upper_left_x = 138
+upper_left_y = 157
+lower_right_x = 462
+lower_right_y = 193  # 183
 
 
 def initialize_camera():
@@ -40,6 +46,27 @@ def rotate_image(frame):
     return image
 
 
+def test_processing(frame):
+    """
+    Test openCV processing algorithms
+    :param frame: frame input from camera
+    :return: frame object post-processing
+    """
+
+    # crop the frame to the monitored area, convert it to grayscale, and blur it
+    # crop area defined by [y1:y2,x1:x2]
+    gray = frame[upper_left_y:lower_right_y, upper_left_x:lower_right_x]
+
+    # convert it to grayscale, and blur it
+    gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
+
+    # Use median filter at night to get rid of graininess
+    gray = cv2.medianBlur(gray, 15)  # TODO: Test this
+    # gray = cv2.GaussianBlur(gray, blur_size, 0)
+
+    return gray
+
+
 def show_webcam(camera, capture):
     """
     Opens camera input and shows frame-by-frame
@@ -51,6 +78,7 @@ def show_webcam(camera, capture):
         for frame in camera.capture_continuous(capture, format='bgr', use_video_port=True):
             image = frame.array
             image = rotate_image(image)  # Rotate the image
+            image = test_processing(image)  # Run openCV image processing
 
             cv2.imshow('Camera Output', image)  # Show the frame in a window
             capture.truncate(0)  # Then, clear the window in prep for next frame
