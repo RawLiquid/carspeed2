@@ -8,7 +8,7 @@ import cv2
 import picamera
 from picamera.array import PiRGBArray
 
-rotation_degrees = 277
+rotation_degrees = 187
 
 
 def initialize_camera():
