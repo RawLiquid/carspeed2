@@ -84,7 +84,7 @@ def test_processing(base, frame):
     thresh = cv2.dilate(thresh, None, iterations=2)
     (_, cnts, _) = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    if cnts is not None:
+    if len(cnts) > 0:
         areas = [cv2.contourArea(c) for c in cnts]  # Get contour areas
         print(cnts)
         max_index = np.argmax(areas)
