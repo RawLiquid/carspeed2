@@ -16,7 +16,6 @@ upper_left_y = 157
 lower_right_x = 462
 lower_right_y = 193  # 183
 
-base_image = None
 THRESHOLD = 15
 
 
@@ -82,7 +81,7 @@ def test_processing(base, frame):
     thresh = cv2.dilate(thresh, None, iterations=2)
     (_, cnts, _) = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    return gray, cnts
+    return base_image, gray, cnts
 
 
 def show_webcam(camera, capture):
@@ -92,11 +91,13 @@ def show_webcam(camera, capture):
     :return: X window
     """
 
+    base_image = None
+
     while True:
         for frame in camera.capture_continuous(capture, format='bgr', use_video_port=True):
             image = frame.array
             image = rotate_image(image)  # Rotate the image
-            blurred, contours = test_processing(base_image, image)  # Run openCV image processing
+            base_image, blurred, contours = test_processing(base_image, image)  # Run openCV image processing
 
             cv2.namedWindow('Blurred')
             cv2.imshow('Blurred', blurred)  # Show the frame in a window
