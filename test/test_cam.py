@@ -16,6 +16,9 @@ upper_left_y = 157
 lower_right_x = 462
 lower_right_y = 193  # 183
 
+base_image = None
+THRESHOLD = 15
+
 
 def initialize_camera():
     """
@@ -46,7 +49,7 @@ def rotate_image(frame):
     return image
 
 
-def test_processing(frame):
+def test_processing(base, frame):
     """
     Test openCV processing algorithms
     :param frame: frame input from camera
@@ -58,6 +61,9 @@ def test_processing(frame):
     # gray = frame[upper_left_y:lower_right_y, upper_left_x:lower_right_x]
     gray = frame
 
+    if not base:
+        base_image = gray.copy().astype("float")
+
     # convert it to grayscale, and blur it
     gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
 
@@ -65,7 +71,18 @@ def test_processing(frame):
     gray = cv2.medianBlur(gray, 3)  # TODO: Test this
     # gray = cv2.GaussianBlur(gray, blur_size, 0)
 
-    return gray
+    # compute the absolute difference between the current image and
+    # base image and then turn everything lighter than THRESHOLD into
+    # white
+    frameDelta = cv2.absdiff(gray, cv2.convertScaleAbs(base_image))
+    thresh = cv2.threshold(frameDelta, THRESHOLD, 255, cv2.THRESH_BINARY)[1]
+
+    # dilate the thresholded image to fill in any holes, then find contours
+    # on thresholded image
+    thresh = cv2.dilate(thresh, None, iterations=2)
+    (_, cnts, _) = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    return gray, cnts
 
 
 def show_webcam(camera, capture):
@@ -79,9 +96,14 @@ def show_webcam(camera, capture):
         for frame in camera.capture_continuous(capture, format='bgr', use_video_port=True):
             image = frame.array
             image = rotate_image(image)  # Rotate the image
-            image = test_processing(image)  # Run openCV image processing
+            blurred, contours = test_processing(base_image, image)  # Run openCV image processing
 
-            cv2.imshow('Camera Output', image)  # Show the frame in a window
+            cv2.namedWindow('Blurred')
+            cv2.imshow('Blurred', blurred)  # Show the frame in a window
+
+            cv2.namedWindow('Contours')
+            cv2.imshow('Contours', contours)
+
             capture.truncate(0)  # Then, clear the window in prep for next frame
 
             if cv2.waitKey(1) == 27:
