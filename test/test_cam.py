@@ -17,6 +17,7 @@ lower_right_x = 462
 lower_right_y = 193  # 183
 
 THRESHOLD = 15
+blur_size = (15, 15)
 
 
 def initialize_camera():
@@ -64,8 +65,8 @@ def test_processing(base, frame):
     gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
 
     # Use median filter at night to get rid of graininess
-    gray = cv2.medianBlur(gray, 25)  # TODO: Test this
-    # gray = cv2.GaussianBlur(gray, blur_size, 0)
+    # gray = cv2.medianBlur(gray, 25)  # TODO: Test this
+    gray = cv2.GaussianBlur(gray, blur_size, 0)
 
     if base is None:
         base = gray.copy().astype("float")  # create a base image if it doesn't yet exist
@@ -81,7 +82,7 @@ def test_processing(base, frame):
     thresh = cv2.dilate(thresh, None, iterations=2)
     (_, cnts, _) = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    base = cv2.accumulateWeighted(gray, base, 0.5)  # attempt background removal
+    base = cv2.accumulateWeighted(gray, base, 0.1)  # attempt background removal
 
     return base, gray, cnts
 
