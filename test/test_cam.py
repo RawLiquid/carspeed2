@@ -68,12 +68,12 @@ def test_processing(base, frame):
     # gray = cv2.GaussianBlur(gray, blur_size, 0)
 
     if not base:
-        base_image = gray.copy().astype("float")  # create a base image if it doesn't yet exist
+        base = gray.copy().astype("float")  # create a base image if it doesn't yet exist
 
     # compute the absolute difference between the current image and
     # base image and then turn everything lighter than THRESHOLD into
     # white
-    frameDelta = cv2.absdiff(gray, cv2.convertScaleAbs(base_image))
+    frameDelta = cv2.absdiff(gray, cv2.convertScaleAbs(base))
     thresh = cv2.threshold(frameDelta, THRESHOLD, 255, cv2.THRESH_BINARY)[1]
 
     # dilate the thresholded image to fill in any holes, then find contours
@@ -81,7 +81,7 @@ def test_processing(base, frame):
     thresh = cv2.dilate(thresh, None, iterations=2)
     (_, cnts, _) = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    return base_image, gray, cnts
+    return base, gray, cnts
 
 
 def show_webcam(camera, capture):
@@ -103,8 +103,9 @@ def show_webcam(camera, capture):
             cv2.imshow('Blurred', blurred)  # Show the frame in a window
 
             cv2.namedWindow('Contours')
-            cv2.imshow('Contours', contours)
-
+            img1 = image.copy()
+            cv2.drawContours(img1, contours, -1, (255, 0, 0), 3)
+            cv2.imshow('Contours', img1)
             capture.truncate(0)  # Then, clear the window in prep for next frame
 
             if cv2.waitKey(1) == 27:
