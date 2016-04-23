@@ -12,7 +12,11 @@ def show_webcam(mirror=False):
         ret, img = cam.read()
         if mirror:
             img = cv2.flip(img, 1)
-        cv2.imshow('Camera Output', img)
+
+        if ret:
+            cv2.imshow('Camera Output', img)
+        else:
+            print("No camera output!")
         if cv2.waitKey(1) == 27:
             break  # esc to quit
 
