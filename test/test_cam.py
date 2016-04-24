@@ -88,8 +88,9 @@ def test_processing(base, frame):
 
     if len(cnts) > 0:
         areas = [cv2.contourArea(c) for c in cnts]  # Get contour areas
-        if areas > MIN_AREA:
-            max_index = np.argmax(areas)
+        max_index = np.argmax(areas)
+
+        if max_index > MIN_AREA:
             cnt = cnts[max_index]
 
             x, y, w, h = cv2.boundingRect(cnt)
