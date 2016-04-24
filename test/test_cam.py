@@ -90,6 +90,8 @@ def test_processing(base, frame):
         areas = [cv2.contourArea(c) for c in cnts]  # Get contour areas
         max_index = np.argmax(areas)
 
+        print(max_index)
+
         if max_index > MIN_AREA:
             cnt = cnts[max_index]
 
