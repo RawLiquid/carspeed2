@@ -80,6 +80,7 @@ def test_processing(base, frame):
     # white
     frameDelta = cv2.absdiff(gray, cv2.convertScaleAbs(base))
     thresh = cv2.threshold(frameDelta, THRESHOLD, 255, cv2.THRESH_BINARY)[1]
+    thresh = cv2.adaptiveThreshold(frameDelta, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
 
     # dilate the thresholded image to fill in any holes, then find contours
     # on thresholded image
@@ -88,10 +89,10 @@ def test_processing(base, frame):
 
     if len(cnts) > 0:
         areas = [cv2.contourArea(c) for c in cnts]  # Get contour areas
-        max_index = np.argmax(areas)
-        cnt = cnts[max_index]
+        max_index = np.argmax(areas)  # Find maximum value in list of areas
+        cnt = cnts[max_index]  # return contour with maximum area
 
-        x, y, w, h = cv2.boundingRect(cnt)
+        x, y, w, h = cv2.boundingRect(cnt)  # Get x,y, width and height of bounding rectangle of maximum area contour.
 
         print(w * h)
 
