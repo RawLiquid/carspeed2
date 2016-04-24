@@ -88,11 +88,12 @@ def test_processing(base, frame):
 
     if len(cnts) > 0:
         areas = [cv2.contourArea(c) for c in cnts]  # Get contour areas
-        print(cnts)
+        print(areas)
         max_index = np.argmax(areas)
         cnt = cnts[max_index]
 
         x, y, w, h = cv2.boundingRect(cnt)
+
         rectangle = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
     base = cv2.accumulateWeighted(gray, base, 0.1)  # attempt background removal
@@ -115,8 +116,8 @@ def show_webcam(camera, capture):
             image = rotate_image(image)  # Rotate the image
             base_image, blurred, thresh, rectangle = test_processing(base_image, image)  # Run openCV image processing
 
-            cv2.namedWindow('Blurred')
-            cv2.imshow('Blurred', base_image)  # Show the frame in a window
+            cv2.namedWindow('Base')
+            cv2.imshow('Base', base_image)  # Show the frame in a window
 
             cv2.namedWindow('Thresh')
             cv2.imshow('Thresh', thresh)
