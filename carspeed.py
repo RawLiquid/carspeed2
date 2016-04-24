@@ -441,9 +441,9 @@ if use_x:
         upper_left_y = fy
         lower_right_y = iy
 else:
-    # Define manually because my camera is mounted
+    # Define bounding box
     upper_left_x = 138
-    upper_left_y = 157
+    upper_left_y = 100
     lower_right_x = 462
     lower_right_y = 193  # 183
 
@@ -667,9 +667,9 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                 if state == WAITING:
                     last_x = 0
                     if is_nighttime():
-                        cv2.accumulateWeighted(gray, base_image, 0.3)  # original is 0.25
+                        cv2.accumulateWeighted(gray, base_image, 0.01)  # original is 0.25
                     else:
-                        cv2.accumulateWeighted(gray, base_image, 0.25)  # original is 0.25
+                        cv2.accumulateWeighted(gray, base_image, 0.01)  # original is 0.25
 
                 state = WAITING
                 key = cv2.waitKey(1) & 0xFF
