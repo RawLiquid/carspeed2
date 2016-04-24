@@ -89,14 +89,13 @@ def test_processing(base, frame):
     if len(cnts) > 0:
         areas = [cv2.contourArea(c) for c in cnts]  # Get contour areas
         max_index = np.argmax(areas)
+        cnt = cnts[max_index]
 
-        print(max_index)
+        x, y, w, h = cv2.boundingRect(cnt)
 
-        if max_index > MIN_AREA:
-            cnt = cnts[max_index]
+        print(w * h)
 
-            x, y, w, h = cv2.boundingRect(cnt)
-
+        if w * h >= MIN_AREA:
             rectangle = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
     base = cv2.accumulateWeighted(gray, base, 0.1)  # attempt background removal
