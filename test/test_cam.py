@@ -62,8 +62,8 @@ def test_processing(base, frame):
 
     # crop the frame to the monitored area, convert it to grayscale, and blur it
     # crop area defined by [y1:y2,x1:x2]
-    gray = frame[upper_left_y:lower_right_y, upper_left_x:lower_right_x]
-    # gray = frame
+    clipped_orig = frame[upper_left_y:lower_right_y, upper_left_x:lower_right_x]
+    gray = clipped_orig
 
     # convert it to grayscale, and blur it
     gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
@@ -96,7 +96,7 @@ def test_processing(base, frame):
         print(w * h)
 
         if w * h >= MIN_AREA:
-            rectangle = cv2.rectangle(frame, (x, y), (x - w, y - h), (0, 255, 0), 2)
+            rectangle = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
     base = cv2.accumulateWeighted(gray, base, 0.1)  # attempt background removal
 
