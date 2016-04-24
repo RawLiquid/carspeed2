@@ -18,7 +18,7 @@ lower_right_x = 462
 lower_right_y = 193  # 183
 
 THRESHOLD = 15
-MIN_AREA = 50
+MIN_AREA = 100
 blur_size = (15, 15)
 
 
