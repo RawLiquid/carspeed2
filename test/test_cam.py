@@ -80,7 +80,7 @@ def test_processing(base, frame):
     # white
     frameDelta = cv2.absdiff(gray, cv2.convertScaleAbs(base))
     thresh = cv2.threshold(frameDelta, THRESHOLD, 255, cv2.THRESH_BINARY)[1]
-    thresh = cv2.adaptiveThreshold(frameDelta, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 1000, 0)
+    thresh = cv2.adaptiveThreshold(frameDelta, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 1000, 1)
 
     # dilate the thresholded image to fill in any holes, then find contours
     # on thresholded image
