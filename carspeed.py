@@ -548,8 +548,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
             #    found_area = w * h
             #    # find the largest bounding rectangle
 
-                if (found_area > MIN_AREA) and (found_area > biggest_area) and state != STUCK:
-                    biggest_area = found_area
+                if (found_area > MIN_AREA) and state != STUCK:
                     motion_found = True
 
                     if not is_nighttime():
