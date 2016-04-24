@@ -531,20 +531,31 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
             motion_found = False
             biggest_area = 0
 
-            # examine the contours, looking for the largest one
-            for c in cnts:
-                (x, y, w, h) = cv2.boundingRect(c)
-                # get an approximate area of the contour
-                found_area = w * h
-                # find the largest bounding rectangle
-                if (found_area > MIN_AREA) and (found_area > biggest_area) and state != STUCK:
-                    biggest_area = found_area
-                    motion_found = True
+            if len(cnts) > 0:
+                areas = [cv2.contourArea(c) for c in cnts]  # Get contour areas
+                max_index = np.argmax(areas)  # Find maximum value in list of areas
+                cnt = cnts[max_index]  # return contour with maximum area
 
-                    if not is_nighttime():
-                        rgb = grab_rgb(image, c)
-                    else:
-                        rgb = 'nighttime'
+                x, y, w, h = cv2.boundingRect(
+                    cnt)  # Get x,y, width and height of bounding rectangle of maximum area contour.
+
+                found_area = w * h
+
+            # examine the contours, looking for the largest one
+            # for c in cnts:
+            #    (x, y, w, h) = cv2.boundingRect(c)
+            #    # get an approximate area of the contour
+            #    found_area = w * h
+            #    # find the largest bounding rectangle
+
+            if (found_area > MIN_AREA) and (found_area > biggest_area) and state != STUCK:
+                biggest_area = found_area
+                motion_found = True
+
+                if not is_nighttime():
+                    rgb = grab_rgb(image, cnt)
+                else:
+                    rgb = 'nighttime'
 
             if motion_found:
                 committed = False
