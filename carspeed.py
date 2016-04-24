@@ -4,17 +4,16 @@
 # TODO: Figure out how to use background subtraction algos
 # TODO: Add feature to detect pedestrians, and use this to temporarily disable detection as it will be inaccurate.
 
+import argparse
+import datetime
 import math
 import os
-import time
-import datetime
 import statistics
+import time
 from uuid import uuid4 as uuid
-import argparse
 
 import cv2
 import numpy as np
-from collections import Counter
 from picamera import PiCamera
 from picamera.array import PiRGBArray
 from sqlalchemy import create_engine, text
@@ -47,7 +46,7 @@ THRESHOLD = 15
 SPEED_THRESHOLD = 40
 MINIMUM_SPEED = 10  # # Don't detect cars in parking lots, walkers, and slow drivers
 MAXIMUM_SPEED = 100  # 70  # Anything higher than this is likely to be noise.
-MIN_AREA = 50
+MIN_AREA = 1500
 blur_size = (15, 15)
 image_width = 640
 image_height = 480
