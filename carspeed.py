@@ -597,10 +597,11 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                                 direction == LEFT_TO_RIGHT)) and not committed:
                                 state = SAVING
                                 timestamp = datetime.datetime.now()
+                                speed = statistics.median(mph_list)
                                 new_vehicle = Vehicles(  # Table for statistics calculations
                                     sessionID=sessionID,
                                     datetime=timestamp,
-                                    speed=statistics.mean(mph_list),
+                                    speed=speed,
                                     direction=dir,
                                     color=rgb,
                                     rating=motion_loop_count
@@ -611,10 +612,10 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                 id = None
                                 committed = True
                                 clear_screen()
-                                print("Added new vehicle: {0} MPH".format(round(statistics.mean(mph_list), 2)))
+                                print("Added new vehicle: {0} MPH".format(round(speed, 2)))
                                 last_vehicle_detected = timestamp.strftime('%Y-%m-%d %H:%M:%S')
                                 time_last_detection = timestamp
-                                last_mph_detected = round(statistics.mean(mph_list), 2)
+                                last_mph_detected = round(speed, 2)
                                 mph_list = []
 
                         last_x = x
