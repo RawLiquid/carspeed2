@@ -113,10 +113,10 @@ def show_webcam(camera, capture):
         for frame in camera.capture_continuous(capture, format='bgr', use_video_port=True):
             image = frame.array
             image = rotate_image(image)  # Rotate the image
-            base_image, blurred, rectangle = test_processing(base_image, image)  # Run openCV image processing
+            # base_image, blurred, rectangle = test_processing(base_image, image)  # Run openCV image processing
 
             cv2.namedWindow('Blurred')
-            cv2.imshow('Blurred', base_image)  # Show the frame in a window
+            cv2.imshow('Blurred', image)  # Show the frame in a window
 
             # if rectangle is not None:
             #    cv2.namedWindow('Contours', cv2.WINDOW_AUTOSIZE)
