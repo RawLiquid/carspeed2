@@ -96,7 +96,7 @@ def test_processing(base, frame):
         print(w * h)
 
         if w * h >= MIN_AREA:
-            rectangle = cv2.rectangle(gray, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            rectangle = cv2.rectangle(frame, (y, x), (x - w, y - h), (0, 255, 0), 2)
 
     base = cv2.accumulateWeighted(gray, base, 0.1)  # attempt background removal
 
