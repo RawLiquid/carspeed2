@@ -41,11 +41,11 @@ session = DBSession()
 
 # define some constants
 save_photos = True
-dropbox_upload = False
+dropbox_upload = True
 RTL_Distance = 85  # Right to left distance to median
 LTR_Distance = 60  # Left to right distance to median
 THRESHOLD = 15
-SPEED_THRESHOLD = 40
+SPEED_THRESHOLD = 50
 MINIMUM_SPEED = 20  # # Don't detect cars in parking lots, walkers, and slow drivers
 MAXIMUM_SPEED = 60  # 70  # Anything higher than this is likely to be noise.
 MIN_AREA = 1500
@@ -636,12 +636,13 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
 
                                     # and save the image to disk
                                     path = None
-                                    filename = "./images/car_at_" + datetime.datetime.now().strftime(
+                                    filename = "images/car_at_" + datetime.datetime.now().strftime(
                                         "%Y%m%d_%H%M%S") + ".jpg"
                                     cv2.imwrite(filename, image)
 
                                     if dropbox_upload:
-                                        os.system('./Dropbox_Uploader.sh upload {0}'.format(filename))
+                                        dropbox_path = 'carspeed.py/{0}'.format(filename)
+                                        os.system('./dropbox_uploader.sh upload {0} {1}'.format(filename, dropbox_path))
 
                         last_x = x
                         last_mph = mph
