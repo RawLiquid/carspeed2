@@ -659,7 +659,6 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                 time_last_detection = timestamp
                                 last_mph_detected = round(speed, 2)
                                 mph_list = []
-
                                 create_image(save_photos, SPEED_THRESHOLD, speed, image_orig, rectangle, image_width,
                                              image_height)
 
