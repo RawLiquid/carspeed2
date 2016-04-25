@@ -419,7 +419,7 @@ def create_image(save_photos, speed_threshold, speed, image, rectangle, image_wi
         cv2.imwrite(filename, image)
 
         if dropbox_upload:
-            os.system('./Dropbox_Uploader.sh upload {0}'.format(filename))
+            os.system('./dropbox_uploader.sh upload {0}'.format(filename))
 
 
 camera, rawCapture = initialize_camera(camera, image_resolution)
