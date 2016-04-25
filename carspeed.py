@@ -391,10 +391,10 @@ def initialize_camera(camera, res):
 
 def create_image(save_photos, speed_threshold, speed, image, rectangle, image_width, image_height):
     if save_photos and speed >= SPEED_THRESHOLD:  # Write out an image of the speeder
-        _x = rectangle[1]
-        _y = rectangle[2]
-        _w = rectangle[3]
-        _h = rectangle[4]
+        _x = rectangle[0]
+        _y = rectangle[1]
+        _w = rectangle[2]
+        _h = rectangle[3]
 
         rectangle = cv2.rectangle(image, (_x, _y), (_x + _w, _y + _h), (0, 255, 0), 2)
 
