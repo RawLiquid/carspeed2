@@ -45,7 +45,7 @@ dropbox_upload = True
 RTL_Distance = 85  # Right to left distance to median
 LTR_Distance = 60  # Left to right distance to median
 THRESHOLD = 15
-SPEED_THRESHOLD = 50
+SPEED_THRESHOLD = 35
 MINIMUM_SPEED = 20  # # Don't detect cars in parking lots, walkers, and slow drivers
 MAXIMUM_SPEED = 60  # 70  # Anything higher than this is likely to be noise.
 MIN_AREA = 1500
@@ -496,6 +496,7 @@ print(" Monitored area:             {}".format(monitored_width * monitored_heigh
 
 fps_is_set = True
 need_to_reset = False
+rectangle = []
 log_entry("in", sessionID)  # Log usage
 
 while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime threshold is crossed.
