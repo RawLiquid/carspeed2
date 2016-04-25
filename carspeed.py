@@ -414,7 +414,7 @@ def create_image(save_photos, speed_threshold, speed, image, rectangle, image_wi
 
         # and save the image to disk
         path = None
-        filename = "/images/car_at_" + datetime.datetime.now().strftime(
+        filename = "images/car_at_" + datetime.datetime.now().strftime(
             "%Y%m%d_%H%M%S") + ".jpg"
         cv2.imwrite(filename, image)
 
