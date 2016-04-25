@@ -41,11 +41,11 @@ session = DBSession()
 
 # define some constants
 save_photos = True
-dropbox_upload = False
+dropbox_upload = True
 RTL_Distance = 85  # Right to left distance to median
 LTR_Distance = 60  # Left to right distance to median
 THRESHOLD = 15
-SPEED_THRESHOLD = 40
+SPEED_THRESHOLD = 50
 MINIMUM_SPEED = 20  # # Don't detect cars in parking lots, walkers, and slow drivers
 MAXIMUM_SPEED = 60  # 70  # Anything higher than this is likely to be noise.
 MIN_AREA = 1500
