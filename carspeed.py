@@ -501,7 +501,6 @@ print(" Monitored area:             {}".format(monitored_width * monitored_heigh
 fps_is_set = True
 need_to_reset = False
 rectangle = []
-image_list = []
 log_entry("in", sessionID)  # Log usage
 
 while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime threshold is crossed.
@@ -634,8 +633,6 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                             print(text_on_image)
                             mph_list.append(mph)
 
-                        image_list.append(image_orig)
-
                         if len(mph_list) >= 3 and motion_loop_count > 1:
                             if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and not committed \
                                     or ((x + w >= monitored_width - 2) and (
@@ -663,7 +660,6 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                 last_mph_detected = round(speed, 2)
                                 mph_list = []
 
-                                image_orig = image_list[len(image_list) - 2]  # Get next-to-last image
                                 create_image(save_photos, SPEED_THRESHOLD, speed, image_orig, rectangle, image_width,
                                              image_height)
 
