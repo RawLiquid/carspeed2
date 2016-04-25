@@ -40,6 +40,7 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 # define some constants
+save_photos = True
 RTL_Distance = 85  # Right to left distance to median
 LTR_Distance = 60  # Left to right distance to median
 THRESHOLD = 15
@@ -616,6 +617,25 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                 time_last_detection = timestamp
                                 last_mph_detected = round(speed, 2)
                                 mph_list = []
+
+                                if save_photos and speed >= SPEED_THRESHOLD:  # Write out an image of the speeder
+                                    # timestamp the image
+                                    cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
+                                                (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX,
+                                                0.75, (0, 255, 0), 1)
+
+                                    # write the speed: first get the size of the text
+                                    size, base = cv2.getTextSize("%.0f mph" % speed, cv2.FONT_HERSHEY_SIMPLEX, 2, 3)
+
+                                    # then center it horizontally on the image
+                                    cntr_x = int((image_width - size[0]) / 2)
+                                    cv2.putText(image, "%.0f mph" % speed,
+                                                (cntr_x, int(image_height * 0.2)), cv2.FONT_HERSHEY_SIMPLEX,
+                                                2.00, (0, 255, 0), 3)
+
+                                    # and save the image to disk
+                                    cv2.imwrite("car_at_" + datetime.datetime.now().strftime("%Y%m%d_%H%M%S") + ".jpg",
+                                                image)
 
                         last_x = x
                         last_mph = mph
