@@ -41,6 +41,7 @@ session = DBSession()
 
 # define some constants
 save_photos = True
+dropbox_upload = False
 RTL_Distance = 85  # Right to left distance to median
 LTR_Distance = 60  # Left to right distance to median
 THRESHOLD = 15
@@ -634,8 +635,13 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                                 2.00, (0, 255, 0), 3)
 
                                     # and save the image to disk
-                                    cv2.imwrite("car_at_" + datetime.datetime.now().strftime("%Y%m%d_%H%M%S") + ".jpg",
-                                                image)
+                                    path = None
+                                    filename = "./images/car_at_" + datetime.datetime.now().strftime(
+                                        "%Y%m%d_%H%M%S") + ".jpg"
+                                    cv2.imwrite(filename, image)
+
+                                    if dropbox_upload:
+                                        os.system('./Dropbox_Uploader.sh upload {0}'.format(filename))
 
                         last_x = x
                         last_mph = mph
