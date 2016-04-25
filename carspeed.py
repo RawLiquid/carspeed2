@@ -396,8 +396,8 @@ def create_image(save_photos, speed_threshold, speed, image, rectangle, image_wi
         _w = rectangle[2]
         _h = rectangle[3]
 
-        width = upper_left_x - lower_right_x
-        height = upper_left_y - lower_right_y
+        width = lower_right_x - upper_left_x
+        height = lower_right_y - upper_left_y
 
         rectangle = cv2.rectangle(image, (_x, _y), (_x + _w, _y + _h), (0, 255, 0), 2)
 
