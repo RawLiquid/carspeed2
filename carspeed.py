@@ -396,6 +396,9 @@ def create_image(save_photos, speed_threshold, speed, image, rectangle, image_wi
         _w = rectangle[2]
         _h = rectangle[3]
 
+        width = upper_left_x - lower_right_x
+        height = upper_left_y - lower_right_y
+
         rectangle = cv2.rectangle(image, (_x, _y), (_x + _w, _y + _h), (0, 255, 0), 2)
 
         # timestamp the image
@@ -407,9 +410,9 @@ def create_image(save_photos, speed_threshold, speed, image, rectangle, image_wi
         size, base = cv2.getTextSize("%.0f mph" % speed, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
 
         # then center it horizontally on the image
-        cntr_x = int((w - size[0]) / 2)
+        cntr_x = int((width - size[0]) / 2)
         cv2.putText(image, "%.0f mph" % speed,
-                    (cntr_x, int(h * 0.2)), cv2.FONT_HERSHEY_SIMPLEX,
+                    (cntr_x, int(height * 0.2)), cv2.FONT_HERSHEY_SIMPLEX,
                     1.00, (0, 255, 0), 2)
 
         # and save the image to disk
