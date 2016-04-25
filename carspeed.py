@@ -525,6 +525,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
             # crop the frame to the monitored area, convert it to grayscale, and blur it
             # crop area defined by [y1:y2,x1:x2]
             gray = image[upper_left_y:lower_right_y, upper_left_x:lower_right_x]
+            image_orig = gray
 
             # convert it to grayscale, and blur it
             gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
@@ -656,7 +657,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                 last_mph_detected = round(speed, 2)
                                 mph_list = []
 
-                                create_image(save_photos, SPEED_THRESHOLD, speed, image, rectangle, image_width,
+                                create_image(save_photos, SPEED_THRESHOLD, speed, image_orig, rectangle, image_width,
                                              image_height)
 
                         last_x = x
