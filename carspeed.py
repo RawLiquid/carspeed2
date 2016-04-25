@@ -389,6 +389,32 @@ def initialize_camera(camera, res):
     return camera, rawCapture
 
 
+def create_image(save_photos, speed_threshold, speed, image, image_width, image_height):
+    if save_photos and speed >= SPEED_THRESHOLD:  # Write out an image of the speeder
+        # timestamp the image
+        cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
+                    (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX,
+                    0.75, (0, 255, 0), 1)
+
+        # write the speed: first get the size of the text
+        size, base = cv2.getTextSize("%.0f mph" % speed, cv2.FONT_HERSHEY_SIMPLEX, 2, 3)
+
+        # then center it horizontally on the image
+        cntr_x = int((image_width - size[0]) / 2)
+        cv2.putText(image, "%.0f mph" % speed,
+                    (cntr_x, int(image_height * 0.2)), cv2.FONT_HERSHEY_SIMPLEX,
+                    2.00, (0, 255, 0), 3)
+
+        # and save the image to disk
+        path = None
+        filename = "./images/car_at_" + datetime.datetime.now().strftime(
+            "%Y%m%d_%H%M%S") + ".jpg"
+        cv2.imwrite(filename, image)
+
+        if dropbox_upload:
+            os.system('./Dropbox_Uploader.sh upload {0}'.format(filename))
+
+
 camera, rawCapture = initialize_camera(camera, image_resolution)
 
 # Set up the bounding box for speed detection
@@ -619,29 +645,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                 last_mph_detected = round(speed, 2)
                                 mph_list = []
 
-                                if save_photos and speed >= SPEED_THRESHOLD:  # Write out an image of the speeder
-                                    # timestamp the image
-                                    cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
-                                                (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX,
-                                                0.75, (0, 255, 0), 1)
-
-                                    # write the speed: first get the size of the text
-                                    size, base = cv2.getTextSize("%.0f mph" % speed, cv2.FONT_HERSHEY_SIMPLEX, 2, 3)
-
-                                    # then center it horizontally on the image
-                                    cntr_x = int((image_width - size[0]) / 2)
-                                    cv2.putText(image, "%.0f mph" % speed,
-                                                (cntr_x, int(image_height * 0.2)), cv2.FONT_HERSHEY_SIMPLEX,
-                                                2.00, (0, 255, 0), 3)
-
-                                    # and save the image to disk
-                                    path = None
-                                    filename = "./images/car_at_" + datetime.datetime.now().strftime(
-                                        "%Y%m%d_%H%M%S") + ".jpg"
-                                    cv2.imwrite(filename, image)
-
-                                    if dropbox_upload:
-                                        os.system('./Dropbox_Uploader.sh upload {0}'.format(filename))
+                                create_image(save_photos, SPEED_THRESHOLD, speed, image, image_width, image_height)
 
                         last_x = x
                         last_mph = mph
