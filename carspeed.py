@@ -397,14 +397,14 @@ def create_image(save_photos, speed_threshold, speed, image, rectangle, image_wi
         _h = rectangle[3]
 
         width = lower_right_x - upper_left_x
-        height = lower_right_y - upper_left_y
+        height = lower_right_y - upper_left_y - 3
 
         rectangle = cv2.rectangle(image, (_x, _y), (_x + _w, _y + _h), (0, 255, 0), 2)
 
         # timestamp the image
-        cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
+        cv2.putText(image, datetime.datetime.now().strftime("%d %B %I:%M:%S%p"),
                     (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX,
-                    0.75, (0, 255, 0), 1)
+                    .5, (0, 255, 0), 1)
 
         # write the speed: first get the size of the text
         size, base = cv2.getTextSize("%.0f mph" % speed, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
@@ -413,7 +413,7 @@ def create_image(save_photos, speed_threshold, speed, image, rectangle, image_wi
         cntr_x = int((width - size[0]) / 2)
         cv2.putText(image, "%.0f mph" % speed,
                     (cntr_x, int(height * 0.2)), cv2.FONT_HERSHEY_SIMPLEX,
-                    1.00, (0, 255, 0), 2)
+                    .75, (0, 255, 0), 2)
 
         # and save the image to disk
         path = None
