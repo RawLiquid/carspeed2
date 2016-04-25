@@ -414,12 +414,13 @@ def create_image(save_photos, speed_threshold, speed, image, rectangle, image_wi
 
         # and save the image to disk
         path = None
-        filename = "./images/car_at_" + datetime.datetime.now().strftime(
+        filename = "/images/car_at_" + datetime.datetime.now().strftime(
             "%Y%m%d_%H%M%S") + ".jpg"
         cv2.imwrite(filename, image)
 
         if dropbox_upload:
-            os.system('./dropbox_uploader.sh upload {0}'.format(filename))
+            dropbox_path = 'carspeed.py/{0}'.format(filename)
+            os.system('./dropbox_uploader.sh upload {0} {1}'.format(filename, dropbox_path))
 
 
 camera, rawCapture = initialize_camera(camera, image_resolution)
