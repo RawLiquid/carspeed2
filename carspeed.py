@@ -559,15 +559,12 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
             if motion_found:
                 committed = False
                 if state == WAITING:
-                    clear_screen()
                     # intialize tracking
                     state = TRACKING
                     initial_x = x
                     last_x = x
                     initial_time = timestamp
                     last_mph = 0
-                    text_on_image = 'Tracking'
-                    print(text_on_image)
                     motion_loop_count = 0
 
                 else:
@@ -589,6 +586,8 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                         mph = get_speed(abs_chg, ftperpixel, secs)
 
                         if MINIMUM_SPEED <= mph < MAXIMUM_SPEED:
+                            text_on_image = 'Tracking'
+                            print(text_on_image)
                             mph_list.append(mph)
 
                         if len(mph_list) >= 3 and motion_loop_count > 1:
