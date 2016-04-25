@@ -668,6 +668,8 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                 create_image(save_photos, SPEED_THRESHOLD, speed, image_orig, rectangle, image_width,
                                              image_height)
 
+                                image_list = []
+
                         last_x = x
                         last_mph = mph
 
@@ -675,6 +677,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
 
             else:
                 if state != WAITING and state != STUCK:
+                    image_list = []
                     state = WAITING
                     direction = UNKNOWN
                     text_on_image = 'No Car Detected'
