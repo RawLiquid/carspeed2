@@ -389,8 +389,15 @@ def initialize_camera(camera, res):
     return camera, rawCapture
 
 
-def create_image(save_photos, speed_threshold, speed, image, image_width, image_height):
+def create_image(save_photos, speed_threshold, speed, image, rectangle, image_width, image_height):
     if save_photos and speed >= SPEED_THRESHOLD:  # Write out an image of the speeder
+        _x = rectangle[1]
+        _y = rectangle[2]
+        _w = rectangle[3]
+        _h = rectangle[4]
+
+        rectangle = cv2.rectangle(image, (_x, _y), (_x + _w, _y + _h), (0, 255, 0), 2)
+
         # timestamp the image
         cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
                     (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX,
@@ -567,6 +574,8 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                 x, y, w, h = cv2.boundingRect(
                     cnt)  # Get x,y, width and height of bounding rectangle of maximum area contour.
 
+                rectangle = [x, y, w, h]
+
                 found_area = w * h
 
             # examine the contours, looking for the largest one
@@ -645,7 +654,8 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                 last_mph_detected = round(speed, 2)
                                 mph_list = []
 
-                                create_image(save_photos, SPEED_THRESHOLD, speed, image, image_width, image_height)
+                                create_image(save_photos, SPEED_THRESHOLD, speed, image, rectangle, image_width,
+                                             image_height)
 
                         last_x = x
                         last_mph = mph
