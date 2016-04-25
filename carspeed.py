@@ -634,9 +634,9 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                             mph_list.append(mph)
 
                         if len(mph_list) >= 3 and motion_loop_count > 1:
-                            if ((x <= 2) and (direction == LEFT_TO_RIGHT)) and not committed \
+                            if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and not committed \
                                     or ((x + w >= monitored_width - 2) and (
-                                                direction == RIGHT_TO_LEFT)) and not committed:
+                                                direction == LEFT_TO_RIGHT)) and not committed:
                                 state = SAVING
                                 timestamp = datetime.datetime.now()
                                 speed = statistics.median(mph_list)
