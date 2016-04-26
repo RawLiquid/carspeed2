@@ -569,242 +569,247 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
         camera, rawCapture = initialize_camera(camera, image_resolution)  # Fire up camera!
         need_to_reset = False
 
-    try:
-        fps_is_set = False
-        for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+    if not is_nighttime():
+        try:
+            fps_is_set = False
+            for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 
-            if commit_counter % 10 == 0:
-                #    display_counter = commit_counter
-                pass
+                if commit_counter % 10 == 0:
+                    #    display_counter = commit_counter
+                    pass
 
-            # initialize the timestamp
-            timestamp = datetime.datetime.now()
+                # initialize the timestamp
+                timestamp = datetime.datetime.now()
 
-            # grab the raw NumPy array representing the image, and rotate it so that it's flat
-            image = frame.array
-            rows, cols, placeholder = image.shape
-            M = cv2.getRotationMatrix2D((cols / 2, rows / 2), rotation_degrees, 1)
-            image = cv2.warpAffine(image, M, (rows, cols))
+                # grab the raw NumPy array representing the image, and rotate it so that it's flat
+                image = frame.array
+                rows, cols, placeholder = image.shape
+                M = cv2.getRotationMatrix2D((cols / 2, rows / 2), rotation_degrees, 1)
+                image = cv2.warpAffine(image, M, (rows, cols))
 
-            # crop the frame to the monitored area, convert it to grayscale, and blur it
-            # crop area defined by [y1:y2,x1:x2]
-            gray = image[upper_left_y:lower_right_y, upper_left_x:lower_right_x]
-            image_orig = gray
+                # crop the frame to the monitored area, convert it to grayscale, and blur it
+                # crop area defined by [y1:y2,x1:x2]
+                gray = image[upper_left_y:lower_right_y, upper_left_x:lower_right_x]
+                image_orig = gray
 
-            # convert it to grayscale, and blur it
-            gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
+                # convert it to grayscale, and blur it
+                gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
 
-            # Use median filter at night to get rid of graininess
-            gray = cv2.medianBlur(gray, 15)  # TODO: Test this
-            # gray = cv2.GaussianBlur(gray, blur_size, 0)
+                # Use median filter at night to get rid of graininess
+                gray = cv2.medianBlur(gray, 15)  # TODO: Test this
+                # gray = cv2.GaussianBlur(gray, blur_size, 0)
 
-            if base_image is None or state == STUCK or state == NEW_BASE_IMG_NEEDED:
-                if state == STUCK:
-                    print("Caught motion loop. Creating new base snapshot")
-                    motion_loop_count = 0
-                    state = UNKNOWN
+                if base_image is None or state == STUCK or state == NEW_BASE_IMG_NEEDED:
+                    if state == STUCK:
+                        print("Caught motion loop. Creating new base snapshot")
+                        motion_loop_count = 0
+                        state = UNKNOWN
 
-                elif state == NEW_BASE_IMG_NEEDED:
-                    print("Creating new base image")
-                    motion_loop_count = 0
-                    state = UNKNOWN
+                    elif state == NEW_BASE_IMG_NEEDED:
+                        print("Creating new base image")
+                        motion_loop_count = 0
+                        state = UNKNOWN
 
-                base_image = gray.copy().astype("float")
-                lastTime = timestamp
-                rawCapture.truncate(0)
-                time_base_image = datetime.datetime.now()
+                    base_image = gray.copy().astype("float")
+                    lastTime = timestamp
+                    rawCapture.truncate(0)
+                    time_base_image = datetime.datetime.now()
 
-                if use_x:
-                    cv2.imshow("Speed Camera", image)
-                continue
+                    if use_x:
+                        cv2.imshow("Speed Camera", image)
+                    continue
 
-            # compute the absolute difference between the current image and
-            # base image and then turn everything lighter than THRESHOLD into
-            # white
-            frameDelta = cv2.absdiff(gray, cv2.convertScaleAbs(base_image))
-            thresh = cv2.threshold(frameDelta, THRESHOLD, 255, cv2.THRESH_BINARY)[1]
+                # compute the absolute difference between the current image and
+                # base image and then turn everything lighter than THRESHOLD into
+                # white
+                frameDelta = cv2.absdiff(gray, cv2.convertScaleAbs(base_image))
+                thresh = cv2.threshold(frameDelta, THRESHOLD, 255, cv2.THRESH_BINARY)[1]
 
-            # dilate the thresholded image to fill in any holes, then find contours
-            # on thresholded image
-            thresh = cv2.dilate(thresh, None, iterations=2)
-            (_, cnts, _) = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+                # dilate the thresholded image to fill in any holes, then find contours
+                # on thresholded image
+                thresh = cv2.dilate(thresh, None, iterations=2)
+                (_, cnts, _) = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-            # look for motion
-            motion_found = False
-            biggest_area = 0
+                # look for motion
+                motion_found = False
+                biggest_area = 0
 
-            if len(cnts) > 0:
-                areas = [cv2.contourArea(c) for c in cnts]  # Get contour areas
-                max_index = np.argmax(areas)  # Find maximum value in list of areas
-                cnt = cnts[max_index]  # return contour with maximum area
+                if len(cnts) > 0:
+                    areas = [cv2.contourArea(c) for c in cnts]  # Get contour areas
+                    max_index = np.argmax(areas)  # Find maximum value in list of areas
+                    cnt = cnts[max_index]  # return contour with maximum area
 
-                x, y, w, h = cv2.boundingRect(
-                    cnt)  # Get x,y, width and height of bounding rectangle of maximum area contour.
+                    x, y, w, h = cv2.boundingRect(
+                        cnt)  # Get x,y, width and height of bounding rectangle of maximum area contour.
 
-                found_area = w * h
+                    found_area = w * h
 
-                if (found_area > MIN_AREA) and state != STUCK:
-                    motion_found = True
+                    if (found_area > MIN_AREA) and state != STUCK:
+                        motion_found = True
 
-                    if not is_nighttime():
-                        rgb = grab_rgb(image, cnt)
+                        if not is_nighttime():
+                            rgb = grab_rgb(image, cnt)
+                        else:
+                            rgb = 'nighttime'
+
+                if motion_found:
+                    committed = False
+                    if state == WAITING:
+                        # intialize tracking
+                        state = TRACKING
+                        initial_x = x
+                        last_x = x
+                        initial_time = timestamp
+                        last_mph = 0
+                        motion_loop_count = 0
+
                     else:
-                        rgb = 'nighttime'
 
-            if motion_found:
-                committed = False
-                if state == WAITING:
-                    # intialize tracking
-                    state = TRACKING
-                    initial_x = x
-                    last_x = x
-                    initial_time = timestamp
-                    last_mph = 0
-                    motion_loop_count = 0
+                        if state == TRACKING:
+                            if x >= last_x:
+                                direction = LEFT_TO_RIGHT
+                                ftperpixel = calculate_ftperpixel(LTR_Distance, image_width)
+                                abs_chg = x + w - initial_x
+                                dir = "North"
+
+                                if 150 < x + w < monitored_width - 2:
+                                    print_image = image_orig
+                                    rectangle = [x, y, w, h]
+
+                            else:
+                                direction = RIGHT_TO_LEFT
+                                dir = "South"
+                                abs_chg = initial_x - x
+                                ftperpixel = calculate_ftperpixel(RTL_Distance, image_width)
+
+                                if 150 > x > 2:
+                                    print_image = image_orig
+                                    rectangle = [x, y, w, h]
+
+                            secs = secs_diff(timestamp, initial_time)
+                            mph = get_speed(abs_chg, ftperpixel, secs)
+
+                            if MINIMUM_SPEED <= mph < MAXIMUM_SPEED:
+                                text_on_image = 'Tracking'
+                                print(text_on_image)
+                                mph_list.append(mph)
+
+                            if len(mph_list) >= 3 and motion_loop_count > 1:
+                                row_information = {
+                                    'x': x,
+                                    'w': w,
+                                    'direction': direction,
+                                    'committed': committed,
+                                    'monitored_width': monitored_width,
+                                    'sessionID': sessionID,
+                                    'dir': dir,
+                                    'color': rgb,
+                                    'rating': motion_loop_count,
+                                    'mph_list': mph_list
+                                }
+
+                                row_output = create_row(row_information)
+
+                                if row_output:
+                                    id = row_output['id']
+                                    committed = row_output['committed']
+                                    last_vehicle_detected = row_output['last_vehicle_detected']
+                                    time_last_detection = row_output['time_last_detection']
+                                    last_mph_detected = row_output['last_mph_detected']
+                                    mph_list = row_output['mph_list']
+
+                                    commit_counter += 1
+
+                            last_x = x
+                            last_mph = mph
+
+                    motion_loop_count += 1
 
                 else:
+                    if state != WAITING and state != STUCK:
+                        state = WAITING
+                        direction = UNKNOWN
+                        text_on_image = 'No Car Detected'
+                        print(text_on_image)
+                        mph_list = []
+                        id = None
+                        motion_loop_count = 0
 
-                    if state == TRACKING:
-                        if x >= last_x:
-                            direction = LEFT_TO_RIGHT
-                            ftperpixel = calculate_ftperpixel(LTR_Distance, image_width)
-                            abs_chg = x + w - initial_x
-                            dir = "North"
+                if state == WAITING and loop_count % 10 == 0:
+                    display('waiting', display_counter, last_db_commit, last_vehicle_detected, last_mph_detected)
+                elif state == TRACKING:
+                    pass
 
-                            if 150 < x + w < monitored_width - 2:
-                                print_image = image_orig
-                                rectangle = [x, y, w, h]
+                if motion_loop_count >= 100:
+                    state = STUCK
 
+                # if time_base_image - timestamp > 3600 and time_last_detection - timestamp > 120:
+                #    state = NEW_BASE_IMG_NEEDED
+                #    print("Creating new base image")
+
+                # only update image and wait for a keypress when waiting for a car
+                # or if 50 frames have been processed in the WAITING state.
+                # This is required since waitkey slows processing.
+                if (state == WAITING) or (loop_count > 50):
+
+                    if use_x:
+                        # draw the text and timestamp on the frame
+                        cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
+                                    (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 1)
+                        cv2.putText(image, "Road Status: {}".format(text_on_image), (10, 20),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
+
+                        # define the monitored area right and left boundary
+                        cv2.line(image, (upper_left_x, upper_left_y), (upper_left_x, lower_right_y), (0, 255, 0))
+                        cv2.line(image, (lower_right_x, upper_left_y), (lower_right_x, lower_right_y), (0, 255, 0))
+
+                        prompt_on_image(prompt)
+                        cv2.imshow("Speed Camera", image)
+
+                    if state == WAITING:
+                        last_x = 0
+                        if is_nighttime():
+                            base_image = cv2.accumulateWeighted(gray, base_image, 0.01)  # original is 0.25
                         else:
-                            direction = RIGHT_TO_LEFT
-                            dir = "South"
-                            abs_chg = initial_x - x
-                            ftperpixel = calculate_ftperpixel(RTL_Distance, image_width)
+                            base_image = cv2.accumulateWeighted(gray, base_image, 0.01)  # original is 0.25
 
-                            if 150 > x > 2:
-                                print_image = image_orig
-                                rectangle = [x, y, w, h]
-
-                        secs = secs_diff(timestamp, initial_time)
-                        mph = get_speed(abs_chg, ftperpixel, secs)
-
-                        if MINIMUM_SPEED <= mph < MAXIMUM_SPEED:
-                            text_on_image = 'Tracking'
-                            print(text_on_image)
-                            mph_list.append(mph)
-
-                        if len(mph_list) >= 3 and motion_loop_count > 1:
-                            row_information = {
-                                'x': x,
-                                'w': w,
-                                'direction': direction,
-                                'committed': committed,
-                                'monitored_width': monitored_width,
-                                'sessionID': sessionID,
-                                'dir': dir,
-                                'color': rgb,
-                                'rating': motion_loop_count,
-                                'mph_list': mph_list
-                            }
-
-                            row_output = create_row(row_information)
-
-                            if row_output:
-                                id = row_output['id']
-                                committed = row_output['committed']
-                                last_vehicle_detected = row_output['last_vehicle_detected']
-                                time_last_detection = row_output['time_last_detection']
-                                last_mph_detected = row_output['last_mph_detected']
-                                mph_list = row_output['mph_list']
-
-                                commit_counter += 1
-
-                        last_x = x
-                        last_mph = mph
-
-                motion_loop_count += 1
-
-            else:
-                if state != WAITING and state != STUCK:
                     state = WAITING
-                    direction = UNKNOWN
-                    text_on_image = 'No Car Detected'
-                    print(text_on_image)
-                    mph_list = []
-                    id = None
-                    motion_loop_count = 0
+                    key = cv2.waitKey(1) & 0xFF
 
-            if state == WAITING and loop_count % 10 == 0:
-                display('waiting', display_counter, last_db_commit, last_vehicle_detected, last_mph_detected)
-            elif state == TRACKING:
-                pass
+                    # if the `q` key is pressed, break from the loop and terminate processing
+                    if key == ord("q"):
+                        log_entry("out", sessionID)
+                        break
+                    loop_count = 0
 
-            if motion_loop_count >= 100:
-                state = STUCK
+                # clear the stream in preparation for the next frame
+                rawCapture.truncate(0)
+                loop_count += 1
 
-            # if time_base_image - timestamp > 3600 and time_last_detection - timestamp > 120:
-            #    state = NEW_BASE_IMG_NEEDED
-            #    print("Creating new base image")
+                if commit_counter >= 5:
+                    clear_screen()
+                    print("***Adding vehicles to database.***")
+                    commit_counter = 0
+                    session.commit()
+                    session.execute(clean)
+                    last_db_commit = timestamp.strftime('%Y-%m-%d %H:%M:%S')
 
-            # only update image and wait for a keypress when waiting for a car
-            # or if 50 frames have been processed in the WAITING state.
-            # This is required since waitkey slows processing.
-            if (state == WAITING) or (loop_count > 50):
-
-                if use_x:
-                    # draw the text and timestamp on the frame
-                    cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
-                                (10, image.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 1)
-                    cv2.putText(image, "Road Status: {}".format(text_on_image), (10, 20),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
-
-                    # define the monitored area right and left boundary
-                    cv2.line(image, (upper_left_x, upper_left_y), (upper_left_x, lower_right_y), (0, 255, 0))
-                    cv2.line(image, (lower_right_x, upper_left_y), (lower_right_x, lower_right_y), (0, 255, 0))
-
-                    prompt_on_image(prompt)
-                    cv2.imshow("Speed Camera", image)
-
-                if state == WAITING:
-                    last_x = 0
-                    if is_nighttime():
-                        base_image = cv2.accumulateWeighted(gray, base_image, 0.01)  # original is 0.25
-                    else:
-                        base_image = cv2.accumulateWeighted(gray, base_image, 0.01)  # original is 0.25
-
-                state = WAITING
-                key = cv2.waitKey(1) & 0xFF
-
-                # if the `q` key is pressed, break from the loop and terminate processing
-                if key == ord("q"):
-                    log_entry("out", sessionID)
+                if not nighttime and is_nighttime():  # reset loop so camera FPS can be changed.
+                    nighttime = True
+                    fps_is_set = True
+                    need_to_reset = True
+                    session.commit()
                     break
-                loop_count = 0
 
-            # clear the stream in preparation for the next frame
-            rawCapture.truncate(0)
-            loop_count += 1
+        except KeyboardInterrupt:  # Catch a CTRL+C interrupt as program exit and close gracefully
+            now = datetime.datetime.now()
+            log_entry("out", sessionID)
+            session.commit()
+            camera.close()
 
-            if commit_counter >= 5:
-                clear_screen()
-                print("***Adding vehicles to database.***")
-                commit_counter = 0
-                session.commit()
-                session.execute(clean)
-                last_db_commit = timestamp.strftime('%Y-%m-%d %H:%M:%S')
-
-            if not nighttime and is_nighttime():  # reset loop so camera FPS can be changed.
-                nighttime = True
-                fps_is_set = True
-                need_to_reset = True
-                session.commit()
-                break
-
-    except KeyboardInterrupt:  # Catch a CTRL+C interrupt as program exit and close gracefully
-        now = datetime.datetime.now()
-        log_entry("out", sessionID)
-        session.commit()
-        camera.close()
+    else:
+        clear_screen()
+        print("Waiting for daylight...")
 
 # cleanup the camera and close any open windows
 cv2.destroyAllWindows()
