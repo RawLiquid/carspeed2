@@ -709,14 +709,15 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
 
                             row_output = create_row(row_information)
 
-                            id = row_output['id']
-                            committed = row_output['committed']
-                            last_vehicle_detected = row_output['last_vehicle_detected']
-                            time_last_detection = row_output['time_last_detection']
-                            last_mph_detected = row_output['last_mph_detected']
-                            mph_list = row_output['mph_list']
+                            if row_output:
+                                id = row_output['id']
+                                committed = row_output['committed']
+                                last_vehicle_detected = row_output['last_vehicle_detected']
+                                time_last_detection = row_output['time_last_detection']
+                                last_mph_detected = row_output['last_mph_detected']
+                                mph_list = row_output['mph_list']
 
-                            commit_counter += 1
+                                commit_counter += 1
 
                         last_x = x
                         last_mph = mph
@@ -738,7 +739,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
             elif state == TRACKING:
                 pass
 
-            if motion_loop_count >= 50:
+            if motion_loop_count >= 100:
                 state = STUCK
 
             # if time_base_image - timestamp > 3600 and time_last_detection - timestamp > 120:
