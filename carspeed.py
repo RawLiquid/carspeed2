@@ -703,7 +703,8 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                 'sessionID': sessionID,
                                 'dir': dir,
                                 'color': rgb,
-                                'rating': motion_loop_count
+                                'rating': motion_loop_count,
+                                'mph_list': mph_list
                             }
 
                             row_output = create_row(row_information)
