@@ -466,7 +466,7 @@ def valid_movement(xpos, width, dir):
     """
 
     tests = []  # Create empty list to contain x positions
-    n_tests = 5  # Number of x positions to test
+    n_tests = 3  # Number of x positions to test
     offset = 2  # Offset so that test bar doesn't fall on very edge of window
     test_spacing = width / n_tests  # Determine spacing of tests
 
@@ -478,8 +478,6 @@ def valid_movement(xpos, width, dir):
     test1 = False
     test2 = False
     test3 = False
-    test4 = False
-    test5 = False
 
     for i in range(n_tests):
         x_test = (i * test_spacing) + offset  # Create x locations
@@ -487,65 +485,34 @@ def valid_movement(xpos, width, dir):
 
     if dir == LEFT_TO_RIGHT:
         for i in xpos:
-            if i > tests[0] and i < tests[1] and i < tests[2] and i < tests[3] and i < tests[4]:
+            if i > tests[0] and i < tests[1] and i < tests[2]:
                 test1 = True
 
-            if i > tests[0] and i > tests[1] and i < tests[2] and i < tests[3] and i < tests[4] and test1 is True:
-                test1 = True
-                test2 = True
-
-            if i > tests[0] and i > tests[1] and i > tests[2] and i < tests[3] and i < tests[4] and test1 is True and \
-                            test2 is True:
+            if i > tests[0] and i > tests[1] and i < tests[2] and test1 is True:
                 test1 = True
                 test2 = True
-                test3 = True
 
-            if i > tests[0] and i > tests[1] and i > tests[2] and i > tests[3] and i < tests[4] and test1 is True and \
-                            test2 is True and test3 is True:
+            if i > tests[0] and i > tests[1] and i > tests[2] and test1 is True and test2 is True:
                 test1 = True
                 test2 = True
                 test3 = True
-                test4 = True
 
-            if i > tests[0] and i > tests[1] and i > tests[2] and i > tests[3] and i > tests[4] and test1 is True and \
-                            test2 is True and test3 is True and test4 is True:
-                test1 = True
-                test2 = True
-                test3 = True
-                test4 = True
-                test5 = True
 
     elif dir == RIGHT_TO_LEFT:
         for i in xpos:
-            if i < tests[0] and i < tests[1] and i < tests[2] and i < tests[3] and i < tests[4] and test5 is True and \
-                            test4 is True and test3 is True and test2 is True:
+            if i < tests[0] and i < tests[1] and i < tests[2] and test2 is True and test3 is True:
                 test1 = True
                 test2 = True
                 test3 = True
-                test4 = True
-                test5 = True
 
-            if i > tests[0] and i < tests[1] and i < tests[2] and i < tests[3] and i < tests[4] and test5 is True and \
-                            test4 is True and test3 is True:
+            if i > tests[0] and i < tests[1] and i < tests[2] and test3 is True:
                 test2 = True
                 test3 = True
-                test4 = True
-                test5 = True
 
-            if i > tests[0] and i > tests[1] and i < tests[2] and i < tests[3] and i < tests[4] and test5 is True and \
-                            test4 is True:
+            if i > tests[0] and i > tests[1] and i < tests[2]:
                 test3 = True
-                test4 = True
-                test5 = True
 
-            if i > tests[0] and i > tests[1] and i > tests[2] and i < tests[3] and i < tests[4] and test5 is True:
-                test4 = True
-                test5 = True
-
-            if i > tests[0] and i > tests[1] and i > tests[2] and i > tests[3] and i < tests[4]:
-                test5 = True
-
-    tests = [test1, test2, test3, test4, test5]
+    tests = [test1, test2, test3]
     print(tests)
     time.sleep(1)
 
