@@ -3,6 +3,7 @@
 # TODO: Figure out logic to detect if two vehicles are in frame
 # TODO: Figure out how to use background subtraction algos
 # TODO: Add feature to detect pedestrians, and use this to temporarily disable detection as it will be inaccurate.
+# TODO: Set parameters by text file.
 
 import argparse
 import datetime
@@ -45,7 +46,7 @@ dropbox_upload = True
 RTL_Distance = 85  # Right to left distance to median
 LTR_Distance = 60  # Left to right distance to median
 THRESHOLD = 15
-SPEED_THRESHOLD = 50
+SPEED_THRESHOLD = 45 + (45 * 0.5)
 MINIMUM_SPEED = 1  # # Don't detect cars in parking lots, walkers, and slow drivers
 MAXIMUM_SPEED = 100  # 70  # Anything higher than this is likely to be noise.
 MIN_AREA = 1500

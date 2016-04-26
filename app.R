@@ -151,8 +151,7 @@ server <- function(input, output) {
 	# query the data from postgreSQL
 	input$update
 	withProgress(message="Updating data...", expr=1)
-	original_vehicles <- sqlQuery(input$range[1], input$range[2])
-	vehicles <- original_vehicles
+	vehicles <- sqlQuery(input$range[1], input$range[2])
 	vehicles$speed <- remove_outliers(vehicles$speed)
 	
 	# Create date variable and sequence of days as specified by user
