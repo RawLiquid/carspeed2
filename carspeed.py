@@ -417,7 +417,6 @@ def create_image(save_photos, speed_threshold, speed, image, rectangle, image_wi
                     .75, (0, 255, 0), 2)
 
         # and save the image to disk
-        path = None
         filename = "images/car_at_" + datetime.datetime.now().strftime(
             "%Y%m%d_%H%M%S") + ".jpg"
         cv2.imwrite(filename, image)
@@ -501,6 +500,8 @@ print(" Monitored area:             {}".format(monitored_width * monitored_heigh
 
 fps_is_set = True
 need_to_reset = False
+pring_image = None
+x, y, w, h = None
 rectangle = []
 log_entry("in", sessionID)  # Log usage
 
@@ -581,8 +582,6 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                 x, y, w, h = cv2.boundingRect(
                     cnt)  # Get x,y, width and height of bounding rectangle of maximum area contour.
 
-                rectangle = [x, y, w, h]
-
                 found_area = w * h
 
             # examine the contours, looking for the largest one
@@ -620,11 +619,19 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                             abs_chg = x + w - initial_x
                             dir = "North"
 
+                            if 150 < x + w < monitored_width - 2:
+                                print_image = image_orig
+                                rectangle = [x, y, w, h]
+
                         else:
                             direction = RIGHT_TO_LEFT
                             dir = "South"
                             abs_chg = initial_x - x
                             ftperpixel = calculate_ftperpixel(RTL_Distance, image_width)
+
+                            if 150 > x > 2:
+                                print_image = image_orig
+                                rectangle = [x, y, w, h]
 
                         secs = secs_diff(timestamp, initial_time)
                         mph = get_speed(abs_chg, ftperpixel, secs)
@@ -660,7 +667,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                 time_last_detection = timestamp
                                 last_mph_detected = round(speed, 2)
                                 mph_list = []
-                                create_image(save_photos, SPEED_THRESHOLD, speed, image_orig, rectangle, image_width,
+                                create_image(save_photos, SPEED_THRESHOLD, speed, print_image, rectangle, image_width,
                                              image_height)
 
                         last_x = x
