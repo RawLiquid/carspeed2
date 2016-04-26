@@ -26,10 +26,12 @@ sqlQuery <- function(){
     # creates a connection to the postgres database
     # note that "con" will be used later in each connection to the database
     con <- dbConnect(drv, dbname = "speedcamdb",
-                     host = "71.90.169.142", port = 5432,
+                     host = "192.168.1.3", port = 5432,
                      user = "speedcam", password = pw)
     
-    results <- dbGetQuery(con, 'SELECT * FROM vehicles;')
+    query <- paste0("SELECT * FROM vehicles")
+    
+    results <- dbGetQuery(con, query)
     
     dbDisconnect(con)
     },
@@ -49,6 +51,15 @@ sqlQuery <- function(){
 
 }
 
+remove_outliers <- function(x, na.rm = TRUE, ...) {
+  qnt <- quantile(x, probs=c(.25, .75), na.rm = na.rm, ...)
+  H <- 1.5 * IQR(x, na.rm = na.rm)
+  y <- x
+  y[x < (qnt[1] - H)] <- NA
+  y[x > (qnt[2] + H)] <- NA
+  y
+}
+
 # Make sure there are no duplicate speeds in table (speeds are so precise, there should never be
 # any real instances where they are the same)
 
@@ -66,9 +77,10 @@ ui <- fluidPage(
 			br(),
 			p("This project is still under heavy development, and data should not be understood to be accurate."),
 			br(),
+			#helpText("*** NOTICE: 4/23/2016 - The Air Power Expo has resulted in Soutbound lane blockage on Ridgmar Blvd. Data will reflect this."),
 			br(),
-			sliderInput("range", "Time Range (N hours ago - Now)", min = 2, max = 48, value = 4),
-			
+			#sliderInput("range", "Time Range (N hours ago - Now)", min = 2, max = 48, value = 4),
+			dateRangeInput('range', 'Date range', start = Sys.Date() - 1, min = '2016-01-01'),
 			sliderInput("l_span", "Trend Fitting Parameter", min = 0.1, max = 1, value = 0.7),
 			
 			br(),
@@ -86,7 +98,7 @@ ui <- fluidPage(
     
 		mainPanel("",
 			tabsetPanel(
-				tabPanel("Hourly Plots",
+				tabPanel("Daily Plots",
 					plotOutput(outputId = "loess"),
 					plotOutput(outputId = "speed_dens"),
 					plotOutput(outputId = "percentage_speeders"),
@@ -135,15 +147,23 @@ server <- function(input, output) {
 	# query the data from postgreSQL
 	input$update
 	withProgress(message="Updating data...", expr=1)
-	#original_vehicles <- sqlQuery()
-	original_vehicles <- readRDS('vehicles.rds')
+	original_vehicles <- sqlQuery()
 	vehicles <- original_vehicles
+	vehicles$speed <- remove_outliers(vehicles$speed)
+	
+	# Create date variable and sequence of days as specified by user
+	vehicles$date <- as.Date(vehicles$datetime)
+	date_seq <- seq(input$range[1], input$range[2], by = "day")
 
 	# Subset the data based on parameters
 	#vehicles <- vehicles[ which(vehicles$rating <= 12), ]  # Only keep good values
 	vehicles <- vehicles[ which(vehicles$speed <= 75), ]
 	#vehicles <- vehicles[ which(vehicles$speed >= 20), ]
-	vehicles <- vehicles[ which(vehicles$datetime >= Sys.time() - (input$range * 3600)), ]
+	#vehicles <- vehicles[ which(vehicles$datetime >= Sys.time() - (input$range * 3600)), ]
+
+	# Subset based on date
+	vehicles <- vehicles[ which(vehicles$date %in% date_seq), ]
+	
 	vehicles$speeding <- ifelse(vehicles$speed>35, as.integer(1),as.integer(0))
 	vehicles$count <- 1
 	#time <- data.frame(time=format(vehicles$datetime, "%H"), speeders=vehicles$speeding, count = vehicles$count)
@@ -161,7 +181,7 @@ server <- function(input, output) {
 	output$percentage_speeders <- renderPlot({
 		ggplot(speed_agg, aes(x = time, y = speed.prop)) + 
   		geom_point(color="#3498db") +
-  		geom_smooth(level=0.99, colour='#c0392b', na.rm=TRUE, span=.5, se=F, cex=0.7, fill='#34495e', alpha = 0.8) + 
+  		geom_smooth(level=0.99, colour='#c0392b', na.rm=TRUE, span=.5, se=F, cex=0.7, fill='#34495e', alpha = .8) + 
   		xlab("Time") + 
   		ylab("Speeders : Drivers") +
   		ggtitle("Proportion of Speeders to All Drivers") +
