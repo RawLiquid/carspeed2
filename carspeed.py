@@ -557,7 +557,7 @@ def valid_movement(xpos, width, dir):
 
         tests = [test1, test2, test3, test4, test5]
 
-        if all(tests == True):  # Test if all are true
+        if all(i is True for i in tests):  # Test if all are true
             return True
         else:
             return False
