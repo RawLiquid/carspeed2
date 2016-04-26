@@ -472,8 +472,6 @@ def valid_movement(xpos, width, dir):
 
     xpos.sort()  # Sort list in ascending order
 
-    print(xpos)
-
     # Define the flags for each test point
     test1 = False
     test2 = False
@@ -513,8 +511,6 @@ def valid_movement(xpos, width, dir):
                 test3 = True
 
     tests = [test1, test2, test3]
-    print(tests)
-    time.sleep(1)
 
     if all(i is True for i in tests):  # Test if all are true
         return True
@@ -820,7 +816,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
             elif state == TRACKING:
                 pass
 
-            if motion_loop_count >= 25: 
+            if motion_loop_count >= 100:
                state = STUCK
 
             # if time_base_image - timestamp > 3600 and time_last_detection - timestamp > 120:
