@@ -14,7 +14,7 @@ library(plyr)
 # TODO: Charts initially display data downloaded in vehicles.Rdata (same dir). "Update" button refreshes data and charts
 
 # create a connection
-sqlQuery <- function(){
+sqlQuery <- function(beginDate, endDate){
 # save the password that we can "hide" it as best as we can by collapsing it
   pw <- {
     "Rward0232"
@@ -29,7 +29,10 @@ sqlQuery <- function(){
                      host = "192.168.1.3", port = 5432,
                      user = "speedcam", password = pw)
     
-    query <- paste0("SELECT * FROM vehicles")
+    # build query
+    beginDate <- sprintf("%s 00:00:00", beginDate)
+    endDate <- sprintf('%s 23:59:59', endDate)
+    query <- sprintf("SELECT * FROM vehicles WHERE datetime >= '%s' AND datetime <= '%s'", beginDate, endDate)
     
     results <- dbGetQuery(con, query)
     
@@ -147,7 +150,7 @@ server <- function(input, output) {
 	# query the data from postgreSQL
 	input$update
 	withProgress(message="Updating data...", expr=1)
-	original_vehicles <- sqlQuery()
+	original_vehicles <- sqlQuery(input$range[1], input$range[2])
 	vehicles <- original_vehicles
 	vehicles$speed <- remove_outliers(vehicles$speed)
 	
