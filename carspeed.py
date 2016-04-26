@@ -46,8 +46,8 @@ dropbox_upload = True
 RTL_Distance = 85  # Right to left distance to median
 LTR_Distance = 60  # Left to right distance to median
 THRESHOLD = 15
-SPEED_THRESHOLD = 45 + (45 * 0.5)
-MINIMUM_SPEED = 1  # # Don't detect cars in parking lots, walkers, and slow drivers
+SPEED_THRESHOLD = 45
+MINIMUM_SPEED = 20  # # Don't detect cars in parking lots, walkers, and slow drivers
 MAXIMUM_SPEED = 100  # 70  # Anything higher than this is likely to be noise.
 MIN_AREA = 1500
 blur_size = (15, 15)
@@ -743,8 +743,8 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
             elif state == TRACKING:
                 pass
 
-            if motion_loop_count >= 100:
-                state = STUCK
+            if motion_loop_count >= 25: 
+               state = STUCK
 
             # if time_base_image - timestamp > 3600 and time_last_detection - timestamp > 120:
             #    state = NEW_BASE_IMG_NEEDED
