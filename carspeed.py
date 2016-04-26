@@ -546,6 +546,8 @@ def valid_movement(xpos, width, dir):
                 test5 = True
 
     tests = [test1, test2, test3, test4, test5]
+    print(tests)
+    time.sleep(1)
 
     if all(i is True for i in tests):  # Test if all are true
         return True
