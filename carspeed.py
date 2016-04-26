@@ -419,8 +419,8 @@ def create_row(row_info):
             datetime=timestamp,
             speed=speed,
             direction=dir,
-            color=rgb,
-            rating=motion_loop_count
+            color=color,
+            rating=rating
         )
 
         session.add(new_vehicle)
