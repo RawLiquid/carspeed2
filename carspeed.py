@@ -697,7 +697,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                             row_information = {
                                 'x': x,
                                 'w': w,
-                                'direciton': direction,
+                                'direction': direction,
                                 'committed': committed,
                                 'monitored_width': monitored_width,
                                 'sessionID': sessionID,
