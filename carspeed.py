@@ -432,10 +432,20 @@ def create_row(row_info):
         time_last_detection = timestamp
         last_mph_detected = round(speed, 2)
         mph_list = []
+
+        row_output = {
+            'id': id,
+            'committed': committed,
+            'last_vehicle_detected': last_vehicle_detected,
+            'time_last_detection': time_last_detection,
+            'last_mph_detected': last_mph_detected,
+            'mph_list': mph_list
+        }
+
         create_image(save_photos, SPEED_THRESHOLD, speed, print_image, rectangle, image_width,
                      image_height)
 
-        return id, committed, last_vehicle_detected, time_last_detection, last_mph_detected, mph_list
+        return row_output
 
 
 def create_image(save_photos, speed_threshold, speed, image, rectangle, image_width, image_height):
@@ -696,8 +706,15 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                 'rating': motion_loop_count
                             }
 
-                            id, committed, last_vehicle_detected, time_last_detection, last_mph_detected, mph_list = create_row(
-                                row_information)
+                            row_output = create_row(row_information)
+
+                            id = row_output['id']
+                            committed = row_output['committed']
+                            last_vehicle_detected = row_output['last_vehicle_detected']
+                            time_last_detection = row_output['time_last_detection']
+                            last_mph_detected = row_output['last_mph_detected']
+                            mph_list = row_output['mph_list']
+
                             commit_counter += 1
 
                         last_x = x
