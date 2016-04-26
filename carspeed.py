@@ -545,12 +545,12 @@ def valid_movement(xpos, width, dir):
             if i > tests[0] and i > tests[1] and i > tests[2] and i > tests[3] and i < tests[4]:
                 test5 = True
 
-        tests = [test1, test2, test3, test4, test5]
+    tests = [test1, test2, test3, test4, test5]
 
-        if all(i is True for i in tests):  # Test if all are true
-            return True
-        else:
-            return False
+    if all(i is True for i in tests):  # Test if all are true
+        return True
+    else:
+        return False
 
 
 def create_image(save_photos, speed_threshold, speed, image, rectangle, image_width, image_height):
