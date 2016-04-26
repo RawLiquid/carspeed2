@@ -46,7 +46,7 @@ RTL_Distance = 85  # Right to left distance to median
 LTR_Distance = 60  # Left to right distance to median
 THRESHOLD = 15
 SPEED_THRESHOLD = 40
-MINIMUM_SPEED = 20  # # Don't detect cars in parking lots, walkers, and slow drivers
+MINIMUM_SPEED = 10  # # Don't detect cars in parking lots, walkers, and slow drivers
 MAXIMUM_SPEED = 60  # 70  # Anything higher than this is likely to be noise.
 MIN_AREA = 1500
 blur_size = (15, 15)
@@ -671,6 +671,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                             abs_chg = x + w - initial_x
                             dir = "North"
 
+                            # Grab frame where vehicle is close to center, for saving image.
                             if 150 < x + w < monitored_width - 2:
                                 print_image = image_orig
                                 rectangle = [x, y, w, h]
@@ -681,10 +682,12 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                             abs_chg = initial_x - x
                             ftperpixel = calculate_ftperpixel(RTL_Distance, image_width)
 
+                            # Grab frame where vehicle is close to center, for saving image.
                             if 150 > x > 2:
                                 print_image = image_orig
                                 rectangle = [x, y, w, h]
 
+                        # Calculate speed
                         secs = secs_diff(timestamp, initial_time)
                         mph = get_speed(abs_chg, ftperpixel, secs)
 
