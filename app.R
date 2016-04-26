@@ -121,7 +121,7 @@ ui <- fluidPage(
 					h4("Summary"),
 					p("A tool developed on a Raspberry Pi 2B to detect and analyze traffic speeds on Ridgmar Boulevard in Fort Worth, Texas."),
 					p("The code is a modified version of Greg Barbu's CarSpeed code, which relies on the OpenCV (Computer Vision) library for Python.
-						The code was modified to allow for output into a PostgreSQL database for data logging and anlaysis, and for auto-correcting
+						The code was modified to allow for output into a PostgreSQL database for data logging and analysis, and for auto-correcting
 						when a problem with motion detection occurs (changing light levels wreaks havoc on the system). Planned features include
 						vehicle color detection and pedestrian detection."),
 					br(),

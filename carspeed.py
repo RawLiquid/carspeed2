@@ -390,12 +390,15 @@ def initialize_camera(camera, res):
     return camera, rawCapture
 
 
+# noinspection PyUnboundLocalVariable
 def create_row(row_info):
     """
     Create the database row
     :param row_info: dictionary of row attributes
     :return: commit a new row to memory
     """
+
+    row_output = None
 
     # unpack the dictionary
     x = row_info['x']
@@ -406,47 +409,158 @@ def create_row(row_info):
     mph_list = row_info['mph_list']
     sessionID = row_info['sessionID']
     dir = row_info['dir']
+    direction = row_info['direction']
     color = row_info['color']
     rating = row_info['rating']
+    xpos = row_info['xpos']
 
-    if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and not committed \
-            or ((x + w >= monitored_width - 2) and (
-                        direction == LEFT_TO_RIGHT)) and not committed:
-        state = SAVING
-        timestamp = datetime.datetime.now()
-        speed = statistics.median(mph_list)
-        new_vehicle = Vehicles(  # Table for statistics calculations
-            sessionID=sessionID,
-            datetime=timestamp,
-            speed=speed,
-            direction=dir,
-            color=color,
-            rating=rating
-        )
+    if valid_movement(xpos, monitored_width, direction):
 
-        session.add(new_vehicle)
-        id = None
-        committed = True
-        clear_screen()
-        print("Added new vehicle: {0} MPH".format(round(speed, 2)))
-        last_vehicle_detected = timestamp.strftime('%Y-%m-%d %H:%M:%S')
-        time_last_detection = timestamp
-        last_mph_detected = round(speed, 2)
-        mph_list = []
+        if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and not committed \
+                or ((x + w >= monitored_width - 2) and (
+                            direction == LEFT_TO_RIGHT)) and not committed:
+            state = SAVING
+            timestamp = datetime.datetime.now()
+            speed = statistics.median(mph_list)
+            new_vehicle = Vehicles(  # Table for statistics calculations
+                sessionID=sessionID,
+                datetime=timestamp,
+                speed=speed,
+                direction=dir,
+                color=color,
+                rating=rating
+            )
 
-        row_output = {
-            'id': id,
-            'committed': committed,
-            'last_vehicle_detected': last_vehicle_detected,
-            'time_last_detection': time_last_detection,
-            'last_mph_detected': last_mph_detected,
-            'mph_list': mph_list
-        }
+            session.add(new_vehicle)
+            id = None
+            committed = True
+            clear_screen()
+            print("Added new vehicle: {0} MPH".format(round(speed, 2)))
+            last_vehicle_detected = timestamp.strftime('%Y-%m-%d %H:%M:%S')
+            time_last_detection = timestamp
+            last_mph_detected = round(speed, 2)
+            mph_list = []
 
-        create_image(save_photos, SPEED_THRESHOLD, speed, print_image, rectangle, image_width,
-                     image_height)
+            row_output = {
+                'id': id,
+                'committed': committed,
+                'last_vehicle_detected': last_vehicle_detected,
+                'time_last_detection': time_last_detection,
+                'last_mph_detected': last_mph_detected,
+                'mph_list': mph_list
+            }
+
+            create_image(save_photos, SPEED_THRESHOLD, speed, print_image, rectangle, image_width,
+                         image_height)
 
         return row_output
+
+
+def valid_movement(xpos, width, dir):
+    """
+    Validates that vehicle has moved across n checkpoints in successive order, to make sure it's actually a vehicle
+    :param xpos: list of x positions that have been traversed
+    :param width: width of viewing area
+    :param dir: direction of vehicle
+    :return: boolean
+    """
+
+    tests = []  # Create empty list to contain x positions
+    n_tests = 5  # Number of x positions to test
+    offset = 2  # Offset so that test bar doesn't fall on very edge of window
+    test_spacing = width / n_tests  # Determine spacing of tests
+
+    xpos = xpos.sort()  # Sort list in ascending order
+
+    # Define the flags for each test point
+    test1 = False
+    test2 = False
+    test3 = False
+    test4 = False
+    test5 = False
+
+    for i in range(n_tests):
+        x_test = (i * test_spacing) + offset  # Create x locations
+        tests.append(x_test)
+
+    if dir == LEFT_TO_RIGHT:
+        if i > tests[0] and i < tests[1] and i < tests[2] and i < tests[3] and i < tests[4]:
+            test1 = True
+            test2 = False
+            test3 = False
+            test4 = False
+            test5 = False
+
+        if i > tests[0] and i > tests[1] and i < tests[2] and i < tests[3] and i < tests[4]:
+            test1 = True
+            test2 = True
+            test3 = False
+            test4 = False
+            test5 = False
+
+        if i > tests[0] and i > tests[1] and i > tests[2] and i < tests[3] and i < tests[4]:
+            test1 = True
+            test2 = True
+            test3 = True
+            test4 = False
+            test5 = False
+
+        if i > tests[0] and i > tests[1] and i > tests[2] and i > tests[3] and i < tests[4]:
+            test1 = True
+            test2 = True
+            test3 = True
+            test4 = True
+            test5 = False
+
+        if i > tests[0] and i > tests[1] and i > tests[2] and i > tests[3] and i > tests[4]:
+            test1 = True
+            test2 = True
+            test3 = True
+            test4 = True
+            test5 = True
+
+    elif dir == RIGHT_TO_LEFT:
+        if i < tests[0] and i < tests[1] and i < tests[2] and i < tests[3] and i < tests[4]:
+            test1 = True
+            test2 = True
+            test3 = True
+            test4 = True
+            test5 = True
+
+        if i > tests[0] and i < tests[1] and i < tests[2] and i < tests[3] and i < tests[4]:
+            test1 = False
+            test2 = True
+            test3 = True
+            test4 = True
+            test5 = True
+
+        if i > tests[0] and i > tests[1] and i < tests[2] and i < tests[3] and i < tests[4]:
+            test1 = False
+            test2 = False
+            test3 = True
+            test4 = True
+            test5 = True
+
+        if i > tests[0] and i > tests[1] and i > tests[2] and i < tests[3] and i < tests[4]:
+            test1 = False
+            test2 = False
+            test3 = False
+            test4 = True
+            test5 = True
+
+        if i > tests[0] and i > tests[1] and i > tests[2] and i > tests[3] and i < tests[4]:
+            test1 = False
+            test2 = False
+            test3 = False
+            test4 = False
+            test5 = True
+
+        tests = [test1, test2, test3, test4, test5]
+
+        if all(tests == True):  # Test if all are true
+            return True
+        else:
+            return False
 
 
 def create_image(save_photos, speed_threshold, speed, image, rectangle, image_width, image_height):
@@ -563,6 +677,7 @@ fps_is_set = True
 need_to_reset = False
 pring_image = None
 rectangle = []
+xpos = []
 log_entry("in", sessionID)  # Log usage
 
 while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime threshold is crossed.
@@ -662,6 +777,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                     initial_time = timestamp
                     last_mph = 0
                     motion_loop_count = 0
+                    xpos.append(x)
 
                 else:
 
@@ -708,7 +824,8 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                 'dir': dir,
                                 'color': rgb,
                                 'rating': motion_loop_count,
-                                'mph_list': mph_list
+                                'mph_list': mph_list,
+                                'xpos': xpos
                             }
 
                             row_output = create_row(row_information)
