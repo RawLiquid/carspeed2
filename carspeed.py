@@ -501,7 +501,6 @@ print(" Monitored area:             {}".format(monitored_width * monitored_heigh
 fps_is_set = True
 need_to_reset = False
 pring_image = None
-x, y, w, h = None
 rectangle = []
 log_entry("in", sessionID)  # Log usage
 
