@@ -413,7 +413,7 @@ def create_image(save_photos, speed_threshold, speed, image, rectangle, image_wi
         cntr_x = int((width - size[0]) / 2)
         y_location = int(height * 0.2)
         cv2.putText(image, "%.0f mph" % speed,
-                    (100, image.shape[0] - 5), cv2.FONT_HERSHEY_SIMPLEX,
+                    (225, image.shape[0] - 5), cv2.FONT_HERSHEY_SIMPLEX,
                     .75, (0, 255, 0), 2)
 
         # and save the image to disk
