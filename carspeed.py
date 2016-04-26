@@ -483,10 +483,6 @@ def valid_movement(xpos, width, dir):
 
     if dir == LEFT_TO_RIGHT:
         for i in xpos:
-
-            if i < tests[0] and test1 is False and test2 is False and test3 is False:
-                pass
-
             if i > tests[0] and i < tests[1] and i < tests[2]:
                 test1 = True
 
@@ -499,16 +495,11 @@ def valid_movement(xpos, width, dir):
                 test2 = True
                 test3 = True
 
-            else:  # break from loop if there is inconsistency
-                print("Inconsistent travel across window")
-                break
+
 
 
     elif dir == RIGHT_TO_LEFT:
         for i in xpos:
-            if i > tests[2] and test1 is False and test2 is False and test3 is False:
-                pass
-
             if i > tests[0] and i > tests[1] and i < tests[2]:
                 test1 = True
 
@@ -520,10 +511,6 @@ def valid_movement(xpos, width, dir):
                 test1 = True
                 test2 = True
                 test3 = True
-
-            else:  # break from loop if there is inconsistency
-                print("Inconsistent travel across window")
-                break
 
 
     tests = [test1, test2, test3]
