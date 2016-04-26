@@ -485,7 +485,7 @@ def valid_movement(xpos, width, dir):
         x_test = (i * test_spacing) + offset  # Create x locations
         tests.append(x_test)
 
-    if dir == LEFT_TO_RIGHT:
+    if dir == RIGHT_TO_LEFT:
         for i in xpos:
             if i > tests[0] and i < tests[1] and i < tests[2] and i < tests[3] and i < tests[4]:
                 test1 = True
@@ -515,7 +515,7 @@ def valid_movement(xpos, width, dir):
                 test4 = True
                 test5 = True
 
-    elif dir == RIGHT_TO_LEFT:
+    elif dir == LEFT_TO_RIGHT:
         for i in xpos:
             if i < tests[0] and i < tests[1] and i < tests[2] and i < tests[3] and i < tests[4] and test5 is True and \
                             test4 is True and test3 is True and test2 is True:
