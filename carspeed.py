@@ -489,31 +489,21 @@ def valid_movement(xpos, width, dir):
         for i in xpos:
             if i > tests[0] and i < tests[1] and i < tests[2] and i < tests[3] and i < tests[4]:
                 test1 = True
-                test2 = False
-                test3 = False
-                test4 = False
-                test5 = False
 
             if i > tests[0] and i > tests[1] and i < tests[2] and i < tests[3] and i < tests[4]:
                 test1 = True
                 test2 = True
-                test3 = False
-                test4 = False
-                test5 = False
 
             if i > tests[0] and i > tests[1] and i > tests[2] and i < tests[3] and i < tests[4]:
                 test1 = True
                 test2 = True
                 test3 = True
-                test4 = False
-                test5 = False
 
             if i > tests[0] and i > tests[1] and i > tests[2] and i > tests[3] and i < tests[4]:
                 test1 = True
                 test2 = True
                 test3 = True
                 test4 = True
-                test5 = False
 
             if i > tests[0] and i > tests[1] and i > tests[2] and i > tests[3] and i > tests[4]:
                 test1 = True
@@ -532,31 +522,21 @@ def valid_movement(xpos, width, dir):
                 test5 = True
 
             if i > tests[0] and i < tests[1] and i < tests[2] and i < tests[3] and i < tests[4]:
-                test1 = False
                 test2 = True
                 test3 = True
                 test4 = True
                 test5 = True
 
             if i > tests[0] and i > tests[1] and i < tests[2] and i < tests[3] and i < tests[4]:
-                test1 = False
-                test2 = False
                 test3 = True
                 test4 = True
                 test5 = True
 
             if i > tests[0] and i > tests[1] and i > tests[2] and i < tests[3] and i < tests[4]:
-                test1 = False
-                test2 = False
-                test3 = False
                 test4 = True
                 test5 = True
 
             if i > tests[0] and i > tests[1] and i > tests[2] and i > tests[3] and i < tests[4]:
-                test1 = False
-                test2 = False
-                test3 = False
-                test4 = False
                 test5 = True
 
         tests = [test1, test2, test3, test4, test5]
