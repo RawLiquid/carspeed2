@@ -767,12 +767,13 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                     initial_time = timestamp
                     last_mph = 0
                     motion_loop_count = 0
-                    xpos.append(x)
 
                 else:
 
                     if state == TRACKING:
+                        xpos.append(initial_x)
                         if x >= last_x:
+                            xpos.append(x)
                             direction = LEFT_TO_RIGHT
                             ftperpixel = calculate_ftperpixel(LTR_Distance, image_width)
                             abs_chg = x + w - initial_x
