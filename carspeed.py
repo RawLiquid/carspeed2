@@ -389,6 +389,55 @@ def initialize_camera(camera, res):
     return camera, rawCapture
 
 
+def create_row(row_info):
+    """
+    Create the database row
+    :param row_info: dictionary of row attributes
+    :return: commit a new row to memory
+    """
+
+    # unpack the dictionary
+    x = row_info['x']
+    w = row_info['w']
+    direction = row_info['direction']
+    committed = row_info['committed']
+    monitored_width = row_info['monitored_width']
+    mph_list = row_info['mph_list']
+    sessionID = row_info['sessionID']
+    dir = row_info['dir']
+    color = row_info['color']
+    rating = row_info['rating']
+
+    if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and not committed \
+            or ((x + w >= monitored_width - 2) and (
+                        direction == LEFT_TO_RIGHT)) and not committed:
+        state = SAVING
+        timestamp = datetime.datetime.now()
+        speed = statistics.median(mph_list)
+        new_vehicle = Vehicles(  # Table for statistics calculations
+            sessionID=sessionID,
+            datetime=timestamp,
+            speed=speed,
+            direction=dir,
+            color=rgb,
+            rating=motion_loop_count
+        )
+
+        session.add(new_vehicle)
+        id = None
+        committed = True
+        clear_screen()
+        print("Added new vehicle: {0} MPH".format(round(speed, 2)))
+        last_vehicle_detected = timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        time_last_detection = timestamp
+        last_mph_detected = round(speed, 2)
+        mph_list = []
+        create_image(save_photos, SPEED_THRESHOLD, speed, print_image, rectangle, image_width,
+                     image_height)
+
+        return id, committed, last_vehicle_detected, time_last_detection, last_mph_detected, mph_list
+
+
 def create_image(save_photos, speed_threshold, speed, image, rectangle, image_width, image_height):
     # noinspection PyUnboundLocalVariable
     if save_photos and speed >= SPEED_THRESHOLD:  # Write out an image of the speeder
@@ -584,13 +633,6 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
 
                 found_area = w * h
 
-            # examine the contours, looking for the largest one
-            # for c in cnts:
-            #    (x, y, w, h) = cv2.boundingRect(c)
-            #    # get an approximate area of the contour
-            #    found_area = w * h
-            #    # find the largest bounding rectangle
-
                 if (found_area > MIN_AREA) and state != STUCK:
                     motion_found = True
 
@@ -642,33 +684,21 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                             mph_list.append(mph)
 
                         if len(mph_list) >= 3 and motion_loop_count > 1:
-                            if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and not committed \
-                                    or ((x + w >= monitored_width - 2) and (
-                                                direction == LEFT_TO_RIGHT)) and not committed:
-                                state = SAVING
-                                timestamp = datetime.datetime.now()
-                                speed = statistics.median(mph_list)
-                                new_vehicle = Vehicles(  # Table for statistics calculations
-                                    sessionID=sessionID,
-                                    datetime=timestamp,
-                                    speed=speed,
-                                    direction=dir,
-                                    color=rgb,
-                                    rating=motion_loop_count
-                                )
+                            row_information = {
+                                'x': x,
+                                'w': w,
+                                'direciton': direction,
+                                'committed': committed,
+                                'monitored_width': monitored_width,
+                                'sessionID': sessionID,
+                                'dir': dir,
+                                'color': rgb,
+                                'rating': motion_loop_count
+                            }
 
-                                session.add(new_vehicle)
-                                commit_counter += 1
-                                id = None
-                                committed = True
-                                clear_screen()
-                                print("Added new vehicle: {0} MPH".format(round(speed, 2)))
-                                last_vehicle_detected = timestamp.strftime('%Y-%m-%d %H:%M:%S')
-                                time_last_detection = timestamp
-                                last_mph_detected = round(speed, 2)
-                                mph_list = []
-                                create_image(save_photos, SPEED_THRESHOLD, speed, print_image, rectangle, image_width,
-                                             image_height)
+                            id, committed, last_vehicle_detected, time_last_detection, last_mph_detected, mph_list = create_row(
+                                row_information)
+                            commit_counter += 1
 
                         last_x = x
                         last_mph = mph
