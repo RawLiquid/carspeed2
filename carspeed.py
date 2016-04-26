@@ -45,7 +45,7 @@ dropbox_upload = True
 RTL_Distance = 85  # Right to left distance to median
 LTR_Distance = 60  # Left to right distance to median
 THRESHOLD = 15
-SPEED_THRESHOLD = 45
+SPEED_THRESHOLD = 40
 MINIMUM_SPEED = 20  # # Don't detect cars in parking lots, walkers, and slow drivers
 MAXIMUM_SPEED = 60  # 70  # Anything higher than this is likely to be noise.
 MIN_AREA = 1500
@@ -390,6 +390,7 @@ def initialize_camera(camera, res):
 
 
 def create_image(save_photos, speed_threshold, speed, image, rectangle, image_width, image_height):
+    # noinspection PyUnboundLocalVariable
     if save_photos and speed >= SPEED_THRESHOLD:  # Write out an image of the speeder
         _x = rectangle[0]
         _y = rectangle[1]
