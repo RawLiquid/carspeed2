@@ -108,8 +108,9 @@ ui <- fluidPage(
 					plotOutput(outputId = "time_dens")
 				),
 
-				#tabPanel("Daily Plots"		
-				#),
+				tabPanel("Images",
+				         p("This page will host images of vehicles travelling at least 10 mph over speed limit.")
+				         ),
 
 				tabPanel("Table",
 					tableOutput("table")
