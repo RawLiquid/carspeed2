@@ -470,9 +470,9 @@ def valid_movement(xpos, width, dir):
     offset = 2  # Offset so that test bar doesn't fall on very edge of window
     test_spacing = width / n_tests  # Determine spacing of tests
 
-    print(xpos)
-
     xpos = xpos.sort()  # Sort list in ascending order
+
+    print(xpos)
 
     # Define the flags for each test point
     test1 = False
