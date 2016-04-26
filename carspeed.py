@@ -494,6 +494,9 @@ def valid_movement(xpos, width, dir):
                 test1 = True
                 test2 = True
                 test3 = True
+            else:  # break from loop if there is inconsistency
+                print("Inconsistent travel across window")
+                break
 
 
     elif dir == RIGHT_TO_LEFT:
@@ -509,6 +512,9 @@ def valid_movement(xpos, width, dir):
                 test1 = True
                 test2 = True
                 test3 = True
+            else:  # break from loop if there is inconsistency
+                print("Inconsistent travel across window")
+                break
 
 
     tests = [test1, test2, test3]
