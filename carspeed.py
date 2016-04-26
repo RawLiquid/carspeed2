@@ -490,22 +490,25 @@ def valid_movement(xpos, width, dir):
             if i > tests[0] and i < tests[1] and i < tests[2] and i < tests[3] and i < tests[4]:
                 test1 = True
 
-            if i > tests[0] and i > tests[1] and i < tests[2] and i < tests[3] and i < tests[4]:
+            if i > tests[0] and i > tests[1] and i < tests[2] and i < tests[3] and i < tests[4] and test1 is True:
                 test1 = True
                 test2 = True
 
-            if i > tests[0] and i > tests[1] and i > tests[2] and i < tests[3] and i < tests[4]:
+            if i > tests[0] and i > tests[1] and i > tests[2] and i < tests[3] and i < tests[4] and test1 is True and \
+                            test2 is True:
                 test1 = True
                 test2 = True
                 test3 = True
 
-            if i > tests[0] and i > tests[1] and i > tests[2] and i > tests[3] and i < tests[4]:
+            if i > tests[0] and i > tests[1] and i > tests[2] and i > tests[3] and i < tests[4] and test1 is True and \
+                            test2 is True and test3 is True:
                 test1 = True
                 test2 = True
                 test3 = True
                 test4 = True
 
-            if i > tests[0] and i > tests[1] and i > tests[2] and i > tests[3] and i > tests[4]:
+            if i > tests[0] and i > tests[1] and i > tests[2] and i > tests[3] and i > tests[4] and test1 is True and \
+                            test2 is True and test3 is True and test4 is True:
                 test1 = True
                 test2 = True
                 test3 = True
@@ -514,25 +517,28 @@ def valid_movement(xpos, width, dir):
 
     elif dir == RIGHT_TO_LEFT:
         for i in xpos:
-            if i < tests[0] and i < tests[1] and i < tests[2] and i < tests[3] and i < tests[4]:
+            if i < tests[0] and i < tests[1] and i < tests[2] and i < tests[3] and i < tests[4] and test5 is True and \
+                            test4 is True and test3 is True and test2 is True:
                 test1 = True
                 test2 = True
                 test3 = True
                 test4 = True
                 test5 = True
 
-            if i > tests[0] and i < tests[1] and i < tests[2] and i < tests[3] and i < tests[4]:
+            if i > tests[0] and i < tests[1] and i < tests[2] and i < tests[3] and i < tests[4] and test5 is True and \
+                            test4 is True and test3 is True:
                 test2 = True
                 test3 = True
                 test4 = True
                 test5 = True
 
-            if i > tests[0] and i > tests[1] and i < tests[2] and i < tests[3] and i < tests[4]:
+            if i > tests[0] and i > tests[1] and i < tests[2] and i < tests[3] and i < tests[4] and test5 is True and \
+                            test4 is True:
                 test3 = True
                 test4 = True
                 test5 = True
 
-            if i > tests[0] and i > tests[1] and i > tests[2] and i < tests[3] and i < tests[4]:
+            if i > tests[0] and i > tests[1] and i > tests[2] and i < tests[3] and i < tests[4] and test5 is True:
                 test4 = True
                 test5 = True
 
