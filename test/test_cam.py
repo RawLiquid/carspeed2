@@ -13,7 +13,7 @@ rotation_degrees = 187  # Rotate camera output
 
 # Define bounding box
 upper_left_x = 133
-upper_left_y = 152
+upper_left_y = 146
 lower_right_x = 472
 lower_right_y = 173  # 183
 
