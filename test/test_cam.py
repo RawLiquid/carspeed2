@@ -119,7 +119,7 @@ def show_webcam(camera, capture):
             base_image, blurred, thresh, rectangle = test_processing(base_image, image)  # Run openCV image processing
 
             cv2.namedWindow('Base')
-            cv2.imshow('Base', base_image)  # Show the frame in a window
+            cv2.imshow('Base', image)  # Show the frame in a window
 
             cv2.namedWindow('Thresh')
             cv2.imshow('Thresh', thresh)
