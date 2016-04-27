@@ -486,26 +486,35 @@ def valid_movement(xpos, width, dir):
             if i > tests[0] and i < tests[1] and i < tests[2]:
                 test1 = True
 
+                if test2 is True or test3 is True:
+                    break
+
             if i > tests[0] and i > tests[1] and i < tests[2] and test1 is True:
                 test1 = True
                 test2 = True
+
+                if test3 is True:
+                    break
 
             if i > tests[0] and i > tests[1] and i > tests[2] and test1 is True and test2 is True:
                 test1 = True
                 test2 = True
                 test3 = True
 
-
-
-
     elif dir == RIGHT_TO_LEFT:
         for i in xpos:
             if i > tests[0] and i > tests[1] and i < tests[2]:
                 test1 = True
 
+                if test2 is True or test3 is True:
+                    break
+
             if i > tests[0] and i < tests[1] and i < tests[2] and test1 is True:
                 test1 = True
                 test2 = True
+
+                if test3 is True:
+                    break
 
             if i < tests[0] and i < tests[1] and i < tests[2] and test1 is True and test2 is True:
                 test1 = True
