@@ -24,6 +24,8 @@ from db import Vehicles, Log
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-x", "--x", help="Use X-server.", action="store_true")
+parser.add_argument("dfps", help="Use X-server.")
+parser.add_argument("nfps", help="Use X-server.")
 
 args = parser.parse_args()
 
@@ -56,8 +58,8 @@ image_height = 480
 image_resolution = [image_width, image_height]
 field_of_view = 54  # 53.5
 FPS = None
-day_fps = 30
-night_fps = 15
+day_fps = args.dfps
+night_fps = args.nfps
 set_by_drawing = True  # Can either set bounding box manually, or by drawing rectangle on screen
 rotation_degrees = 187  # Rotate image by this amount to create flat road
 timeOn = datetime.datetime.now()  # This is used for the log
