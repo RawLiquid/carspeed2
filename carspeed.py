@@ -414,125 +414,44 @@ def create_row(row_info):
     rating = row_info['rating']
     xpos = row_info['xpos']
 
-    if valid_movement(xpos, monitored_width, direction):
+    if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and not committed \
+            or ((x + w >= monitored_width - 2) and (
+                        direction == LEFT_TO_RIGHT)) and not committed:
+        state = SAVING
+        timestamp = datetime.datetime.now()
+        speed = statistics.median(mph_list)
+        new_vehicle = Vehicles(  # Table for statistics calculations
+            sessionID=sessionID,
+            datetime=timestamp,
+            speed=speed,
+            direction=dir,
+            color=color,
+            rating=rating
+        )
 
-        if ((x <= 2) and (direction == RIGHT_TO_LEFT)) and not committed \
-                or ((x + w >= monitored_width - 2) and (
-                            direction == LEFT_TO_RIGHT)) and not committed:
-            state = SAVING
-            timestamp = datetime.datetime.now()
-            speed = statistics.median(mph_list)
-            new_vehicle = Vehicles(  # Table for statistics calculations
-                sessionID=sessionID,
-                datetime=timestamp,
-                speed=speed,
-                direction=dir,
-                color=color,
-                rating=rating
-            )
+        session.add(new_vehicle)
+        id = None
+        committed = True
+        clear_screen()
+        print("Added new vehicle: {0} MPH".format(round(speed, 2)))
+        last_vehicle_detected = timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        time_last_detection = timestamp
+        last_mph_detected = round(speed, 2)
+        mph_list = []
 
-            session.add(new_vehicle)
-            id = None
-            committed = True
-            clear_screen()
-            print("Added new vehicle: {0} MPH".format(round(speed, 2)))
-            last_vehicle_detected = timestamp.strftime('%Y-%m-%d %H:%M:%S')
-            time_last_detection = timestamp
-            last_mph_detected = round(speed, 2)
-            mph_list = []
+        row_output = {
+            'id': id,
+            'committed': committed,
+            'last_vehicle_detected': last_vehicle_detected,
+            'time_last_detection': time_last_detection,
+            'last_mph_detected': last_mph_detected,
+            'mph_list': mph_list
+        }
 
-            row_output = {
-                'id': id,
-                'committed': committed,
-                'last_vehicle_detected': last_vehicle_detected,
-                'time_last_detection': time_last_detection,
-                'last_mph_detected': last_mph_detected,
-                'mph_list': mph_list
-            }
+        create_image(save_photos, SPEED_THRESHOLD, speed, print_image, rectangle, image_width,
+                     image_height)
 
-            create_image(save_photos, SPEED_THRESHOLD, speed, print_image, rectangle, image_width,
-                         image_height)
-
-        return row_output
-
-
-def valid_movement(xpos, width, dir):
-    """
-    Validates that vehicle has moved across n checkpoints in successive order, to make sure it's actually a vehicle
-    :param xpos: list of x positions that have been traversed
-    :param width: width of viewing area
-    :param dir: direction of vehicle
-    :return: boolean
-    """
-
-    tests = []  # Create empty list to contain x positions
-    n_tests = 3  # Number of x positions to test
-    offset = 10  # Offset so that test bar doesn't fall on very edge of window
-    test_spacing = width / n_tests  # Determine spacing of tests
-
-    # xpos.sort()  # Sort list in ascending order
-
-    # Define the flags for each test point
-    test1 = False
-    test2 = False
-    test3 = False
-
-    for i in range(n_tests):
-        x_test = ((i + 1) * test_spacing - offset)  # Create x locations
-        tests.append(x_test)
-
-    if dir == LEFT_TO_RIGHT:
-
-        for i in xpos:
-
-            if i < tests[0]:
-                continue
-
-            if i > tests[0] and i < tests[1] and i < tests[2]:
-                test1 = True
-
-                if test2 is True or test3 is True:
-                    break
-
-            if i > tests[0] and i > tests[1] and i < tests[2] and test1 is True:
-                test1 = True
-                test2 = True
-
-                if test3 is True:
-                    break
-
-            if i > tests[0] and i > tests[1] and i > tests[2] and test1 is True and test2 is True:
-                test1 = True
-                test2 = True
-                test3 = True
-
-    elif dir == RIGHT_TO_LEFT:
-        for i in xpos:
-            if i > tests[0] and i > tests[1] and i < tests[2]:
-                test1 = True
-
-                if test2 is True or test3 is True:
-                    break
-
-            if i > tests[0] and i < tests[1] and i < tests[2] and test1 is True:
-                test1 = True
-                test2 = True
-
-                if test3 is True:
-                    break
-
-            if i < tests[0] and i < tests[1] and i < tests[2] and test1 is True and test2 is True:
-                test1 = True
-                test2 = True
-                test3 = True
-
-
-    tests = [test1, test2, test3]
-
-    if all(i is True for i in tests):  # Test if all are true
-        return True
-    else:
-        return False
+    return row_output
 
 
 def create_image(save_photos, speed_threshold, speed, image, rectangle, image_width, image_height):
