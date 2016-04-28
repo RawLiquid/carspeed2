@@ -482,7 +482,12 @@ def valid_movement(xpos, width, dir):
         tests.append(x_test)
 
     if dir == LEFT_TO_RIGHT:
+
         for i in xpos:
+
+            if i < tests[0]:
+                continue
+
             if i > tests[0] and i < tests[1] and i < tests[2]:
                 test1 = True
 
