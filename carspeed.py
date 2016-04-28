@@ -467,7 +467,7 @@ def valid_movement(xpos, width, dir):
 
     tests = []  # Create empty list to contain x positions
     n_tests = 3  # Number of x positions to test
-    offset = 2  # Offset so that test bar doesn't fall on very edge of window
+    offset = 10  # Offset so that test bar doesn't fall on very edge of window
     test_spacing = width / n_tests  # Determine spacing of tests
 
     # xpos.sort()  # Sort list in ascending order
@@ -478,7 +478,7 @@ def valid_movement(xpos, width, dir):
     test3 = False
 
     for i in range(n_tests):
-        x_test = (i * test_spacing) + offset  # Create x locations
+        x_test = ((i + 1) * test_spacing - offset)  # Create x locations
         tests.append(x_test)
 
     if dir == LEFT_TO_RIGHT:
