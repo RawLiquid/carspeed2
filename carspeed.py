@@ -820,6 +820,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                     text_on_image = 'No Car Detected'
                     print(text_on_image)
                     mph_list = []
+                    xpos = []
                     id = None
                     motion_loop_count = 0
 
