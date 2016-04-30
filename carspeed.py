@@ -684,8 +684,6 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                 x, y, w, h = cv2.boundingRect(
                     cnt)  # Get x,y, width and height of bounding rectangle of maximum area contour.
 
-                print(y)
-
                 found_area = w * h
 
                 if (found_area > MIN_AREA) and state != STUCK:
@@ -712,6 +710,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                     if state == TRACKING:
                         xpos.append(initial_x)
                         if x >= last_x:
+                            print(y)
                             xpos.append(x)
                             direction = LEFT_TO_RIGHT
                             ftperpixel = calculate_ftperpixel(LTR_Distance, image_width)
