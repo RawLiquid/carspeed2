@@ -73,6 +73,8 @@ def test_processing(base, frame):
     # convert it to grayscale, and blur it
     gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
 
+    gray = cv2.equalizeHist(gray)
+
     # Use median filter at night to get rid of graininess
     # gray = cv2.medianBlur(gray, 25)  # TODO: Test this
     gray = cv2.GaussianBlur(gray, blur_size, 0)
