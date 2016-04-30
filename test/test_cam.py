@@ -12,10 +12,15 @@ from picamera.array import PiRGBArray
 rotation_degrees = 187  # Rotate camera output
 
 # Define bounding box
-upper_left_x = 133
-upper_left_y = 146
-lower_right_x = 472
-lower_right_y = 173  # 183
+# upper_left_x = 133
+# upper_left_y = 146
+# lower_right_x = 472
+# lower_right_y = 173  # 183
+
+upper_left_x = 138
+upper_left_y = 100
+lower_right_x = 462
+lower_right_y = 193  # 183
 
 THRESHOLD = 15
 MIN_AREA = 300

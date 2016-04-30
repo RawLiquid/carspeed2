@@ -57,7 +57,7 @@ image_width = 640
 image_height = 480
 image_resolution = [image_width, image_height]
 field_of_view = 54  # 53.5
-y_test_value = 50
+y_test_value = 145
 FPS = None
 day_fps = int(args.dfps)
 night_fps = int(args.nfps)
@@ -467,7 +467,7 @@ def y_test(vehicle_y_min, y_test_value):
     :return: Boolean
     """
 
-    if vehicle_y_min >= y_test_value:
+    if vehicle_y_min <= y_test_value:
         return False
     else:
         return True
@@ -711,8 +711,6 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                     if state == TRACKING:
                         xpos.append(initial_x)
                         if x >= last_x:
-                            print(y)
-                            print(y + h)
                             xpos.append(x)
                             direction = LEFT_TO_RIGHT
                             ftperpixel = calculate_ftperpixel(LTR_Distance, image_width)
