@@ -26,7 +26,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-x", "--x", help="Use X-server.", action="store_true")
 parser.add_argument("dfps", help="Use X-server.")
 parser.add_argument("nfps", help="Use X-server.")
-parser.add_argument("-v", "--Verbose", help="verbose output", action="store_true")
+parser.add_argument("-v", "--verbose", help="verbose output", action="store_true")
 
 args = parser.parse_args()
 
