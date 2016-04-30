@@ -72,7 +72,6 @@ def test_processing(base, frame):
 
     # convert it to grayscale, and blur it
     gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
-
     gray = cv2.equalizeHist(gray)
 
     # Use median filter at night to get rid of graininess
@@ -125,7 +124,8 @@ def show_webcam(camera, capture):
             image = rotate_image(image)  # Rotate the image
             base_image, blurred, thresh, rectangle = test_processing(base_image, image)  # Run openCV image processing
 
-            gray = frame.array
+            gray = rotate_image(frame)
+            gray = gray.array
             gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
             gray = cv2.equalizeHist(gray)
 
