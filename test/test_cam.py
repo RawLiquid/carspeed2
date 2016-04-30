@@ -128,7 +128,7 @@ def show_webcam(camera, capture):
             gray = cv2.equalizeHist(gray)
 
             cv2.namedWindow('Base')
-            cv2.imshow('Base', image)  # Show the frame in a window
+            cv2.imshow('Base', base)  # Show the frame in a window
 
             cv2.namedWindow('Equalized')
             cv2.imshow('Equalized', gray)  # Show the frame in a window
