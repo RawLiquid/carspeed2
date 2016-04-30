@@ -712,6 +712,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                         xpos.append(initial_x)
                         if x >= last_x:
                             print(y)
+                            print(y + h)
                             xpos.append(x)
                             direction = LEFT_TO_RIGHT
                             ftperpixel = calculate_ftperpixel(LTR_Distance, image_width)
