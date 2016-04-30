@@ -640,9 +640,8 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
             # convert it to grayscale, and blur it
             gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
 
-            if is_nighttime():
-                gray = cv2.equalizeHist(gray)  # Equalize image histogram to improve vision at night.
-                image_orig = gray
+            gray = cv2.equalizeHist(gray)  # Equalize image histogram to improve vision at night.
+            image_orig = gray
 
             # Use median filter at night to get rid of graininess
             gray = cv2.medianBlur(gray, 15)  # TODO: Test this
