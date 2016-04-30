@@ -131,7 +131,7 @@ def show_webcam(camera, capture):
             cv2.imshow('Base', base_image)  # Show the frame in a window
 
             cv2.namedWindow('Equalized')
-            cv2.imshow('Equalized', gray)  # Show the frame in a window
+            cv2.imshow('Equalized', blurred)  # Show the frame in a window
 
             cv2.namedWindow('Thresh')
             cv2.imshow('Thresh', thresh)
