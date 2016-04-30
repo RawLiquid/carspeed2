@@ -125,8 +125,8 @@ def show_webcam(camera, capture):
             image = rotate_image(image)  # Rotate the image
             base_image, blurred, thresh, rectangle = test_processing(base_image, image)  # Run openCV image processing
 
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
+            gray = frame.array
+            gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
             gray = cv2.equalizeHist(gray)
 
             cv2.namedWindow('Base')
