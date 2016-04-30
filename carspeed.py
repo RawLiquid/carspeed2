@@ -393,7 +393,7 @@ def initialize_camera(camera, res):
 
 
 # noinspection PyUnboundLocalVariable
-def create_row(row_info):
+def create_row(row_info, print_image):
     """
     Create the database row
     :param row_info: dictionary of row attributes
@@ -589,6 +589,9 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
             # initialize the timestamp
             timestamp = datetime.datetime.now()
 
+            # Erase image stored
+            print_image = None
+
             # grab the raw NumPy array representing the image, and rotate it so that it's flat
             image = frame.array
             rows, cols, placeholder = image.shape
@@ -722,7 +725,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                 'xpos': xpos
                             }
 
-                            row_output = create_row(row_information)
+                            row_output = create_row(row_information, print_image)
 
                             if row_output:
                                 id = row_output['id']
