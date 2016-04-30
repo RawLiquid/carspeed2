@@ -57,6 +57,7 @@ image_width = 640
 image_height = 480
 image_resolution = [image_width, image_height]
 field_of_view = 54  # 53.5
+y_test_value = 50
 FPS = None
 day_fps = int(args.dfps)
 night_fps = int(args.nfps)
@@ -456,8 +457,34 @@ def create_row(row_info, print_image):
     return row_output
 
 
+def y_test(vehicle_y_min, y_test_value):
+    """
+    Tests whether vehicle's minimum y-value falls below the y_test value, to filter out vehicles that
+    are in parking lot.
+    :param vehicle_y_min: minimum y-value of passing vehicle
+    :param y_value: maximum y value that vehicle min-y value can be
+    :return: Boolean
+    """
+
+    if vehicle_y_min >= y_test_value:
+        return False
+    else:
+        return True
+
+
 def create_image(save_photos, speed_threshold, speed, image, rectangle, image_width, image_height):
-    # noinspection PyUnboundLocalVariable
+    """
+    Create image and upload to dropbox
+    :param save_photos:
+    :param speed_threshold:
+    :param speed:
+    :param image:
+    :param rectangle:
+    :param image_width:
+    :param image_height:
+    :return:
+    """
+
     if save_photos and speed >= SPEED_THRESHOLD:  # Write out an image of the speeder
         _x = rectangle[0]
         _y = rectangle[1]
@@ -656,6 +683,8 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
 
                 x, y, w, h = cv2.boundingRect(
                     cnt)  # Get x,y, width and height of bounding rectangle of maximum area contour.
+
+                print(y)
 
                 found_area = w * h
 
