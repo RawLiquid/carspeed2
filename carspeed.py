@@ -473,7 +473,7 @@ def y_test(vehicle_y_min, y_test_value):
     :return: Boolean
     """
 
-    if vehicle_y_min <= y_test_value:
+    if vehicle_y_min < y_test_value:
         if verbose:
             print("Parking lot detection")
         return False
