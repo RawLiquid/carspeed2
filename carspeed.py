@@ -39,7 +39,7 @@ else:
     show_bounds = False
     showImage = False
 
-if args.v:
+if args.verbose:
     verbose = True
 else:
     verbose = False
