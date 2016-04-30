@@ -707,7 +707,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
 
             if motion_found:
                 committed = False
-                if state == WAITING and y_test(y - h, y_test_value):
+                if state == WAITING:
                     # intialize tracking
                     state = TRACKING
                     initial_x = x
@@ -718,7 +718,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
 
                 else:
 
-                    if state == TRACKING and y_test(y - h, y_test_value):
+                    if state == TRACKING:
                         xpos.append(initial_x)
                         if x >= last_x:
                             xpos.append(x)
