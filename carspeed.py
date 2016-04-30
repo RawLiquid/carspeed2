@@ -26,6 +26,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-x", "--x", help="Use X-server.", action="store_true")
 parser.add_argument("dfps", help="Use X-server.")
 parser.add_argument("nfps", help="Use X-server.")
+parser.add_argument("-v", "--Verbose", help="verbose output", action="store_true")
 
 args = parser.parse_args()
 
@@ -37,6 +38,11 @@ else:
     use_x = False
     show_bounds = False
     showImage = False
+
+if args.v:
+    verbose = True
+else:
+    verbose = False
 
 engine = create_engine('postgresql://speedcam:Rward0232@localhost/speedcamdb')
 DBSession = sessionmaker(bind=engine)
@@ -57,7 +63,7 @@ image_width = 640
 image_height = 480
 image_resolution = [image_width, image_height]
 field_of_view = 54  # 53.5
-y_test_value = 145
+y_test_value = 55
 FPS = None
 day_fps = int(args.dfps)
 night_fps = int(args.nfps)
@@ -468,6 +474,8 @@ def y_test(vehicle_y_min, y_test_value):
     """
 
     if vehicle_y_min <= y_test_value:
+        if verbose:
+            print("Parking lot detection")
         return False
     else:
         return True
