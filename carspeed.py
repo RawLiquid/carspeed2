@@ -626,9 +626,6 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
             # initialize the timestamp
             timestamp = datetime.datetime.now()
 
-            # Erase image stored
-            print_image = None
-
             # grab the raw NumPy array representing the image, and rotate it so that it's flat
             image = frame.array
             rows, cols, placeholder = image.shape
@@ -776,6 +773,9 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                                 time_last_detection = row_output['time_last_detection']
                                 last_mph_detected = row_output['last_mph_detected']
                                 mph_list = row_output['mph_list']
+
+                                # Erase image stored
+                                print_image = None
 
                                 commit_counter += 1
 
