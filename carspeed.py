@@ -697,7 +697,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                 found_area = w * h
 
                 if (found_area > MIN_AREA) and state != STUCK:
-                    if y_test(y, y_test_value):
+                    if y_test(y - h, y_test_value):
                         motion_found = True
 
                         if not is_nighttime():
