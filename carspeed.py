@@ -457,7 +457,7 @@ def create_row(row_info, print_image):
             'mph_list': mph_list
         }
 
-        if print_image.any():
+        if print_image:
             create_image(save_photos, SPEED_THRESHOLD, speed, print_image, rectangle, image_width,
                          image_height)
 
