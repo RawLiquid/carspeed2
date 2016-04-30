@@ -726,9 +726,12 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                             dir = "North"
 
                             # Grab frame where vehicle is close to center, for saving image.
-                            if 150 < x + w < monitored_width - 2:
+                            if 100 < x + w < monitored_width - 2:
                                 print_image = image_orig
                                 rectangle = [x, y, w, h]
+
+                            else:
+                                print_image = None
 
                         else:
                             direction = RIGHT_TO_LEFT
@@ -737,9 +740,12 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                             ftperpixel = calculate_ftperpixel(RTL_Distance, image_width)
 
                             # Grab frame where vehicle is close to center, for saving image.
-                            if 150 > x > 2:
+                            if 100 > x > 2:
                                 print_image = image_orig
                                 rectangle = [x, y, w, h]
+
+                            else:
+                                print_image = None
 
                         # Calculate speed
                         secs = secs_diff(timestamp, initial_time)
