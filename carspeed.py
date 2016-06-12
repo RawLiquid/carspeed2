@@ -63,7 +63,7 @@ LEFT_TO_RIGHT = 1
 RIGHT_TO_LEFT = 2
 
 # state maintains the state of the speed computation process
-# if starts as WAITING
+# it starts as WAITING
 # the first motion detected sets it to TRACKING
 
 # if it is tracking and no motion is found or the x value moves
