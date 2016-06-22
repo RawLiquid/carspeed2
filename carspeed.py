@@ -50,12 +50,12 @@ session = DBSession()
 
 # define some constants
 save_photos = True
-dropbox_upload = True
-RTL_Distance = 85  # Right to left distance to median
-LTR_Distance = 60  # Left to right distance to median
+dropbox_upload = False
+RTL_Distance = 34  # Right to left distance to median
+LTR_Distance = 27  # Left to right distance to median
 THRESHOLD = 15
 SPEED_THRESHOLD = 45
-MINIMUM_SPEED = 20  # # Don't detect cars in parking lots, walkers, and slow drivers
+MINIMUM_SPEED = 10  # # Don't detect cars in parking lots, walkers, and slow drivers
 MAXIMUM_SPEED = 100  # 70  # Anything higher than this is likely to be noise.
 MIN_AREA = 1500
 blur_size = (15, 15)
@@ -68,7 +68,7 @@ FPS = None
 day_fps = int(args.dfps)
 night_fps = int(args.nfps)
 set_by_drawing = True  # Can either set bounding box manually, or by drawing rectangle on screen
-rotation_degrees = 187  # Rotate image by this amount to create flat road
+rotation_degrees = 0  # Rotate image by this amount to create flat road
 timeOn = datetime.datetime.now()  # This is used for the log
 sessionID = uuid()
 current_id = None
@@ -243,7 +243,7 @@ def secs_diff(endTime, begTime):
     return diff
 
 
-def draw_rectangle(event, x, y):
+def draw_rectangle(event, x, y, flags, param):
     """
     Allows user to draw rectangle on screen to select bounding area.
     :param event:
