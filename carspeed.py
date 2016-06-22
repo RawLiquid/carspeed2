@@ -30,8 +30,8 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 # define some constants
-RTL_Distance = 85  # Right to left distance to median
-LTR_Distance = 60  # Left to right distance to median
+RTL_Distance = 34  # Right to left distance to median
+LTR_Distance = 27  # Left to right distance to median
 THRESHOLD = 15
 SPEED_THRESHOLD = 40
 MINIMUM_SPEED = 10  # # Don't detect cars in parking lots, walkers, and slow drivers
@@ -46,7 +46,7 @@ FPS = None
 day_fps = 30
 night_fps = 15
 set_by_drawing = True  # Can either set bounding box manually, or by drawing rectangle on screen
-rotation_degrees = 187  # Rotate image by this amount to create flat road
+rotation_degrees = 0  # Rotate image by this amount to create flat road
 timeOn = datetime.datetime.now()  # This is used for the log
 sessionID = uuid()
 current_id = None
@@ -221,7 +221,7 @@ def secs_diff(endTime, begTime):
     return diff
 
 
-def draw_rectangle(event, x, y):
+def draw_rectangle(event, x, y, flags, param):
     """
     Allows user to draw rectangle on screen to select bounding area.
     :param event:
