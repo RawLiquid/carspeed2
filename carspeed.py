@@ -21,7 +21,7 @@ from sqlalchemy.orm import sessionmaker
 
 from db import Vehicles, Log
 
-use_x = False
+use_x = True
 show_bounds = True
 showImage = True
 
@@ -43,7 +43,7 @@ image_height = 480
 image_resolution = [image_width, image_height]
 field_of_view = 53.5
 FPS = None
-day_fps = 20
+day_fps = 30
 night_fps = 15
 set_by_drawing = True  # Can either set bounding box manually, or by drawing rectangle on screen
 rotation_degrees = 0  # Rotate image by this amount to create flat road
