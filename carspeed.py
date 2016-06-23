@@ -43,7 +43,7 @@ image_height = 480
 image_resolution = [image_width, image_height]
 field_of_view = 53.5
 FPS = None
-day_fps = 30
+day_fps = 60
 night_fps = 15
 set_by_drawing = True  # Can either set bounding box manually, or by drawing rectangle on screen
 rotation_degrees = 0  # Rotate image by this amount to create flat road
@@ -331,6 +331,11 @@ def display(mode, ccounter, last_db_commit, last_vehicle_detected, last_mph_dete
     print("=========================================================")
     print("                 Car Speed Detector")
     print("=========================================================")
+    print("Monitored area:{0}x{1}   {2}".format(monitored_width, monitored_height, monitored_width * monitored_height))
+    print(" Upper left_x:               {}".format(upper_left_x))
+    print(" Upper left_y:               {}".format(upper_left_y))
+    print(" Lower right_x:              {}".format(lower_right_x))
+    print(" Lower right_y:              {}".format(lower_right_y))
 
     if mode == 'waiting':
         print("\nStatus:                No vehicle within bounding box")
@@ -382,6 +387,10 @@ camera, rawCapture = initialize_camera(camera, image_resolution)
 # Set up the bounding box for speed detection
 # create an image window and place it in the upper left corner of the screen
 if use_x:
+    upper_left_x = 65
+    upper_left_y = 275
+    lower_right_x = 615
+    lower_right_y = 315
     cv2.namedWindow("Speed Camera", cv2.WINDOW_AUTOSIZE)
     cv2.moveWindow("Speed Camera", 10, 40)
 
@@ -432,10 +441,10 @@ if use_x:
         lower_right_y = iy
 else:
     # Define manually because my camera is mounted
-    upper_left_x = 138
-    upper_left_y = 157
-    lower_right_x = 462
-    lower_right_y = 183
+    upper_left_x = 65
+    upper_left_y = 275
+    lower_right_x = 615
+    lower_right_y = 315
 
 monitored_width = lower_right_x - upper_left_x
 monitored_height = lower_right_y - upper_left_y
