@@ -442,7 +442,7 @@ if use_x:
 else:
     # Define manually because my camera is mounted
     upper_left_x = 65
-    upper_left_y = 275
+    upper_left_y = 260
     lower_right_x = 615
     lower_right_y = 315
 
