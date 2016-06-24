@@ -21,6 +21,7 @@ from sqlalchemy.orm import sessionmaker
 
 from db import Vehicles, Log
 
+debug = True
 use_x = True
 show_bounds = True
 showImage = True
@@ -529,7 +530,7 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
             # look for motion
             motion_found = False
             biggest_area = 0
-
+            
             # examine the contours, looking for the largest one
             for c in cnts:
                 (x, y, w, h) = cv2.boundingRect(c)
@@ -539,11 +540,17 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                 if (found_area > MIN_AREA) and (found_area > biggest_area) and state != STUCK:
                     biggest_area = found_area
                     motion_found = True
+                    cv2.rectangle(image,(x,y),(x+w,y+h),(0,0,255),2)
 
                     if not is_nighttime():
                         rgb = grab_rgb(image, c)
                     else:
                         rgb = 'nighttime'
+                else:
+                    cv2.rectangle(image,(x,y),(x+w,y+h),(255,0,0),2)
+                      
+            if debug:
+                cv2.imshow("DebugView",image)
 
             if motion_found:
                 committed = False
