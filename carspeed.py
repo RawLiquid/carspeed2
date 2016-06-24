@@ -379,7 +379,6 @@ def initialize_camera(camera, res):
     time.sleep(0.9)  # allow the camera to warm up
 
     print("Camera initialized")
-
     return camera, rawCapture
 
 
@@ -530,6 +529,10 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
             # look for motion
             motion_found = False
             biggest_area = 0
+
+            if debug:
+                cv2.imshow("DebugView",image)
+
             
             # examine the contours, looking for the largest one
             for c in cnts:
@@ -549,9 +552,6 @@ while fps_is_set:  # Run loop while FPS is set. Should restart when nighttime th
                 else:
                     cv2.rectangle(image,(x,y),(x+w,y+h),(255,0,0),2)
                       
-            if debug:
-                cv2.imshow("DebugView",image)
-
             if motion_found:
                 committed = False
                 if state == WAITING:
